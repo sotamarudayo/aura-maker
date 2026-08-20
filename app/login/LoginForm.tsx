@@ -1,0 +1,140 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+
+type AuthMode = "login" | "signup";
+
+export default function LoginForm() {
+  const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleEmailAuth(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+
+    if (mode === "signup") {
+      const { error: signupError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        },
+      });
+
+      if (signupError) {
+        setError(signupError.message);
+      } else {
+        setMessage("登録しました。確認メールが届いた場合はリンクを開いてください。");
+      }
+      setLoading(false);
+      return;
+    }
+
+    const { error: signinError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signinError) {
+      setError(signinError.message);
+    } else {
+      router.push("/dashboard");
+      router.refresh();
+    }
+    setLoading(false);
+  }
+
+  async function handleGoogleAuth() {
+    setLoading(true);
+    setError(null);
+
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+      },
+    });
+
+    if (oauthError) {
+      setError(oauthError.message);
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="w-full max-w-md rounded-2xl border border-white/15 bg-black/40 p-6 backdrop-blur">
+      <div className="mb-4 flex gap-2">
+        <button
+          type="button"
+          onClick={() => setMode("login")}
+          className={`rounded-full px-4 py-2 text-sm ${
+            mode === "login" ? "bg-white text-black" : "bg-white/10 text-white"
+          }`}
+        >
+          ログイン
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("signup")}
+          className={`rounded-full px-4 py-2 text-sm ${
+            mode === "signup" ? "bg-white text-black" : "bg-white/10 text-white"
+          }`}
+        >
+          新規登録
+        </button>
+      </div>
+
+      <form onSubmit={handleEmailAuth} className="space-y-3">
+        <input
+          type="email"
+          required
+          placeholder="email@example.com"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white outline-none placeholder:text-white/50"
+        />
+        <input
+          type="password"
+          required
+          minLength={6}
+          placeholder="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white outline-none placeholder:text-white/50"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-lg bg-violet-400 px-4 py-2 font-semibold text-black disabled:opacity-60"
+        >
+          {loading ? "処理中..." : mode === "login" ? "メールでログイン" : "メールで登録"}
+        </button>
+      </form>
+
+      <div className="my-4 h-px bg-white/15" />
+
+      <button
+        type="button"
+        onClick={handleGoogleAuth}
+        disabled={loading}
+        className="w-full rounded-lg border border-white/30 bg-white/5 px-4 py-2 text-white disabled:opacity-60"
+      >
+        Googleで続ける
+      </button>
+
+      {message ? <p className="mt-3 text-sm text-emerald-300">{message}</p> : null}
+      {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
+    </div>
+  );
+}
