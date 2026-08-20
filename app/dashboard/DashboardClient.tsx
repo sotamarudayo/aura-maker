@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
@@ -238,6 +239,15 @@ export default function DashboardClient({
           hasVotes={ranking.length > 0}
           pulse={pulseActive}
         />
+
+        <div className="flex justify-center">
+          <Link
+            href="/auras"
+            className="rounded-full border border-violet-300/40 bg-violet-500/15 px-6 py-3 text-sm font-semibold text-violet-100 transition hover:bg-violet-500/25"
+          >
+            ✨ 全オーラ一覧（図鑑）を見る
+          </Link>
+        </div>
 
         <header className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur sm:p-6">
           <div className="flex flex-wrap items-center gap-3">

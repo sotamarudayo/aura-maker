@@ -1,3 +1,4 @@
+import AppHeader from "@/components/AppHeader";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -46,7 +47,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ja"
       className={`${geistSans.variable} ${geistMono.variable} h-full overflow-x-clip antialiased`}
     >
-      <body className="flex min-h-full flex-col overflow-x-clip">{children}</body>
+      <body className="flex min-h-full flex-col overflow-x-clip">
+        <AppHeader />
+        {children}
+      </body>
     </html>
   );
 }
