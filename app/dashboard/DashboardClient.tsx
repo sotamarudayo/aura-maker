@@ -100,7 +100,10 @@ export default function DashboardClient({
   }, [supabase, userId]);
 
   const ranking = useMemo(() => buildCounts(words), [words]);
-  const auraResult = useMemo(() => calculateAuraType(words), [words]);
+  const auraResult = useMemo(
+    () => calculateAuraType(words, { userId, displayName }),
+    [words, userId, displayName],
+  );
   const palette = auraResult.aura.palette;
   const maxCount = ranking[0]?.[1] ?? 1;
   const shareText = buildVoteShareText(displayName);
@@ -181,7 +184,8 @@ export default function DashboardClient({
         displayName={displayName}
         aura={auraResult.aura}
         description={auraResult.dynamicProfile.mainText}
-        ecology={auraResult.dynamicProfile.ecology}
+        specialMove={auraResult.dynamicProfile.specialMove}
+        dailyFortune={auraResult.dynamicProfile.dailyFortune}
         topWords={auraResult.topWords}
         onSaved={() => {
           setToastMessage("保存しました！");
@@ -233,8 +237,7 @@ export default function DashboardClient({
         <AuraCard
           aura={auraResult.aura}
           catchCopy={auraResult.personalizedCatchCopy}
-          description={auraResult.dynamicProfile.mainText}
-          ecology={auraResult.dynamicProfile.ecology}
+          profile={auraResult.dynamicProfile}
           topWords={auraResult.topWords}
           hasVotes={ranking.length > 0}
           pulse={pulseActive}

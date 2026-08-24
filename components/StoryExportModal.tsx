@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { toPng } from "html-to-image";
-import type { AuraEcology, AuraType } from "@/lib/constants/auras";
+import type { AuraType } from "@/lib/constants/auras";
 import { RARITY_LABELS } from "@/lib/constants/auras";
 
 type StoryExportModalProps = {
@@ -12,7 +12,8 @@ type StoryExportModalProps = {
   displayName: string;
   aura: AuraType;
   description: string;
-  ecology?: AuraEcology | null;
+  specialMove?: string;
+  dailyFortune?: string;
   topWords: string[];
   onSaved?: () => void;
 };
@@ -23,7 +24,8 @@ export default function StoryExportModal({
   displayName,
   aura,
   description,
-  ecology,
+  specialMove,
+  dailyFortune,
   topWords,
   onSaved,
 }: StoryExportModalProps) {
@@ -35,12 +37,12 @@ export default function StoryExportModal({
 
   const words = topWords.slice(0, 3);
   const shortDescription =
-    description.length > 72 ? `${description.slice(0, 72)}…` : description;
-  const ecologyLine = ecology
-    ? `⚡${ecology.trigger} / 🩹${ecology.weakness}`
-    : null;
-  const shortEcology =
-    ecologyLine && ecologyLine.length > 48 ? `${ecologyLine.slice(0, 48)}…` : ecologyLine;
+    description.length > 60 ? `${description.slice(0, 60)}…` : description;
+  const storyExtra = [specialMove ? `💥${specialMove}` : null, dailyFortune]
+    .filter(Boolean)
+    .join(" / ");
+  const shortExtra =
+    storyExtra && storyExtra.length > 42 ? `${storyExtra.slice(0, 42)}…` : storyExtra;
 
   async function handleDownload() {
     if (!canvasRef.current || exporting) return;
@@ -199,7 +201,7 @@ export default function StoryExportModal({
                 >
                   {shortDescription}
                 </p>
-                {shortEcology ? (
+                {shortExtra ? (
                   <p
                     style={{
                       marginTop: 8,
@@ -208,7 +210,7 @@ export default function StoryExportModal({
                       color: "rgba(196,181,253,0.85)",
                     }}
                   >
-                    {shortEcology}
+                    {shortExtra}
                   </p>
                 ) : null}
               </div>

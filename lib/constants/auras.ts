@@ -30,9 +30,45 @@ export type AuraEcology = {
   weakness: string;
 };
 
+export type AuraStats = {
+  social: number;
+  neta: number;
+  mystic: number;
+  heal: number;
+  gap: number;
+};
+
+export type AuraContradiction = {
+  wordA: string;
+  wordB: string;
+  text: string;
+};
+
+export type AuraCompatibility = {
+  good: { id: string; name: string };
+  bad: { id: string; name: string };
+};
+
+export type AuraAwakening = {
+  percent: number;
+  hint: string;
+};
+
 export type DynamicAuraProfile = {
   mainText: string;
   ecology: AuraEcology;
+  stats: AuraStats;
+  specialMove: string;
+  contradiction: AuraContradiction | null;
+  compatibility: AuraCompatibility;
+  shareLine: string;
+  dailyFortune: string;
+  awakening: AuraAwakening;
+};
+
+export type AuraCalculationOptions = {
+  userId?: string;
+  displayName?: string;
 };
 
 export type AuraCalculationResult = {
@@ -40,6 +76,19 @@ export type AuraCalculationResult = {
   topWords: string[];
   personalizedCatchCopy: string;
   dynamicProfile: DynamicAuraProfile;
+};
+
+const DORMANT_STATS: AuraStats = {
+  social: 10,
+  neta: 10,
+  mystic: 10,
+  heal: 10,
+  gap: 10,
+};
+
+const DORMANT_COMPATIBILITY: AuraCompatibility = {
+  good: { id: "healing-mint", name: "癒しのミントオーラ" },
+  bad: { id: "chaos-neon", name: "陽気なカオスオーラ" },
 };
 
 const DORMANT_ECOLOGY: AuraEcology = {
@@ -744,13 +793,13 @@ function pickStable<T>(items: readonly T[], seed: string): T {
   return items[hash % items.length]!;
 }
 
-function findContradiction(topWords: string[]): string | null {
+function findContradictionDetail(topWords: string[]): AuraContradiction | null {
   const wordSet = new Set(topWords);
   for (const pair of CONTRADICTION_PAIRS) {
     const wordA = topWords.find((word) => pair.groupA.includes(word));
     const wordB = topWords.find((word) => pair.groupB.includes(word));
     if (wordA && wordB && wordSet.has(wordA) && wordSet.has(wordB)) {
-      return pair.opener(wordA, wordB);
+      return { wordA, wordB, text: pair.opener(wordA, wordB) };
     }
   }
   return null;
@@ -831,25 +880,233 @@ function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
   };
 }
 
-export function generateDynamicDescription(aura: AuraType, topWords: string[]): DynamicAuraProfile {
+const SPECIAL_MOVE_BY_WORD: Partial<Record<string, readonly string[]>> = {
+  限界オタク: ["推し語り無双", "オタク語録ラッシュ"],
+  推ししか勝たん: ["推し一択爆発", "推し語りタイphoon"],
+  突然ボケる: ["不意打ちボケ", "空気白けてからの一撃"],
+  既読スルー魔: ["既読スルーの極意", "返信保留フィニッシュ"],
+  だるいのに有能: ["だる顔必殺仕事", "締切前覚醒"],
+  理論武装: ["論破モード全開", "説教フィニッシュ"],
+  草不可避: ["草を生やす笑い", "場を凍らせてからボケ"],
+  飯テロ魔: ["飯テロ連打", "深夜メシ誘惑"],
+  天才的バカ: ["天才とバカの同時発火", "神プレイと大失態"],
+};
+
+const DAILY_FORTUNES: readonly string[] = [
+  "推しの話をすると大吉",
+  "既読スルーは凶・返信早めは吉",
+  "飲み会で場を盛り上げると吉",
+  "深夜テンション全開に注意（吉）",
+  "理論武装は午後が吉、朝は凶",
+  "新しい印象ワードが集まると大吉",
+  "だるいのに有能モード発動で吉",
+  "飯テロは罪なき者にのみ吉",
+  "突然ボケると周囲の運が上がる",
+  "グルチャ未読は凶・直接連絡は吉",
+];
+
+function clampStat(value: number): number {
+  return Math.min(100, Math.max(12, Math.round(value)));
+}
+
+function buildStats(votes: string[]): AuraStats {
+  const totals = { social: 0, neta: 0, mystic: 0, heal: 0, gap: 0 };
+  let weight = 0;
+
+  for (const word of votes) {
+    const def = getVoteWordDef(word);
+    if (!def) continue;
+    weight += 1;
+
+    if (
+      def.category === "vibes" ||
+      def.auraCategory.includes("warm") ||
+      def.auraCategory.includes("hero")
+    ) {
+      totals.social += 2;
+    }
+    if (def.category === "chaos" || def.auraCategory.includes("chaos")) {
+      totals.neta += 2.5;
+    }
+    if (
+      def.auraCategory.includes("mystic") ||
+      def.auraCategory.includes("void") ||
+      def.auraCategory.includes("crystal")
+    ) {
+      totals.mystic += 2;
+    }
+    if (def.auraCategory.includes("heal")) {
+      totals.heal += 2;
+    }
+    if (def.category === "gap" || def.auraCategory.includes("imp")) {
+      totals.gap += 2.5;
+    }
+  }
+
+  const base = Math.max(weight, 1);
+  return {
+    social: clampStat(28 + (totals.social / base) * 22),
+    neta: clampStat(28 + (totals.neta / base) * 22),
+    mystic: clampStat(28 + (totals.mystic / base) * 22),
+    heal: clampStat(28 + (totals.heal / base) * 22),
+    gap: clampStat(28 + (totals.gap / base) * 22),
+  };
+}
+
+function attributeConflictScore(
+  aAttrs: readonly AuraAttribute[],
+  bAttrs: readonly AuraAttribute[],
+): number {
+  let score = 0;
+  if (bAttrs.includes("void") && (aAttrs.includes("warm") || aAttrs.includes("hero"))) score += 3;
+  if (bAttrs.includes("chaos") && aAttrs.includes("heal")) score += 3;
+  if (bAttrs.includes("crystal") && aAttrs.includes("warm")) score += 2;
+  if (bAttrs.includes("god") && aAttrs.includes("heal")) score += 2;
+  if (bAttrs.includes("void") && aAttrs.includes("chaos")) score += 1;
+  return score;
+}
+
+function buildCompatibility(aura: AuraType): AuraCompatibility {
+  const pool = AURA_TYPES.filter((item) => item.id !== aura.id);
+  if (pool.length === 0) return DORMANT_COMPATIBILITY;
+
+  let bestGood = pool[0]!;
+  let bestGoodScore = -1;
+  let bestBad = pool[0]!;
+  let bestBadScore = -1;
+
+  for (const other of pool) {
+    let synergy = 0;
+    for (const attr of aura.attributes) {
+      if (other.attributes.includes(attr)) synergy += 3;
+    }
+    const sharedKeywords = aura.keywords.filter((keyword) => other.keywords.includes(keyword)).length;
+    synergy += sharedKeywords * 2;
+
+    if (synergy > bestGoodScore) {
+      bestGoodScore = synergy;
+      bestGood = other;
+    }
+
+    const conflict = attributeConflictScore(aura.attributes, other.attributes);
+    if (conflict > bestBadScore) {
+      bestBadScore = conflict;
+      bestBad = other;
+    }
+  }
+
+  if (bestGood.id === bestBad.id) {
+    bestBad = pool.find((item) => item.id !== bestGood.id) ?? bestBad;
+  }
+
+  return {
+    good: { id: bestGood.id, name: bestGood.name },
+    bad: { id: bestBad.id, name: bestBad.name },
+  };
+}
+
+function buildSpecialMove(aura: AuraType, topWords: string[]): string {
+  for (const word of topWords) {
+    const moves = SPECIAL_MOVE_BY_WORD[word];
+    if (moves) {
+      return pickStable(moves, `move:${word}:${aura.id}`);
+    }
+  }
+
+  const primary = topWords[0] ?? "オーラ";
+  return pickStable(
+    [
+      `究極・${primary}フィニッシュ`,
+      `秘技「${primary}全開」`,
+      `${primary}の領域展開`,
+    ],
+    `move-default:${aura.id}:${primary}`,
+  );
+}
+
+function buildShareLine(aura: AuraType, topWords: string[], displayName?: string): string {
+  const who = displayName ? `${displayName}の` : "自分の";
+  const shortName = aura.name.replace(/オーラ$/, "");
+  const tags =
+    topWords.length > 0 ? topWords.map((word) => `#${word}`).join(" ") : "#AuraMaker";
+  return `友達から見た${who}オーラ「${shortName}」\n${tags} #AuraMaker`;
+}
+
+function buildDailyFortune(userId: string | undefined, aura: AuraType): string {
+  const today = new Date().toISOString().slice(0, 10);
+  const fortune = pickStable(DAILY_FORTUNES, `${userId ?? "guest"}:${today}:${aura.id}`);
+  return `今日のオーラ運：${fortune}`;
+}
+
+function buildAwakening(votes: string[]): AuraAwakening {
+  const total = votes.length;
+  const unique = new Set(votes).size;
+  let percent = Math.min(100, Math.round(12 + Math.log10(total + 1) * 28 + unique * 6));
+  if (total >= 20) percent = Math.min(100, percent + 8);
+
+  let hint: string;
+  if (total === 0) {
+    hint = "投票URLをシェアして覚醒させよう";
+  } else if (total < 3) {
+    hint = `あと${3 - total}票でオーラが安定`;
+  } else if (total < 10) {
+    hint = `あと${10 - total}票で覚醒度アップ`;
+  } else if (unique < 8) {
+    hint = "いろんな印象ワードが集まると進化の兆し";
+  } else {
+    hint = "シークレットオーラの条件が近づいている…？";
+  }
+
+  return { percent, hint };
+}
+
+function buildDynamicProfile(
+  aura: AuraType,
+  topWords: string[],
+  votes: string[],
+  options?: AuraCalculationOptions,
+): DynamicAuraProfile {
   if (aura.id === "dormant" || topWords.length === 0) {
     return {
       mainText: aura.description,
       ecology: DORMANT_ECOLOGY,
+      stats: DORMANT_STATS,
+      specialMove: "（覚醒待ち）",
+      contradiction: null,
+      compatibility: DORMANT_COMPATIBILITY,
+      shareLine: buildShareLine(aura, topWords, options?.displayName),
+      dailyFortune: "投票が集まると今日のオーラ占いが解放されます",
+      awakening: buildAwakening(votes),
     };
   }
 
-  const gapRoast = findContradiction(topWords);
+  const contradiction = findContradictionDetail(topWords);
   const witness = buildWitness(aura, topWords);
   const praise = buildPraise(aura, topWords);
   const punchline = buildPunchline(aura, topWords);
-
-  const mainText = [gapRoast, witness, praise, punchline].filter(Boolean).join("");
+  const mainText = [witness, praise, punchline].filter(Boolean).join("");
 
   return {
     mainText,
     ecology: buildEcology(aura, topWords),
+    stats: buildStats(votes),
+    specialMove: buildSpecialMove(aura, topWords),
+    contradiction,
+    compatibility: buildCompatibility(aura),
+    shareLine: buildShareLine(aura, topWords, options?.displayName),
+    dailyFortune: buildDailyFortune(options?.userId, aura),
+    awakening: buildAwakening(votes),
   };
+}
+
+/** @deprecated buildDynamicProfile を使用 */
+export function generateDynamicDescription(
+  aura: AuraType,
+  topWords: string[],
+  votes: string[] = topWords,
+  options?: AuraCalculationOptions,
+): DynamicAuraProfile {
+  return buildDynamicProfile(aura, topWords, votes, options);
 }
 
 const SECRET_FLAVOR =
@@ -939,16 +1196,16 @@ function scoreAura(aura: AuraType, counts: Map<string, number>, topWords: string
   return score;
 }
 
-export function calculateAuraType(votes: string[]): AuraCalculationResult {
+export function calculateAuraType(
+  votes: string[],
+  options?: AuraCalculationOptions,
+): AuraCalculationResult {
   if (votes.length === 0) {
     return {
       aura: DORMANT_AURA,
       topWords: [],
       personalizedCatchCopy: DORMANT_AURA.catchCopy,
-      dynamicProfile: {
-        mainText: DORMANT_AURA.description,
-        ecology: DORMANT_ECOLOGY,
-      },
+      dynamicProfile: buildDynamicProfile(DORMANT_AURA, [], votes, options),
     };
   }
 
@@ -962,7 +1219,7 @@ export function calculateAuraType(votes: string[]): AuraCalculationResult {
       aura: secret,
       topWords,
       personalizedCatchCopy: personalizeCatchCopy(secret, topWords),
-      dynamicProfile: generateDynamicDescription(secret, topWords),
+      dynamicProfile: buildDynamicProfile(secret, topWords, votes, options),
     };
   }
 
@@ -982,7 +1239,7 @@ export function calculateAuraType(votes: string[]): AuraCalculationResult {
     aura: bestAura,
     topWords,
     personalizedCatchCopy: personalizeCatchCopy(bestAura, topWords),
-    dynamicProfile: generateDynamicDescription(bestAura, topWords),
+    dynamicProfile: buildDynamicProfile(bestAura, topWords, votes, options),
   };
 }
 
