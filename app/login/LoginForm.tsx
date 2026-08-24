@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import OAuthButtons from "@/components/OAuthButtons";
 import { createClient } from "@/utils/supabase/client";
 
 type AuthMode = "login" | "signup";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = useMemo(() => createClient(), []);
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
@@ -16,6 +18,13 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const authError = searchParams.get("error");
+    if (authError) {
+      setError(decodeURIComponent(authError));
+    }
+  }, [searchParams]);
 
   async function handleEmailAuth(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,23 +64,6 @@ export default function LoginForm() {
     setLoading(false);
   }
 
-  async function handleGoogleAuth() {
-    setLoading(true);
-    setError(null);
-
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-      },
-    });
-
-    if (oauthError) {
-      setError(oauthError.message);
-      setLoading(false);
-    }
-  }
-
   return (
     <div className="w-full max-w-md rounded-2xl border border-white/15 bg-black/40 p-6 backdrop-blur">
       <div className="mb-4 flex gap-2">
@@ -94,6 +86,15 @@ export default function LoginForm() {
           新規登録
         </button>
       </div>
+
+      <OAuthButtons
+        mode="signin"
+        loading={loading}
+        onLoadingChange={setLoading}
+        onError={setError}
+      />
+
+      <div className="my-4 h-px bg-white/15" />
 
       <form onSubmit={handleEmailAuth} className="space-y-3">
         <input
@@ -121,17 +122,6 @@ export default function LoginForm() {
           {loading ? "処理中..." : mode === "login" ? "メールでログイン" : "メールで登録"}
         </button>
       </form>
-
-      <div className="my-4 h-px bg-white/15" />
-
-      <button
-        type="button"
-        onClick={handleGoogleAuth}
-        disabled={loading}
-        className="w-full rounded-lg border border-white/30 bg-white/5 px-4 py-2 text-white disabled:opacity-60"
-      >
-        Googleで続ける
-      </button>
 
       {message ? <p className="mt-3 text-sm text-emerald-300">{message}</p> : null}
       {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}

@@ -5,10 +5,21 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const next = url.searchParams.get("next") ?? "/dashboard";
+  const oauthError = url.searchParams.get("error");
+  const oauthErrorDescription = url.searchParams.get("error_description");
+
+  if (oauthError) {
+    const message = oauthErrorDescription ?? oauthError;
+    return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(message)}`, url.origin));
+  }
 
   if (code) {
     const supabase = await createClient();
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, url.origin));
+    }
   }
 
   return NextResponse.redirect(new URL(next, url.origin));

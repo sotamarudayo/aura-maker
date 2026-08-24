@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import OAuthButtons from "@/components/OAuthButtons";
 import { createClient } from "@/utils/supabase/client";
 
 type LinkAccountModalProps = {
@@ -45,24 +46,6 @@ export default function LinkAccountModal({ open, onClose, onLinked }: LinkAccoun
     setLoading(false);
   }
 
-  async function handleOAuthLink(provider: "google" | "twitter") {
-    setLoading(true);
-    setError(null);
-    setMessage(null);
-
-    const { error: linkError } = await supabase.auth.linkIdentity({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-      },
-    });
-
-    if (linkError) {
-      setError(linkError.message);
-      setLoading(false);
-    }
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
       <div className="w-full max-w-md rounded-2xl border border-white/20 bg-zinc-950 p-6 text-white shadow-2xl">
@@ -82,6 +65,15 @@ export default function LinkAccountModal({ open, onClose, onLinked }: LinkAccoun
           </button>
         </div>
 
+        <OAuthButtons
+          mode="link"
+          loading={loading}
+          onLoadingChange={setLoading}
+          onError={setError}
+        />
+
+        <div className="my-4 h-px bg-white/15" />
+
         <form onSubmit={handleEmailLink} className="space-y-3">
           <input
             type="email"
@@ -98,7 +90,7 @@ export default function LinkAccountModal({ open, onClose, onLinked }: LinkAccoun
             placeholder="password（6文字以上）"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white outline-none placeholder:text-white/50"
+            className="w-full rounded-lg border border-white/10 px-3 py-2 text-white outline-none placeholder:text-white/50"
           />
           <button
             type="submit"
@@ -108,27 +100,6 @@ export default function LinkAccountModal({ open, onClose, onLinked }: LinkAccoun
             {loading ? "連携中..." : "メールで連携する"}
           </button>
         </form>
-
-        <div className="my-4 h-px bg-white/15" />
-
-        <div className="space-y-2">
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => handleOAuthLink("google")}
-            className="w-full rounded-lg border border-white/30 bg-white/5 px-4 py-2 disabled:opacity-70"
-          >
-            Googleで連携
-          </button>
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => handleOAuthLink("twitter")}
-            className="w-full rounded-lg border border-white/30 bg-white/5 px-4 py-2 disabled:opacity-70"
-          >
-            X（Twitter）で連携
-          </button>
-        </div>
 
         {message ? <p className="mt-3 text-sm text-emerald-300">{message}</p> : null}
         {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}

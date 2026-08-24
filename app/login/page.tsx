@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import AnonymousStartButton from "@/components/AnonymousStartButton";
 import AuraBackground from "@/components/AuraBackground";
@@ -26,7 +27,9 @@ export default async function LoginPage() {
           <AnonymousStartButton />
         </div>
         <div className="mx-auto">
-          <LoginForm />
+          <Suspense fallback={<div className="h-40" />}>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </main>
