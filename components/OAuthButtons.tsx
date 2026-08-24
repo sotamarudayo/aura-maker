@@ -60,7 +60,7 @@ export default function OAuthButtons({
     }
   }
 
-  const providers: OAuthProvider[] = ["google", "twitter"];
+  const providers: OAuthProvider[] = ["google", "x"];
 
   return (
     <div className="space-y-2">

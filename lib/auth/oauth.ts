@@ -1,4 +1,4 @@
-export type OAuthProvider = "google" | "twitter";
+export type OAuthProvider = "google" | "x";
 
 export function buildAuthCallbackUrl(next = "/dashboard") {
   if (typeof window === "undefined") {
@@ -10,5 +10,5 @@ export function buildAuthCallbackUrl(next = "/dashboard") {
 
 export const OAUTH_PROVIDER_LABELS: Record<OAuthProvider, string> = {
   google: "Google",
-  twitter: "X（Twitter）",
+  x: "X（Twitter）",
 };
