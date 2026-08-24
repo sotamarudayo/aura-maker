@@ -6,6 +6,7 @@ import AuraBackground from "@/components/AuraBackground";
 import {
   VOTE_CATEGORY_LABELS,
   VOTE_WORD_DEFS,
+  getCategoryWordCount,
   getWordsByCategory,
   type VoteCategory,
   type VoteWord,
@@ -192,6 +193,10 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
         <div className="mt-5 flex flex-wrap gap-2">
           {FILTER_TABS.map((tab) => {
             const active = category === tab;
+            const countLabel =
+              tab === "all"
+                ? "おすすめ12"
+                : `${getCategoryWordCount(tab)}語`;
             return (
               <button
                 key={tab}
@@ -204,10 +209,21 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
                 }`}
               >
                 {VOTE_CATEGORY_LABELS[tab]}
+                <span className="ml-1 text-[10px] opacity-70">({countLabel})</span>
               </button>
             );
           })}
         </div>
+
+        {category === "all" ? (
+          <p className="mt-3 text-xs text-violet-200/90">
+            🔥 よく選ばれる12語。もっと探すなら上のカテゴリタブをタップ（全{VOTE_WORD_DEFS.length}語）
+          </p>
+        ) : (
+          <p className="mt-3 text-xs text-white/55">
+            {VOTE_CATEGORY_LABELS[category]}カテゴリから選べます
+          </p>
+        )}
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {visibleWords.map((word) => {

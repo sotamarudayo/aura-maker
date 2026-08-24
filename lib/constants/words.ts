@@ -263,7 +263,197 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     category: "secret",
     auraCategory: ["god", "hero", "legend"],
   },
+
+  // --- ネタ拡充（60語） ---
+
+  // ビジュアル追加
+  {
+    id: "shashin-ugarisug",
+    label: "写真写り良すぎ",
+    category: "visual",
+    auraCategory: ["hero", "warm", "imp"],
+  },
+  {
+    id: "jidori-no-oni",
+    label: "自撮りの鬼",
+    category: "visual",
+    auraCategory: ["hero", "chaos", "imp"],
+  },
+
+  // バイブス追加
+  {
+    id: "henshin-hayasug",
+    label: "返信早すぎ",
+    category: "vibes",
+    auraCategory: ["heal", "warm", "imp"],
+  },
+  {
+    id: "kidoku-suru-ma",
+    label: "既読スルー魔",
+    category: "vibes",
+    auraCategory: ["cool", "void", "imp"],
+  },
+  {
+    id: "kuuki-yomisug",
+    label: "空気読みすぎ",
+    category: "vibes",
+    auraCategory: ["heal", "cool", "void"],
+  },
+  {
+    id: "nomikai-junkan",
+    label: "飲み会の潤滑油",
+    category: "vibes",
+    auraCategory: ["warm", "hero", "chaos"],
+  },
+
+  // ネタ・カオス追加
+  {
+    id: "yotei-cancel",
+    label: "予定キャンセル多め",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "void"],
+  },
+  {
+    id: "ronri-busou",
+    label: "理論武装",
+    category: "chaos",
+    auraCategory: ["intellect", "chaos", "otaku"],
+  },
+  {
+    id: "totsuzen-boke",
+    label: "突然ボケる",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "warm"],
+  },
+  {
+    id: "reaction-kajo",
+    label: "リアクション過剰",
+    category: "chaos",
+    auraCategory: ["chaos", "warm", "imp"],
+  },
+  {
+    id: "meshi-tero",
+    label: "飯テロ魔",
+    category: "chaos",
+    auraCategory: ["chaos", "warm", "otaku"],
+  },
+  {
+    id: "chikoku-joshu",
+    label: "遅刻常習",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "void"],
+  },
+  {
+    id: "tension-hokei",
+    label: "テンション継続不能",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "otaku"],
+  },
+  {
+    id: "goi-netto",
+    label: "語彙がネット",
+    category: "chaos",
+    auraCategory: ["chaos", "otaku", "intellect"],
+  },
+  {
+    id: "sekkyo-mode",
+    label: "説教モード",
+    category: "chaos",
+    auraCategory: ["intellect", "hero", "chaos"],
+  },
+  {
+    id: "neochi-tanto",
+    label: "寝落ち担当",
+    category: "chaos",
+    auraCategory: ["void", "heal", "imp"],
+  },
+  {
+    id: "jigaku-neta",
+    label: "自虐ネタ過多",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "warm"],
+  },
+  {
+    id: "oshi-shika-katan",
+    label: "推ししか勝たん",
+    category: "chaos",
+    auraCategory: ["otaku", "chaos", "hero"],
+  },
+
+  // ギャップ追加
+  {
+    id: "darui-non-yuuno",
+    label: "だるいのに有能",
+    category: "gap",
+    auraCategory: ["intellect", "imp", "void"],
+  },
+  {
+    id: "hito-mishiri",
+    label: "人見知り",
+    category: "gap",
+    auraCategory: ["cool", "mystic", "void"],
+  },
+  {
+    id: "emoi",
+    label: "エモい",
+    category: "gap",
+    auraCategory: ["mystic", "warm", "imp"],
+  },
+  {
+    id: "oshikatsu-no-oni",
+    label: "推し活の鬼",
+    category: "gap",
+    auraCategory: ["otaku", "hero", "chaos"],
+  },
+  {
+    id: "kuchihazuk-non-dokuzetsu",
+    label: "口下手なのに毒舌",
+    category: "gap",
+    auraCategory: ["imp", "intellect", "cool"],
+  },
+
+  // サブカル追加
+  {
+    id: "ichininshou-tsuyoi",
+    label: "一人称が強い",
+    category: "secret",
+    auraCategory: ["chaos", "hero", "otaku"],
+  },
+  {
+    id: "gruchat-midoku",
+    label: "グルチャ未読",
+    category: "secret",
+    auraCategory: ["void", "cool", "imp"],
+  },
+  {
+    id: "onchi-non-atsui",
+    label: "音痴なのに熱い",
+    category: "secret",
+    auraCategory: ["chaos", "warm", "imp"],
+  },
+  {
+    id: "warai-no-inryoku",
+    label: "笑いの引力",
+    category: "secret",
+    auraCategory: ["warm", "chaos", "hero"],
+  },
 ] as const;
+
+/** 「すべて」タブ用：よく選ばれる12語（全60語はカテゴリタブから） */
+export const RECOMMENDED_WORD_LABELS: readonly string[] = [
+  "ギャップの鬼",
+  "天才的バカ",
+  "草不可避",
+  "限界オタク",
+  "NPC",
+  "だるいのに有能",
+  "突然ボケる",
+  "既読スルー魔",
+  "推ししか勝たん",
+  "リアクション過剰",
+  "カリスマ",
+  "癒やし枠",
+];
 
 export const VOTE_WORDS = VOTE_WORD_DEFS.map((word) => word.label);
 
@@ -274,6 +464,15 @@ export function getVoteWordDef(label: string): VoteWordDef | undefined {
 }
 
 export function getWordsByCategory(category: VoteCategory | "all") {
-  if (category === "all") return VOTE_WORD_DEFS;
+  if (category === "all") {
+    return RECOMMENDED_WORD_LABELS.flatMap((label) => {
+      const def = getVoteWordDef(label);
+      return def ? [def] : [];
+    });
+  }
   return VOTE_WORD_DEFS.filter((word) => word.category === category);
+}
+
+export function getCategoryWordCount(category: VoteCategory) {
+  return VOTE_WORD_DEFS.filter((word) => word.category === category).length;
 }

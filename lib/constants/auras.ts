@@ -73,7 +73,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 25% 20%, #fbbf24, transparent 45%), radial-gradient(circle at 80% 30%, #fb7185, transparent 50%), linear-gradient(135deg, #1a0f00 0%, #3b1d05 100%)",
     palette: { a: "#fbbf24", b: "#fb7185", c: "#f97316" },
-    keywords: ["ビジュ爆発", "圧倒的主人公", "カリスマ", "陽キャバイブス", "頼れる相棒", "シルエット強め"],
+    keywords: ["ビジュ爆発", "圧倒的主人公", "カリスマ", "陽キャバイブス", "頼れる相棒", "シルエット強め", "写真写り良すぎ", "自撮りの鬼"],
     attributes: ["hero", "warm"],
     rarity: "common",
   },
@@ -99,7 +99,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 30% 25%, #fb923c, transparent 45%), radial-gradient(circle at 75% 65%, #fbbf24, transparent 50%), linear-gradient(135deg, #2a1200 0%, #1a0f00 100%)",
     palette: { a: "#fb923c", b: "#fbbf24", c: "#f97316" },
-    keywords: ["陽キャバイブス", "草不可避", "深夜テンション", "平成レトロ"],
+    keywords: ["陽キャバイブス", "草不可避", "深夜テンション", "平成レトロ", "飲み会の潤滑油", "笑いの引力"],
     attributes: ["warm", "chaos"],
     rarity: "common",
   },
@@ -138,7 +138,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 25% 25%, #e879f9, transparent 45%), radial-gradient(circle at 75% 35%, #22d3ee, transparent 50%), radial-gradient(circle at 50% 80%, #f43f5e, transparent 55%), linear-gradient(135deg, #1a0520 0%, #0c1222 100%)",
     palette: { a: "#e879f9", b: "#22d3ee", c: "#f43f5e" },
-    keywords: ["深夜テンション", "治安悪め", "天才的バカ", "草不可避", "距離感バグ", "バグ技"],
+    keywords: ["深夜テンション", "治安悪め", "天才的バカ", "草不可避", "距離感バグ", "バグ技", "突然ボケる", "リアクション過剰"],
     attributes: ["chaos", "imp"],
     rarity: "uncommon",
   },
@@ -177,7 +177,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 30% 20%, #f472b6, transparent 45%), radial-gradient(circle at 70% 70%, #a855f7, transparent 50%), linear-gradient(135deg, #2a0a1f 0%, #1a1033 100%)",
     palette: { a: "#f472b6", b: "#a855f7", c: "#ec4899" },
-    keywords: ["ギャップの鬼", "ツンデレ", "クールに見えてドジ", "天然毒舌", "距離感バグ"],
+    keywords: ["ギャップの鬼", "ツンデレ", "クールに見えてドジ", "天然毒舌", "距離感バグ", "だるいのに有能", "口下手なのに毒舌", "人見知り"],
     attributes: ["imp", "chaos"],
     rarity: "rare",
   },
@@ -203,7 +203,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 20% 30%, #818cf8, transparent 45%), radial-gradient(circle at 80% 50%, #c084fc, transparent 50%), radial-gradient(circle at 50% 85%, #22d3ee, transparent 55%), linear-gradient(135deg, #0f0a2e 0%, #1a0a2e 100%)",
     palette: { a: "#818cf8", b: "#c084fc", c: "#22d3ee" },
-    keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC"],
+    keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC", "推し活の鬼", "推ししか勝たん"],
     attributes: ["otaku", "chaos"],
     rarity: "rare",
   },
@@ -354,6 +354,33 @@ const WORD_NUANCE: Record<string, string> = {
   バグ技: "仕様外の一手",
   異次元: "ズレた次元感",
   チート級: "バランス崩壊級",
+  写真写り良すぎ: "盛れすぎ問題",
+  自撮りの鬼: "自撮り全振り",
+  返信早すぎ: "返信速度バグ",
+  既読スルー魔: "既読放置力",
+  空気読みすぎ: "配慮過多",
+  飲み会の潤滑油: "場の潤滑油",
+  予定キャンセル多め: "ドタキャ属性",
+  理論武装: "論破待ち",
+  突然ボケる: "不意打ちボケ",
+  リアクション過剰: "リアクション特大",
+  飯テロ魔: "飯テロ力",
+  遅刻常習: "時間感覚バグ",
+  テンション継続不能: "テンション消耗早",
+  語彙がネット: "ネット語彙100%",
+  説教モード: "説教全開",
+  寝落ち担当: "寝落ち率最高",
+  自虐ネタ過多: "自虐ネタ過剰",
+  推ししか勝たん: "推し一択",
+  だるいのに有能: "だるさと有能の矛盾",
+  人見知り: "人見知り全開",
+  エモい: "エモさ全開",
+  推し活の鬼: "推し活全振り",
+  口下手なのに毒舌: "口下手×毒舌",
+  一人称が強い: "一人称がキャラ",
+  グルチャ未読: "既読回避",
+  音痴なのに熱い: "音痴なのに情熱",
+  笑いの引力: "笑いを引き寄せる",
 };
 
 type ContradictionPair = {
@@ -399,6 +426,18 @@ const CONTRADICTION_PAIRS: ContradictionPair[] = [
     opener: (a, b) =>
       `普段は「${a}」を装っているのに、特定条件下で「${b}」が漏れ出すタイプ。周囲はいつスイッチが入るか読めません。`,
   },
+  {
+    groupA: ["返信早すぎ", "癒やし枠", "頼れる相棒"],
+    groupB: ["既読スルー魔", "グルチャ未読", "NPC"],
+    opener: (a, b) =>
+      `「${a}」なのに「${b}」も入っている通信障害タイプ。距離感の更新頻度が友達を翻弄しています。`,
+  },
+  {
+    groupA: ["だるいのに有能", "寝落ち担当", "予定キャンセル多め"],
+    groupB: ["圧倒的主人公", "カリスマ", "説教モード"],
+    opener: (a, b) =>
+      `「${a}」と「${b}」の矛盾。サボってるように見えて要所で仕事する、説教だけは本気、という不可解なキャラです。`,
+  },
 ];
 
 const WITNESS_BY_WORD: Record<string, readonly string[]> = {
@@ -437,6 +476,22 @@ const WITNESS_BY_WORD: Record<string, readonly string[]> = {
   天才的バカ: [
     "周囲からは『天才なのかバカなのか』として認識されています",
     "一見ドジですが、要所で神プレイを見せます",
+  ],
+  既読スルー魔: [
+    "周囲からは『既読つくのに返信来ない人』として認識されています",
+    "一見クールですが、実は返信迷子タイプです",
+  ],
+  だるいのに有能: [
+    "周囲からは『サボってるのに仕事できる人』として認識されています",
+    "一見だるそうですが、要所で急に有能になります",
+  ],
+  推ししか勝たん: [
+    "周囲からは『推しの話になると別人』として認識されています",
+    "推し以外の話題だと急に省エネモードになります",
+  ],
+  突然ボケる: [
+    "周囲からは『真面目な場で急にボケる人』として認識されています",
+    "空気が白けた瞬間にツッコミどころを提供します",
   ],
   実は寂しがり: [
     "周囲からは『意外と寂しがりそうな人』として認識されています",
@@ -509,6 +564,30 @@ const PUNCHLINE_BY_WORD: Record<string, readonly string[]> = {
   草不可避: [
     "ただし真面目な場でも笑い我慢が限界になります",
     "ツッコミ待ちの空気を作ってしまいます",
+  ],
+  既読スルー魔: [
+    "ただし返信が来ると長文で返してくることがあります",
+    "既読だけは秒速、返信は別人格が担当します",
+  ],
+  だるいのに有能: [
+    "ただし本番5分前に急に覚醒します",
+    "普段はだるいのに締切前だけチート級になります",
+  ],
+  突然ボケる: [
+    "ただし空気が白けた直後に一番面白いことを言います",
+    "真面目な会議中に限ってボケが入ります",
+  ],
+  推ししか勝たん: [
+    "ただし推しの話以外は返答が短くなります",
+    "推しの話題になると早口モードに入ります",
+  ],
+  理論武装: [
+    "ただし好きな話題になると説教モード全開です",
+    "議論が始まると帰宅時間が不明になります",
+  ],
+  飯テロ魔: [
+    "ただし深夜にグルチャで飯テロを仕掛けます",
+    "お腹が空いてない時でも飯の話でテンションが上がります",
   ],
 };
 
@@ -601,6 +680,31 @@ const ECOLOGY_BY_WORD: Partial<Record<string, AuraEcology>> = {
     trigger: "ネタ枠 / 空気が白けた時",
     sideEffect: "周囲の笑いが止まらなくなる",
     weakness: "真面目モード / 厳しい上司",
+  },
+  既読スルー魔: {
+    trigger: "返信内容を考えすぎる / 通知が多い",
+    sideEffect: "相手の既読確認が止まらなくなる",
+    weakness: "「返信早く」 / 電話",
+  },
+  だるいのに有能: {
+    trigger: "締切直前 / 本番5分前",
+    sideEffect: "周囲が「なんで今できる？」と混乱する",
+    weakness: "余裕がある時 / 朝の時間帯",
+  },
+  突然ボケる: {
+    trigger: "空気が白けた / 真面目な場",
+    sideEffect: "周囲の笑いが止まらなくなる",
+    weakness: "真剣な相談 / 初対面",
+  },
+  推ししか勝たん: {
+    trigger: "推しの話題 / ライブ前後",
+    sideEffect: "会話が推し一方向に流れる",
+    weakness: "ネタバレ / 推しの不調",
+  },
+  理論武装: {
+    trigger: "好きな話題 / 議論",
+    sideEffect: "周囲がツッコミ役に就く",
+    weakness: "雑談のみ / 時間制限",
   },
 };
 
