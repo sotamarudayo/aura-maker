@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/api/og",
+        url: "/brand/og.png",
         width: 1200,
         height: 630,
         alt: "AuraMaker",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AuraMaker | 友達から見た自分のオーラがわかる",
     description: SERVICE_SHARE_TEXT,
-    images: ["/api/og"],
+    images: ["/brand/og.png"],
   },
 };
 

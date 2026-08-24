@@ -26,7 +26,7 @@ const siteUrl =
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 const ogImage = {
-  url: `${siteUrl}/api/og`,
+  url: `${siteUrl}/brand/og.png`,
   width: 1200,
   height: 630,
   alt: "AuraMaker | 友達から見た自分のオーラがわかる",
