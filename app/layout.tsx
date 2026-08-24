@@ -57,6 +57,11 @@ export const metadata: Metadata = {
       "友達から見た自分の『オーラ』がわかる！ AuraMakerでみんなの印象を集めよう✨",
     images: [ogImage.url],
   },
+  icons: {
+    icon: [{ url: "/brand/auramaker-logo.png", type: "image/png" }],
+    apple: [{ url: "/brand/auramaker-logo.png", type: "image/png" }],
+    shortcut: ["/brand/auramaker-logo.png"],
+  },
   ...(googleSiteVerification
     ? {
         verification: {

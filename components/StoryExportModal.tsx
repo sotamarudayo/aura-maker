@@ -27,6 +27,27 @@ const STAT_META = [
   { key: "gap" as const, label: "ギャップ", color: "#22d3ee" },
 ];
 
+function ExportBrandFooter() {
+  return (
+    <div style={{ marginTop: "auto", paddingTop: 8, textAlign: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/auramaker-logo.png"
+          alt=""
+          width={22}
+          height={22}
+          style={{ borderRadius: 999, display: "block" }}
+        />
+        <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>AuraMaker</p>
+      </div>
+      <p style={{ marginTop: 4, fontSize: 9, color: "rgba(255,255,255,0.28)" }}>
+        友達から見たオーラ診断
+      </p>
+    </div>
+  );
+}
+
 function MiniStatBar({
   label,
   value,
@@ -102,6 +123,7 @@ export default function StoryExportModal({
       cacheBust: true,
       pixelRatio: 3,
       backgroundColor: "#05030b",
+      style: { isolation: "isolate" },
     });
   }
 
@@ -395,7 +417,7 @@ function StoryLayout({
         }}
       >
         <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>リンクはこちら👇</p>
-        <p style={{ marginTop: 4, fontSize: 10, color: "rgba(255,255,255,0.28)" }}>AuraMaker</p>
+        <ExportBrandFooter />
       </div>
     </div>
   );
@@ -577,9 +599,7 @@ function CardLayout({
         ))}
       </div>
 
-      <div style={{ marginTop: "auto", paddingTop: 8, textAlign: "center" }}>
-        <p style={{ fontSize: 9, color: "rgba(255,255,255,0.32)" }}>AuraMaker · 友達から見たオーラ診断</p>
-      </div>
+      <ExportBrandFooter />
     </div>
   );
 }
