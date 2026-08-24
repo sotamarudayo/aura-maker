@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import { toPng } from "html-to-image";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
 import { RARITY_LABELS } from "@/lib/constants/auras";
+import { trackEvent } from "@/lib/analytics";
 
 type ExportFormat = "story" | "card";
 
@@ -118,6 +119,7 @@ export default function StoryExportModal({
         format === "story" ? "my_aura_story.png" : "my_aura_result.png";
       link.href = dataUrl;
       link.click();
+      trackEvent("export_result_image", { format, method: "download" });
       onSaved?.();
     } catch (err) {
       const message = err instanceof Error ? err.message : "画像の生成に失敗しました";
@@ -146,6 +148,7 @@ export default function StoryExportModal({
           title: `${displayName}のオーラ診断`,
           text: profile.shareLine,
         });
+        trackEvent("export_result_image", { format, method: "native_share" });
         onSaved?.();
       } else {
         await handleDownload();

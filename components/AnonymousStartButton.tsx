@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/analytics";
 import { createClient } from "@/utils/supabase/client";
 
 type AnonymousStartButtonProps = {
@@ -30,6 +31,7 @@ export default function AnonymousStartButton({
       return;
     }
 
+    trackEvent("start_anonymous");
     router.push("/dashboard");
     router.refresh();
   }

@@ -12,6 +12,7 @@ import {
   type VoteWord,
 } from "@/lib/constants/words";
 import { buildServiceShareUrls, SERVICE_SHARE_TEXT } from "@/lib/constants/share";
+import { trackEvent } from "@/lib/analytics";
 import { markVoteSent, readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
 import { createClient } from "@/utils/supabase/client";
 
@@ -110,11 +111,13 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
     }
 
     markVoteSent(userId);
+    trackEvent("vote_submit", { word_count: selected.length });
     setSending(false);
   }
 
   async function copyServiceUrl() {
     await navigator.clipboard.writeText(siteUrl);
+    trackEvent("copy_service_url", { source: "vote_thanks" });
     setCopyMessage("サイトのURLをコピーしました！");
     window.setTimeout(() => setCopyMessage(null), 1800);
   }

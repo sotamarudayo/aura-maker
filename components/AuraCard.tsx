@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { CSSProperties } from "react";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
 import { RARITY_LABELS } from "@/lib/constants/auras";
+import { trackEvent } from "@/lib/analytics";
 
 type AuraCardProps = {
   aura: AuraType;
@@ -53,6 +54,7 @@ export default function AuraCard({
 
   async function copyShareLine() {
     await navigator.clipboard.writeText(profile.shareLine);
+    trackEvent("copy_share_line");
     setCopyMessage("シェア文をコピーしました！");
     window.setTimeout(() => setCopyMessage(null), 1800);
   }

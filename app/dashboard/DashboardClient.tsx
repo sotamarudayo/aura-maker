@@ -14,6 +14,7 @@ import {
   buildVoteShareText,
   SERVICE_SHARE_TEXT,
 } from "@/lib/constants/share";
+import { trackEvent } from "@/lib/analytics";
 
 type DashboardClientProps = {
   userId: string;
@@ -112,6 +113,7 @@ export default function DashboardClient({
 
   async function copyVoteUrl() {
     await navigator.clipboard.writeText(voteUrl);
+    trackEvent("copy_vote_url");
     setToastMessage("投票URLをコピーしました");
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
@@ -119,6 +121,7 @@ export default function DashboardClient({
 
   async function copyServiceUrl() {
     await navigator.clipboard.writeText(siteUrl);
+    trackEvent("copy_service_url", { source: "dashboard" });
     setToastMessage("サイトのURLをコピーしました！");
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
@@ -212,7 +215,10 @@ export default function DashboardClient({
               </div>
               <button
                 type="button"
-                onClick={() => setLinkModalOpen(true)}
+                onClick={() => {
+                  trackEvent("open_link_account");
+                  setLinkModalOpen(true);
+                }}
                 className="shrink-0 rounded-full bg-amber-200 px-5 py-2.5 text-sm font-bold text-black"
               >
                 アカウントを連携して保存
