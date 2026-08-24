@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { GA_MEASUREMENT_ID, isGaEnabled, trackPageView } from "@/lib/analytics";
@@ -8,9 +8,15 @@ import { GA_MEASUREMENT_ID, isGaEnabled, trackPageView } from "@/lib/analytics";
 function GoogleAnalyticsPageViews() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isFirst = useRef(true);
 
   useEffect(() => {
     if (!isGaEnabled()) return;
+    // 初回は gtag config の send_page_view に任せる（二重送信防止）
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
     const query = searchParams.toString();
     const url = query ? `${pathname}?${query}` : pathname;
     trackPageView(url);
@@ -33,7 +39,7 @@ export default function GoogleAnalytics() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: false });
+          gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: true });
         `}
       </Script>
       <Suspense fallback={null}>
