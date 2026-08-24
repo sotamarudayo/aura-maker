@@ -12,6 +12,7 @@ type AuraCardProps = {
   topWords: string[];
   hasVotes: boolean;
   pulse?: boolean;
+  onExportImage?: () => void;
 };
 
 const STAT_META = [
@@ -46,6 +47,7 @@ export default function AuraCard({
   topWords,
   hasVotes,
   pulse = false,
+  onExportImage,
 }: AuraCardProps) {
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
 
@@ -197,17 +199,28 @@ export default function AuraCard({
           </div>
 
           <div className="rounded-xl border border-white/15 bg-white/5 p-4">
-            <p className="text-xs font-semibold tracking-[0.18em] text-violet-200">📋 シェア用1行</p>
+            <p className="text-xs font-semibold tracking-[0.18em] text-violet-200">📋 シェア</p>
             <p className="mt-2 whitespace-pre-line break-words text-sm text-white/80">
               {profile.shareLine}
             </p>
-            <button
-              type="button"
-              onClick={copyShareLine}
-              className="mt-3 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25"
-            >
-              シェア文をコピー
-            </button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={copyShareLine}
+                className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25"
+              >
+                シェア文をコピー
+              </button>
+              {onExportImage ? (
+                <button
+                  type="button"
+                  onClick={onExportImage}
+                  className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2 text-sm font-bold text-black"
+                >
+                  📸 画像でシェア
+                </button>
+              ) : null}
+            </div>
             {copyMessage ? (
               <p className="mt-2 text-xs text-emerald-300">{copyMessage}</p>
             ) : null}

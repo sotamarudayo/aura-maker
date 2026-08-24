@@ -183,12 +183,10 @@ export default function DashboardClient({
         onClose={() => setStoryModalOpen(false)}
         displayName={displayName}
         aura={auraResult.aura}
-        description={auraResult.dynamicProfile.mainText}
-        specialMove={auraResult.dynamicProfile.specialMove}
-        dailyFortune={auraResult.dynamicProfile.dailyFortune}
+        profile={auraResult.dynamicProfile}
         topWords={auraResult.topWords}
         onSaved={() => {
-          setToastMessage("保存しました！");
+          setToastMessage("画像を保存しました！");
           if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
           toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
         }}
@@ -241,9 +239,17 @@ export default function DashboardClient({
           topWords={auraResult.topWords}
           hasVotes={ranking.length > 0}
           pulse={pulseActive}
+          onExportImage={() => setStoryModalOpen(true)}
         />
 
-        <div className="flex justify-center">
+        <div className="flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => setStoryModalOpen(true)}
+            className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-6 py-3 text-sm font-bold text-black shadow-lg transition hover:scale-[1.02]"
+          >
+            📸 結果を画像でシェア
+          </button>
           <Link
             href="/auras"
             className="rounded-full border border-violet-300/40 bg-violet-500/15 px-6 py-3 text-sm font-semibold text-violet-100 transition hover:bg-violet-500/25"
@@ -411,7 +417,7 @@ export default function DashboardClient({
               onClick={() => setStoryModalOpen(true)}
               className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2 font-bold text-black"
             >
-              📸 ストーリー用画像を保存
+              📸 結果を画像でシェア
             </button>
             <a
               className="rounded-full bg-white/15 px-4 py-2"
