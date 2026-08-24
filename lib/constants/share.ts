@@ -18,20 +18,37 @@ export function buildVoteShareText(displayName: string) {
 
 /** LINE / X のリンクプレビュー用タイトル */
 export function buildVoteInviteTitle(displayName: string) {
-  return `緊急：${displayName}のオーラ、観測ミッション発生中`;
+  return `【匿名10秒】${displayName}さんのオーラ診断に協力`;
 }
 
 /** LINE / X のリンクプレビュー用説明文 */
 export function buildVoteInviteDescription(displayName: string) {
-  return `匿名・約10秒。印象ワードを3つ選ぶだけ。正直でもネタ多めでもOK。${displayName}の正体、みんなでバラそう。`;
+  return `印象ワードを最大3つ選ぶだけ。投票が集まると${displayName}さんのオーラタイプと診断結果が完成します（匿名・本人のみ結果表示）。`;
 }
 
 /** 投票ページ本体の見出し */
 export function buildVotePageHeading(displayName: string) {
-  return `${displayName}のオーラ、観測してみ？`;
+  return `${displayName}さんの印象、教えて！`;
 }
 
 /** 投票ページ本体のサブコピー */
-export const VOTE_PAGE_SUBCOPY =
-  "匿名・最大3ワード。正直でもネタ多めでも歓迎。あなたの一言でオーラが覚醒します。";
+export function buildVotePageSubcopy(displayName: string) {
+  return `匿名でOK・約10秒。選んだ言葉は${displayName}さんのオーラ診断に使われ、本人のダッシュボードに反映されます。`;
+}
 
+/** 投票後に何が起きるか（3ステップ） */
+export const VOTE_PAGE_FLOW = [
+  "あなたが印象ワードを選んで送る（匿名）",
+  "友達の投票が集まっていく",
+  "集まった印象からオーラタイプと診断結果が完成",
+] as const;
+
+/** 投票ボタンラベル */
+export function buildVoteSubmitLabel(selectedCount: number) {
+  return selectedCount > 0 ? `この内容で投票する（${selectedCount}/3）` : "投票する（0/3）";
+}
+
+/** 投票完了メッセージ */
+export function buildVoteThanksMessage(displayName: string) {
+  return `${displayName}さんのオーラ診断に、あなたの印象が加わりました。投票が増えるほど診断結果が育っていきます。`;
+}

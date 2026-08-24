@@ -11,7 +11,7 @@ import {
   type VoteCategory,
   type VoteWord,
 } from "@/lib/constants/words";
-import { buildServiceShareUrls, buildVotePageHeading, SERVICE_SHARE_TEXT, VOTE_PAGE_SUBCOPY } from "@/lib/constants/share";
+import { buildServiceShareUrls, buildVotePageHeading, buildVotePageSubcopy, buildVoteSubmitLabel, buildVoteThanksMessage, SERVICE_SHARE_TEXT, VOTE_PAGE_FLOW } from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
 import { markVoteSent, readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
 import { createClient } from "@/utils/supabase/client";
@@ -127,10 +127,8 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
       <main className="relative flex min-h-screen items-center justify-center overflow-x-clip px-4 py-8 text-white sm:py-10">
         <AuraBackground />
         <section className="relative z-10 w-full min-w-0 max-w-xl rounded-2xl border border-white/20 bg-black/40 p-5 text-center backdrop-blur sm:p-8">
-          <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票ありがとうございます！</h1>
-          <p className="mt-3 text-white/80">
-            {currentDisplayName}さんへの印象ワードを送信しました。
-          </p>
+          <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票ありがとう！</h1>
+          <p className="mt-3 text-white/80">{buildVoteThanksMessage(currentDisplayName)}</p>
 
           <div className="mt-8 space-y-3 text-left">
             <Link
@@ -189,9 +187,22 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
         <h1 className="break-words text-2xl font-black leading-tight sm:text-3xl">
           {buildVotePageHeading(currentDisplayName)}
         </h1>
-        <p className="mt-2 text-white/80">{VOTE_PAGE_SUBCOPY}</p>
-        <p className="mt-1 text-xs text-white/55">
-          全{VOTE_WORD_DEFS.length}語から印象をピック。最大3つまで。
+        <p className="mt-2 text-white/80">{buildVotePageSubcopy(currentDisplayName)}</p>
+
+        <div className="mt-4 rounded-xl border border-violet-300/25 bg-violet-500/10 p-4">
+          <p className="text-xs font-semibold tracking-wide text-violet-100">投票するとどうなる？</p>
+          <ol className="mt-2 space-y-1.5 text-sm text-white/75">
+            {VOTE_PAGE_FLOW.map((step, index) => (
+              <li key={step} className="flex gap-2">
+                <span className="font-bold text-violet-200">{index + 1}.</span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <p className="mt-3 text-xs text-white/55">
+          正直でもネタ多めでもOK。全{VOTE_WORD_DEFS.length}語から最大3つまで選べます。
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2">
@@ -256,7 +267,7 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
             onClick={submitVote}
             className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-black disabled:opacity-60 sm:px-6 sm:text-base"
           >
-            {sending ? "送信中..." : `オーラを観測する（${selected.length}/3）`}
+            {sending ? "送信中..." : buildVoteSubmitLabel(selected.length)}
           </button>
           <p className="min-w-0 break-words text-sm text-white/80">
             選択中: {selected.join(" / ") || "なし"}
