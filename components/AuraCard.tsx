@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import type { CSSProperties } from "react";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
 import { RARITY_LABELS } from "@/lib/constants/auras";
-import { trackEvent } from "@/lib/analytics";
 
 type AuraCardProps = {
   aura: AuraType;
@@ -13,7 +11,6 @@ type AuraCardProps = {
   topWords: string[];
   hasVotes: boolean;
   pulse?: boolean;
-  onExportImage?: () => void;
 };
 
 const STAT_META = [
@@ -48,17 +45,7 @@ export default function AuraCard({
   topWords,
   hasVotes,
   pulse = false,
-  onExportImage,
 }: AuraCardProps) {
-  const [copyMessage, setCopyMessage] = useState<string | null>(null);
-
-  async function copyShareLine() {
-    await navigator.clipboard.writeText(profile.shareLine);
-    trackEvent("copy_share_line");
-    setCopyMessage("シェア文をコピーしました！");
-    window.setTimeout(() => setCopyMessage(null), 1800);
-  }
-
   return (
     <section
       className="min-w-0 rounded-3xl border border-white/20 bg-black/35 p-4 backdrop-blur sm:p-6 md:p-8"
@@ -198,34 +185,6 @@ export default function AuraCard({
                 #覚醒待ち
               </span>
             )}
-          </div>
-
-          <div className="rounded-xl border border-white/15 bg-white/5 p-4">
-            <p className="text-xs font-semibold tracking-[0.18em] text-violet-200">📋 シェア</p>
-            <p className="mt-2 whitespace-pre-line break-words text-sm text-white/80">
-              {profile.shareLine}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={copyShareLine}
-                className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25"
-              >
-                シェア文をコピー
-              </button>
-              {onExportImage ? (
-                <button
-                  type="button"
-                  onClick={onExportImage}
-                  className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2 text-sm font-bold text-black"
-                >
-                  📸 画像でシェア
-                </button>
-              ) : null}
-            </div>
-            {copyMessage ? (
-              <p className="mt-2 text-xs text-emerald-300">{copyMessage}</p>
-            ) : null}
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ import {
   type VoteCategory,
   type VoteWord,
 } from "@/lib/constants/words";
-import { buildServiceShareUrls, SERVICE_SHARE_TEXT } from "@/lib/constants/share";
+import { buildServiceShareUrls, buildVotePageHeading, SERVICE_SHARE_TEXT, VOTE_PAGE_SUBCOPY } from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
 import { markVoteSent, readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
 import { createClient } from "@/utils/supabase/client";
@@ -187,10 +187,11 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
       <AuraBackground />
       <section className="relative z-10 mx-auto w-full min-w-0 max-w-4xl rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur sm:p-6 md:p-8">
         <h1 className="break-words text-2xl font-black leading-tight sm:text-3xl">
-          {currentDisplayName} さんを表すワードを選ぼう
+          {buildVotePageHeading(currentDisplayName)}
         </h1>
-        <p className="mt-2 text-white/80">
-          最大3つまで選択できます。全{VOTE_WORD_DEFS.length}語から印象をピック。
+        <p className="mt-2 text-white/80">{VOTE_PAGE_SUBCOPY}</p>
+        <p className="mt-1 text-xs text-white/55">
+          全{VOTE_WORD_DEFS.length}語から印象をピック。最大3つまで。
         </p>
 
         <div className="mt-5 flex flex-wrap gap-2">
@@ -255,7 +256,7 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
             onClick={submitVote}
             className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-black disabled:opacity-60 sm:px-6 sm:text-base"
           >
-            {sending ? "送信中..." : `投票する（${selected.length}/3）`}
+            {sending ? "送信中..." : `オーラを観測する（${selected.length}/3）`}
           </button>
           <p className="min-w-0 break-words text-sm text-white/80">
             選択中: {selected.join(" / ") || "なし"}

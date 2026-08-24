@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import AuraBackground from "@/components/AuraBackground";
+import {
+  buildVoteInviteDescription,
+  buildVoteInviteTitle,
+} from "@/lib/constants/share";
 import { resolveSiteUrl } from "@/lib/utils/site-url";
 import { createClient } from "@/utils/supabase/server";
 import VoteClient from "./VoteClient";
@@ -22,11 +26,11 @@ async function getProfile(userId: string) {
 export async function generateMetadata({ params }: VotePageProps): Promise<Metadata> {
   const { userId } = await params;
   const profile = await getProfile(userId);
-  const displayName = profile?.display_name ?? "Anonymous";
+  const displayName = profile?.display_name ?? "名無しのオーラ使い";
   const siteUrl = await resolveSiteUrl();
   const ogImage = `${siteUrl}/api/og?userId=${encodeURIComponent(userId)}`;
-  const title = `${displayName}さんのオーラに投票しよう！`;
-  const description = `${displayName}さんを表す単語を3つ選んで、匿名でオーラ投票に参加しよう。`;
+  const title = buildVoteInviteTitle(displayName);
+  const description = buildVoteInviteDescription(displayName);
   const pageUrl = `${siteUrl}/vote/${encodeURIComponent(userId)}`;
 
   return {
@@ -76,7 +80,7 @@ export default async function VotePage({ params }: VotePageProps) {
   return (
     <VoteClient
       userId={userId}
-      displayName={profile.display_name ?? "Anonymous"}
+      displayName={profile.display_name ?? "名無しのオーラ使い"}
       siteUrl={siteUrl}
     />
   );

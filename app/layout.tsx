@@ -19,9 +19,21 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+  "https://aura.booklovers-haven.com";
+
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
+const ogImage = {
+  url: `${siteUrl}/api/og`,
+  width: 1200,
+  height: 630,
+  alt: "AuraMaker | 友達から見た自分のオーラがわかる",
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "AuraMaker | 友達から見た自分のオーラがわかる",
     template: "%s | AuraMaker",
@@ -35,12 +47,15 @@ export const metadata: Metadata = {
     siteName: "AuraMaker",
     type: "website",
     locale: "ja_JP",
+    url: siteUrl,
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title: "AuraMaker | 友達から見た自分のオーラがわかる",
     description:
       "友達から見た自分の『オーラ』がわかる！ AuraMakerでみんなの印象を集めよう✨",
+    images: [ogImage.url],
   },
   ...(googleSiteVerification
     ? {
