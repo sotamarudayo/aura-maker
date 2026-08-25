@@ -1,18 +1,64 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
+import { createClient } from "@/utils/supabase/client";
 
-type HeaderProps = {
-  isLoggedIn: boolean;
-  isAnonymous: boolean;
-};
+type AuthState =
+  | { status: "loading" }
+  | { status: "guest" }
+  | { status: "anonymous" }
+  | { status: "linked" };
 
-export default function Header({ isLoggedIn, isAnonymous }: HeaderProps) {
+export default function Header() {
+  const supabase = useMemo(() => createClient(), []);
+  const [auth, setAuth] = useState<AuthState>({ status: "loading" });
+
+  useEffect(() => {
+    let active = true;
+
+    async function syncUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!active) return;
+      if (!user) {
+        setAuth({ status: "guest" });
+        return;
+      }
+      setAuth({ status: user.is_anonymous ? "anonymous" : "linked" });
+    }
+
+    void syncUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      if (!user) {
+        setAuth({ status: "guest" });
+        return;
+      }
+      setAuth({ status: user.is_anonymous ? "anonymous" : "linked" });
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  const isLoggedIn = auth.status === "anonymous" || auth.status === "linked";
   const logoHref = isLoggedIn ? "/dashboard" : "/";
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
-        <Link href={logoHref} className="flex shrink-0 items-center gap-2.5 text-lg font-black tracking-tight text-white">
+        <Link
+          href={logoHref}
+          className="flex shrink-0 items-center gap-2.5 text-lg font-black tracking-tight text-white"
+        >
           <BrandLogo size={28} />
           AuraMaker
         </Link>
@@ -31,20 +77,26 @@ export default function Header({ isLoggedIn, isAnonymous }: HeaderProps) {
             📊 マイオーラ
           </Link>
 
-          {isLoggedIn ? (
-            isAnonymous ? (
-              <span className="shrink-0 rounded-full border border-amber-300/50 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-100 sm:px-2.5 sm:text-xs">
-                ゲスト
-              </span>
-            ) : (
-              <span className="shrink-0 rounded-full border border-emerald-400/50 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-100 sm:px-2.5 sm:text-xs">
-                連携済み
-              </span>
-            )
+          {auth.status === "loading" ? (
+            <span className="h-7 w-16 shrink-0 rounded-full bg-white/10" aria-hidden />
+          ) : auth.status === "anonymous" ? (
+            <Link
+              href="/dashboard"
+              className="shrink-0 rounded-full border border-amber-300/50 bg-amber-500/20 px-2.5 py-1 text-[10px] font-bold text-amber-100 transition hover:bg-amber-500/30 sm:text-xs"
+            >
+              ゲスト
+            </Link>
+          ) : auth.status === "linked" ? (
+            <Link
+              href="/dashboard"
+              className="shrink-0 rounded-full border border-emerald-300/60 bg-emerald-400/90 px-2.5 py-1 text-[10px] font-bold text-black transition hover:bg-emerald-300 sm:text-xs"
+            >
+              マイページ
+            </Link>
           ) : (
             <Link
               href="/login"
-              className="shrink-0 rounded-full border border-white/25 bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/80 sm:px-2.5 sm:text-xs"
+              className="shrink-0 rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/80 transition hover:bg-white/15 sm:text-xs"
             >
               ログイン
             </Link>
