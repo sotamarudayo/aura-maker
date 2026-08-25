@@ -33,7 +33,7 @@ function ExportBrandFooter() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/brand/auramaker-logo.png"
+          src="/brand/logo-mark.png"
           alt=""
           width={22}
           height={22}

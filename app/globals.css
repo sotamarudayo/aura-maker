@@ -9,7 +9,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -109,11 +109,11 @@ body {
 
 .aura-orb {
   position: absolute;
-  width: 55vmax;
-  height: 55vmax;
+  width: 48vmax;
+  height: 48vmax;
   border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.7;
+  filter: blur(48px);
+  opacity: 0.55;
   mix-blend-mode: screen;
   will-change: transform;
 }

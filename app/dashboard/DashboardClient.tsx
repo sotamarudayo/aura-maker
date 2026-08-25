@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import AuraBackground from "@/components/AuraBackground";
 import AuraCard from "@/components/AuraCard";
 import LinkAccountModal from "@/components/LinkAccountModal";
-import StoryExportModal from "@/components/StoryExportModal";
 import { calculateAuraType } from "@/lib/constants/auras";
 import {
   buildServiceShareUrls,
@@ -16,6 +16,10 @@ import {
   SERVICE_SHARE_TEXT,
 } from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
+
+const StoryExportModal = dynamic(() => import("@/components/StoryExportModal"), {
+  ssr: false,
+});
 
 type DashboardClientProps = {
   userId: string;

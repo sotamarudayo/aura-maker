@@ -59,7 +59,7 @@ export default function Header() {
           href={logoHref}
           className="flex shrink-0 items-center gap-2.5 text-lg font-black tracking-tight text-white"
         >
-          <BrandLogo size={28} />
+          <BrandLogo size={28} priority />
           AuraMaker
         </Link>
 
