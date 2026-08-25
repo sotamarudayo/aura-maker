@@ -65,7 +65,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md rounded-2xl border border-white/15 bg-black/40 p-6 backdrop-blur">
+    <div className="w-full rounded-2xl border border-white/15 bg-black/40 p-6 text-left backdrop-blur">
       <div className="mb-4 flex gap-2">
         <button
           type="button"

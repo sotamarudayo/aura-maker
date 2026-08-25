@@ -16,21 +16,21 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-x-clip px-4 py-8 text-white sm:py-10">
+    <main className="relative flex flex-1 flex-col items-center overflow-x-clip px-4 py-8 text-white sm:py-12">
       <AuraBackground />
-      <div className="relative z-10 w-full min-w-0 max-w-3xl space-y-6 text-center">
-        <h1 className="text-3xl font-black sm:text-4xl">AuraMaker</h1>
-        <p className="text-white/80">
-          匿名で集まる印象ワードを、あなたのオーラとして可視化しよう。
-        </p>
-        <div className="mx-auto flex justify-center">
-          <AnonymousStartButton />
+      <div className="relative z-10 flex w-full max-w-md flex-col items-center gap-6 text-center">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-black sm:text-4xl">AuraMaker</h1>
+          <p className="text-sm text-white/80 sm:text-base">
+            匿名で集まる印象ワードを、あなたのオーラとして可視化しよう。
+          </p>
         </div>
-        <div className="mx-auto">
-          <Suspense fallback={<div className="h-40" />}>
-            <LoginForm />
-          </Suspense>
-        </div>
+
+        <AnonymousStartButton className="w-full rounded-full bg-violet-300 px-6 py-3 font-semibold text-black disabled:opacity-60" />
+
+        <Suspense fallback={<div className="h-40 w-full" />}>
+          <LoginForm />
+        </Suspense>
       </div>
     </main>
   );
