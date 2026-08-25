@@ -5,6 +5,7 @@ import {
   AURA_LINEAGES,
   AURA_TYPES,
   getAuraById,
+  sortAurasByRarity,
 } from "@/lib/constants/auras";
 
 type AuraEncyclopediaSectionProps = {
@@ -30,9 +31,11 @@ export default function AuraEncyclopediaSection({
 
       <div className="space-y-10">
         {AURA_LINEAGES.map((lineage) => {
-          const auras = lineage.auraIds
-            .map((id) => getAuraById(id))
-            .filter((aura): aura is NonNullable<typeof aura> => Boolean(aura));
+          const auras = sortAurasByRarity(
+            lineage.auraIds
+              .map((id) => getAuraById(id))
+              .filter((aura): aura is NonNullable<typeof aura> => Boolean(aura)),
+          );
 
           return (
             <div key={lineage.id} className="space-y-4">

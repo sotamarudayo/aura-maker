@@ -156,7 +156,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     palette: { a: "#fb923c", b: "#fbbf24", c: "#f97316" },
     keywords: ["陽キャバイブス", "草不可避", "深夜テンション", "平成レトロ", "飲み会の潤滑油", "笑いの引力"],
     attributes: ["warm", "chaos"],
-    rarity: "common",
+    rarity: "rare",
   },
   {
     id: "soft-peach",
@@ -170,7 +170,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     palette: { a: "#fda4af", b: "#fecdd3", c: "#fb7185" },
     keywords: ["癒やし枠", "実は寂しがり", "平成レトロ", "ツンデレ", "クールに見えてドジ"],
     attributes: ["heal", "imp", "warm"],
-    rarity: "common",
+    rarity: "uncommon",
   },
   {
     id: "mystic-purple",
@@ -184,7 +184,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     palette: { a: "#c084fc", b: "#818cf8", c: "#a78bfa" },
     keywords: ["ミステリアス", "儚げ", "沼", "概念", "実は寂しがり"],
     attributes: ["mystic", "cool"],
-    rarity: "uncommon",
+    rarity: "common",
   },
   {
     id: "chaos-neon",
@@ -198,7 +198,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     palette: { a: "#e879f9", b: "#22d3ee", c: "#f43f5e" },
     keywords: ["深夜テンション", "治安悪め", "天才的バカ", "草不可避", "距離感バグ", "バグ技", "突然ボケる", "リアクション過剰"],
     attributes: ["chaos", "imp"],
-    rarity: "uncommon",
+    rarity: "common",
   },
   {
     id: "dream-chaser",
@@ -268,7 +268,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     palette: { a: "#818cf8", b: "#c084fc", c: "#22d3ee" },
     keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC", "推し活の鬼", "推ししか勝たん"],
     attributes: ["otaku", "chaos"],
-    rarity: "rare",
+    rarity: "uncommon",
   },
   {
     id: "crimson-rebel",
@@ -296,6 +296,20 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     palette: { a: "#a78bfa", b: "#c4b5fd", c: "#8b5cf6" },
     keywords: ["概念", "儚げ", "平成レトロ", "ミステリアス", "沼"],
     attributes: ["mystic", "intellect"],
+    rarity: "rare",
+  },
+  {
+    id: "mythic-quill",
+    name: "神話のインクオーラ",
+    archetypeName: "語り部の神",
+    catchCopy: "物語そのものが滲み出す、金と墨の軌跡。",
+    description:
+      "あなたの纏う空気感は、人の人生を一章にしてしまう語り部。言葉の余韻が長く残ります。",
+    gradient:
+      "radial-gradient(circle at 25% 25%, #fde68a, transparent 42%), radial-gradient(circle at 75% 55%, #c4b5fd, transparent 48%), linear-gradient(135deg, #1c1917 0%, #292524 100%)",
+    palette: { a: "#fde68a", b: "#c4b5fd", c: "#a8a29e" },
+    keywords: ["知性派", "概念", "カリスマ", "黒幕", "平成レトロ", "ミステリアス"],
+    attributes: ["legend", "mystic", "intellect"],
     rarity: "rare",
   },
   {
@@ -342,6 +356,20 @@ export const SECRET_AURA_TYPES: AuraType[] = [
     palette: { a: "#312e81", b: "#0f172a", c: "#1e293b" },
     keywords: ["NPC", "概念", "黒幕", "異次元", "距離感バグ"],
     attributes: ["void"],
+    rarity: "secret",
+  },
+  {
+    id: "phantom-mirror",
+    name: "幻影ミラーオーラ",
+    archetypeName: "別人スイッチ",
+    catchCopy: "見る角度で別人になる、鏡面の蜃気楼。",
+    description:
+      "あなたの纏う空気感は、場面ごとに人格が切り替わる幻影。友達ごとに別キャラとして記憶されます。",
+    gradient:
+      "radial-gradient(circle at 28% 30%, #e879f9, transparent 40%), radial-gradient(circle at 72% 65%, #67e8f9, transparent 45%), linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)",
+    palette: { a: "#e879f9", b: "#67e8f9", c: "#c4b5fd" },
+    keywords: ["ギャップの鬼", "ツンデレ", "距離感バグ", "NPC", "異次元", "ミステリアス"],
+    attributes: ["void", "imp", "mystic"],
     rarity: "secret",
   },
   {
@@ -400,7 +428,7 @@ export const AURA_LINEAGES: readonly AuraLineage[] = [
     tagline: "陽キャ・癒し・距離感の近さ。そばにいると場が温まる系統。",
     accent: "#fbbf24",
     accentSoft: "rgba(251, 191, 36, 0.18)",
-    auraIds: ["sunrise-hero", "healing-mint", "gourmet-sun", "soft-peach"],
+    auraIds: ["sunrise-hero", "healing-mint", "soft-peach", "gourmet-sun"],
   },
   {
     id: "chaos",
@@ -409,7 +437,7 @@ export const AURA_LINEAGES: readonly AuraLineage[] = [
     tagline: "盛り上げ・ギャップ・推し愛。予測不能で巻き込む系統。",
     accent: "#e879f9",
     accentSoft: "rgba(232, 121, 249, 0.18)",
-    auraIds: ["chaos-neon", "imp-neon", "otaku-galaxy", "crimson-rebel"],
+    auraIds: ["chaos-neon", "otaku-galaxy", "imp-neon", "crimson-rebel"],
   },
   {
     id: "mystic",
@@ -418,16 +446,16 @@ export const AURA_LINEAGES: readonly AuraLineage[] = [
     tagline: "じわ惹き・クール・感性。静かに残る空気感の系統。",
     accent: "#a78bfa",
     accentSoft: "rgba(167, 139, 250, 0.2)",
-    auraIds: ["mystic-purple", "midnight-moon", "velvet-muse", "electric-cyan"],
+    auraIds: ["mystic-purple", "electric-cyan", "midnight-moon", "velvet-muse"],
   },
   {
     id: "legend",
     code: "LG",
     name: "伝説系",
-    tagline: "野心・説得力・全属性。レア枠の光をまとう系統。",
+    tagline: "野心・物語・説得力。頂点クラスの光をまとう系統。",
     accent: "#facc15",
     accentSoft: "rgba(250, 204, 21, 0.16)",
-    auraIds: ["dream-chaser", "legendary-prism", "golden-oracle"],
+    auraIds: ["dream-chaser", "mythic-quill", "legendary-prism", "golden-oracle"],
   },
   {
     id: "secret",
@@ -436,9 +464,21 @@ export const AURA_LINEAGES: readonly AuraLineage[] = [
     tagline: "特殊条件でのみ発現する、幻のオーラたち。",
     accent: "#c4b5fd",
     accentSoft: "rgba(124, 58, 237, 0.22)",
-    auraIds: ["void-abyss", "god-calamity", "absolute-crystal"],
+    auraIds: ["void-abyss", "phantom-mirror", "absolute-crystal", "god-calamity"],
   },
 ];
+
+export const RARITY_ORDER: Record<AuraRarity, number> = {
+  common: 0,
+  uncommon: 1,
+  rare: 2,
+  legendary: 3,
+  secret: 4,
+};
+
+export function sortAurasByRarity<T extends { rarity: AuraRarity }>(auras: T[]): T[] {
+  return [...auras].sort((a, b) => RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity]);
+}
 
 export function getAuraLineage(auraId: string): AuraLineage | undefined {
   return AURA_LINEAGES.find((lineage) => lineage.auraIds.includes(auraId));
@@ -1236,6 +1276,13 @@ function resolveSecretAura(topWords: string[]): AuraType | null {
   const voidMood = hasAny(topSet, ["距離感バグ", "儚げ", "ミステリアス", "絶対零度"]);
   if (voidCore && voidMood) {
     return SECRET_AURA_TYPES.find((aura) => aura.id === "void-abyss") ?? null;
+  }
+
+  // 幻影ミラー: ギャップ系 × 別人感（NPC/異次元）
+  const mirrorGap = hasAny(topSet, ["ギャップの鬼", "ツンデレ", "距離感バグ", "既読スルー魔"]);
+  const mirrorOther = hasAny(topSet, ["NPC", "異次元", "ミステリアス", "概念"]);
+  if (mirrorGap && mirrorOther && topWords.length >= 2) {
+    return SECRET_AURA_TYPES.find((aura) => aura.id === "phantom-mirror") ?? null;
   }
 
   // 絶対零度: 透明感/絶対零度 × ギャップやミステリアス
