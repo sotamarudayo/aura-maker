@@ -18,22 +18,53 @@ export function buildVoteShareText(displayName: string) {
 
 /** LINE / X のリンクプレビュー用タイトル */
 export function buildVoteInviteTitle(displayName: string) {
-  return `【匿名10秒】${displayName}さんのオーラ診断に協力`;
+  return `【AuraMaker】${displayName}さんのタイプ診断に投票して`;
 }
 
 /** LINE / X のリンクプレビュー用説明文 */
 export function buildVoteInviteDescription(displayName: string) {
-  return `印象ワードを最大3つ選ぶだけ。投票が集まると${displayName}さんのオーラタイプと診断結果が完成します（匿名・本人のみ結果表示）。`;
+  return `MBTIみたいな他人から見たタイプ診断。${displayName}さんの印象ワードを最大3つ選ぶだけ（匿名・約10秒）。結果は本人だけが見られます。`;
 }
+
+/**
+ * 投票依頼を送るときの本文（URLの前にサービス説明を置く）
+ * booklovers などのドメインで誤解されないように、先に AuraMaker を明示する
+ */
+export function buildVoteInviteShareText(displayName: string) {
+  return [
+    "【AuraMaker】MBTIみたいな他人から見たタイプ診断🙏",
+    `${displayName}の印象に合う言葉を、最大3つ選んで投票してほしい！`,
+    "匿名OK・約10秒。本の紹介とかじゃなくて、雰囲気キャラ診断です。",
+  ].join("\n");
+}
+
+export function buildVoteInviteSharePayload(displayName: string, voteUrl: string) {
+  return `${buildVoteInviteShareText(displayName)}\n${voteUrl}`;
+}
+
+export function buildVoteInviteShareUrls(displayName: string, voteUrl: string) {
+  const text = buildVoteInviteShareText(displayName);
+  const encodedText = encodeURIComponent(text);
+  const encodedUrl = encodeURIComponent(voteUrl);
+
+  return {
+    twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+    line: `https://line.me/R/msg/text/?${encodeURIComponent(`${text}\n${voteUrl}`)}`,
+  };
+}
+
+/** 投票ページ冒頭：サービス説明（初見向け） */
+export const VOTE_PAGE_WHAT_IS_THIS =
+  "AuraMakerは、MBTIみたいな他人から見たタイプ診断。自分で答えるんじゃなく、友達が印象ワードを選ぶとオーラタイプがわかります。";
 
 /** 投票ページ本体の見出し */
 export function buildVotePageHeading(displayName: string) {
-  return `${displayName}さんの印象、教えて！`;
+  return `${displayName}さんから、あなたの印象を教えてほしいと頼まれています`;
 }
 
 /** 投票ページ本体のサブコピー */
 export function buildVotePageSubcopy(displayName: string) {
-  return `匿名でOK・約10秒。選んだ言葉は${displayName}さんのオーラ診断に使われ、本人のダッシュボードに反映されます。`;
+  return `下の言葉から最大3つ選んで送るだけ。匿名OK・約10秒。結果は${displayName}さん本人だけが見られます。`;
 }
 
 /** 投票後に何が起きるか（3ステップ） */

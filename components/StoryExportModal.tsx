@@ -105,7 +105,7 @@ export default function StoryExportModal({
   onSaved,
 }: StoryExportModalProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const [format, setFormat] = useState<ExportFormat>("card");
+  const [format, setFormat] = useState<ExportFormat>("story");
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -211,21 +211,21 @@ export default function StoryExportModal({
         <div className="mb-4 flex gap-2">
           <button
             type="button"
-            onClick={() => setFormat("card")}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
-              format === "card" ? "bg-white text-black" : "bg-white/10 text-white/80"
-            }`}
-          >
-            結果カード（詳細）
-          </button>
-          <button
-            type="button"
             onClick={() => setFormat("story")}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
               format === "story" ? "bg-white text-black" : "bg-white/10 text-white/80"
             }`}
           >
             ストーリー（9:16）
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormat("card")}
+            className={`rounded-full px-4 py-2 text-sm font-semibold ${
+              format === "card" ? "bg-white text-black" : "bg-white/10 text-white/80"
+            }`}
+          >
+            結果カード（詳細）
           </button>
         </div>
 
@@ -375,7 +375,19 @@ function StoryLayout({
         >
           {RARITY_LABELS[aura.rarity]}
         </span>
-        <h3 style={{ marginTop: 10, fontSize: 20, fontWeight: 900, lineHeight: 1.25, color: "#fff" }}>
+        <p style={{ marginTop: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)" }}>
+          通り名
+        </p>
+        <h3
+          style={{
+            marginTop: 4,
+            fontSize: 28,
+            fontWeight: 900,
+            lineHeight: 1.15,
+            color: "#fff",
+            textShadow: `0 0 24px ${palette.a}aa`,
+          }}
+        >
           {aura.archetypeName}
         </h3>
         <p style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>
@@ -419,7 +431,7 @@ function StoryLayout({
           paddingBottom: 16,
         }}
       >
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>リンクはこちら👇</p>
+        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>AuraMakerで診断</p>
         <ExportBrandFooter />
       </div>
     </div>
@@ -468,7 +480,19 @@ function CardLayout({
       </div>
 
       <p style={{ marginTop: 4, fontSize: 11, color: "rgba(255,255,255,0.55)" }}>{displayName}</p>
-      <h3 style={{ marginTop: 6, fontSize: 22, fontWeight: 900, lineHeight: 1.2, color: "#fff" }}>
+      <p style={{ marginTop: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)" }}>
+        通り名
+      </p>
+      <h3
+        style={{
+          marginTop: 4,
+          fontSize: 26,
+          fontWeight: 900,
+          lineHeight: 1.15,
+          color: "#fff",
+          textShadow: `0 0 22px ${aura.palette.a}aa`,
+        }}
+      >
         {aura.archetypeName}
       </h3>
       <p style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>

@@ -21,6 +21,7 @@ import {
   buildVoteThanksMessage,
   SERVICE_SHARE_TEXT,
   VOTE_PAGE_FLOW,
+  VOTE_PAGE_WHAT_IS_THIS,
 } from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
 import { markVoteSent, readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
@@ -210,7 +211,14 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
     <main className="relative min-h-screen overflow-x-clip px-4 py-8 pb-28 text-white sm:py-10 sm:pb-32">
       <AuraBackground />
       <section className="relative z-10 mx-auto w-full min-w-0 max-w-4xl rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur sm:p-6 md:p-8">
-        <h1 className="break-words text-2xl font-black leading-tight sm:text-3xl">
+        <div className="rounded-xl border border-cyan-300/25 bg-cyan-500/10 p-4">
+          <p className="text-xs font-semibold tracking-wide text-cyan-100">これなに？</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/85 sm:text-base">
+            {VOTE_PAGE_WHAT_IS_THIS}
+          </p>
+        </div>
+
+        <h1 className="mt-5 break-words text-2xl font-black leading-tight sm:text-3xl">
           {buildVotePageHeading(currentDisplayName)}
         </h1>
         <p className="mt-2 text-white/80">{buildVotePageSubcopy(currentDisplayName)}</p>
@@ -228,7 +236,7 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
         </div>
 
         <p className="mt-3 text-xs text-white/55">
-          正直でもネタ多めでもOK。全{VOTE_WORD_DEFS.length}語から最大3つまで選べます。カテゴリごとに全部並んでるので、スクロールして探してね。
+          正直でもネタ多めでもOK。全{VOTE_WORD_DEFS.length}語から最大3つ。カテゴリごとに並んでるので、スクロールして探してね。
         </p>
 
         <nav className="mt-5 flex flex-wrap gap-2" aria-label="カテゴリへジャンプ">

@@ -70,9 +70,9 @@ export default function AuraEncyclopediaCard({
         <div className="relative mt-4 min-w-0 space-y-2">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <h3 className="break-words text-base font-bold leading-snug sm:text-lg">
-                {isSecret ? "？？？（シークレット）" : aura.archetypeName}
-              </h3>
+            <h3 className="min-w-0 break-words text-lg font-black leading-snug sm:text-xl">
+              {isSecret ? "？？？（シークレット）" : aura.archetypeName}
+            </h3>
               {!isSecret ? (
                 <p className="mt-1 break-words text-xs font-medium text-white/50">{aura.name}</p>
               ) : null}

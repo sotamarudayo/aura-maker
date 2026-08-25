@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://aura.booklovers-haven.com";
+  "https://auramaker.net";
 
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 

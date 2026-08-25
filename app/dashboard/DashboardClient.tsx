@@ -11,6 +11,8 @@ import StoryExportModal from "@/components/StoryExportModal";
 import { calculateAuraType } from "@/lib/constants/auras";
 import {
   buildServiceShareUrls,
+  buildVoteInviteSharePayload,
+  buildVoteInviteShareUrls,
   SERVICE_SHARE_TEXT,
 } from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
@@ -111,11 +113,13 @@ export default function DashboardClient({
   const encodedVoteUrl = encodeURIComponent(voteUrl);
   const resultTwitterUrl = `https://twitter.com/intent/tweet?text=${encodedResultShareText}&url=${encodedVoteUrl}`;
   const resultLineUrl = `https://line.me/R/msg/text/?${encodedResultShareText}%0A${encodedVoteUrl}`;
+  const voteInviteText = buildVoteInviteSharePayload(displayName, voteUrl);
+  const voteInviteShareUrls = buildVoteInviteShareUrls(displayName, voteUrl);
 
   async function copyVoteUrl() {
-    await navigator.clipboard.writeText(voteUrl);
+    await navigator.clipboard.writeText(voteInviteText);
     trackEvent("copy_vote_url");
-    setToastMessage("投票URLをコピーしました");
+    setToastMessage("投票のお願い文＋URLをコピーしました");
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
@@ -321,20 +325,39 @@ export default function DashboardClient({
 
           <div className="mt-5 space-y-5">
             <div>
-              <p className="text-sm font-semibold text-violet-100">1. 投票URLを送る</p>
-              <div className="mt-3 flex flex-col gap-3 md:flex-row">
-                <input
-                  readOnly
-                  value={voteUrl}
-                  className="min-w-0 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs break-all sm:text-sm"
-                />
+              <p className="text-sm font-semibold text-violet-100">1. 投票をお願いする</p>
+              <p className="mt-1 text-xs text-white/55">
+                URLだけだとドメインで誤解されやすいので、説明文つきで送るのがおすすめ。
+              </p>
+              <p className="mt-3 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
+                {voteInviteText}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={copyVoteUrl}
-                  className="w-full rounded-lg bg-violet-300 px-4 py-2 font-semibold text-black sm:w-auto"
+                  className="rounded-full bg-violet-300 px-4 py-2 text-sm font-bold text-black"
                 >
-                  投票URLをコピー
+                  お願い文＋URLをコピー
                 </button>
+                <a
+                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
+                  href={voteInviteShareUrls.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("share_vote_invite", { channel: "x" })}
+                >
+                  Xでお願い
+                </a>
+                <a
+                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
+                  href={voteInviteShareUrls.line}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent("share_vote_invite", { channel: "line" })}
+                >
+                  LINEでお願い
+                </a>
               </div>
             </div>
 

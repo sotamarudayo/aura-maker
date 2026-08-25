@@ -58,14 +58,25 @@ export default function AuraCard({
       }
     >
       <div className="grid min-w-0 items-start gap-6 sm:gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
-        <div className="relative mx-auto h-56 w-56 sm:h-64 sm:w-64 md:h-72 md:w-72 lg:h-80 lg:w-80">
-          <div className={`aura-card-halo ${pulse ? "aura-card-halo-pulse" : ""}`} />
-          <div className="aura-card-ring aura-card-ring-a" />
-          <div className="aura-card-ring aura-card-ring-b" />
-          <div className={`aura-card-core ${hasVotes ? "" : "aura-card-core-dormant"}`} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="rounded-full border border-white/35 bg-black/35 px-4 py-2 text-xs font-semibold tracking-widest text-white/90">
-              {hasVotes ? "AURA ACTIVE" : "AURA DORMANT"}
+        <div className="mx-auto flex w-full max-w-[20rem] flex-col items-center gap-3 sm:max-w-none">
+          <p
+            className="max-w-[90%] break-words rounded-full border border-white/25 bg-black/45 px-3 py-1.5 text-center text-xs font-bold tracking-wide text-white/90 shadow-[0_0_24px_rgba(0,0,0,0.35)] backdrop-blur-sm sm:text-sm"
+            style={{
+              boxShadow: `0 0 28px ${aura.palette.a}44`,
+              borderColor: `${aura.palette.a}66`,
+            }}
+          >
+            {aura.name}
+          </p>
+          <div className="relative h-56 w-56 sm:h-64 sm:w-64 md:h-72 md:w-72 lg:h-80 lg:w-80">
+            <div className={`aura-card-halo ${pulse ? "aura-card-halo-pulse" : ""}`} />
+            <div className="aura-card-ring aura-card-ring-a" />
+            <div className="aura-card-ring aura-card-ring-b" />
+            <div className={`aura-card-core ${hasVotes ? "" : "aura-card-core-dormant"}`} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="rounded-full border border-white/35 bg-black/35 px-4 py-2 text-xs font-semibold tracking-widest text-white/90">
+                {hasVotes ? "AURA ACTIVE" : "AURA DORMANT"}
+              </div>
             </div>
           </div>
         </div>
@@ -80,12 +91,19 @@ export default function AuraCard({
                 {RARITY_LABELS[aura.rarity]}
               </span>
             </div>
-            <h2 className="mt-3 break-words text-2xl font-black leading-tight sm:text-3xl md:text-5xl">
+            <p className="mt-4 text-[11px] font-bold tracking-[0.28em] text-white/45">通り名</p>
+            <h2
+              className="mt-1 break-words text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
+              style={{
+                backgroundImage: `linear-gradient(120deg, #fff 0%, ${aura.palette.a} 42%, ${aura.palette.b} 78%, ${aura.palette.c} 100%)`,
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                filter: `drop-shadow(0 0 28px ${aura.palette.a}66)`,
+              }}
+            >
               {aura.archetypeName}
             </h2>
-            <p className="mt-2 break-words text-sm font-semibold text-white/55 sm:text-base">
-              {aura.name}
-            </p>
             <p className="mt-3 break-words text-base text-cyan-100 sm:text-lg">{catchCopy}</p>
             <p className="mt-4 break-words text-sm text-white/80 sm:text-base">{profile.mainText}</p>
           </div>

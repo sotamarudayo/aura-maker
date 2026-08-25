@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 function getBaseUrl() {
   return (
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-    "https://aura.booklovers-haven.com"
+    "https://auramaker.net"
   );
 }
 
