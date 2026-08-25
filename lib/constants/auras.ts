@@ -14,6 +14,8 @@ export type AuraPalette = {
 export type AuraType = {
   id: string;
   name: string;
+  /** 会話で使える通り名（例: 盛り上げ番長） */
+  archetypeName: string;
   catchCopy: string;
   description: string;
   gradient: string;
@@ -100,6 +102,7 @@ const DORMANT_ECOLOGY: AuraEcology = {
 export const DORMANT_AURA: AuraType = {
   id: "dormant",
   name: "覚醒待ちのオーラ",
+  archetypeName: "観測待ちのただの人",
   catchCopy: "まだ静かに眠る、半透明のモノトーンオーラ。",
   description:
     "あなたの纏う空気感は観測待ち。投票が集まるほど色と個性が立ち上がります。",
@@ -116,6 +119,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "sunrise-hero",
     name: "サンライズ・ヒーローオーラ",
+    archetypeName: "主人公番長",
     catchCopy: "眩しい前向きエネルギーが、周囲を自然と照らす。",
     description:
       "あなたの纏う空気感は、頼れる太陽タイプ。安心感と高揚感を同時に届けます。",
@@ -129,6 +133,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "healing-mint",
     name: "癒しのミントオーラ",
+    archetypeName: "空気清浄機枠",
     catchCopy: "やわらかな光が、触れた人の心を静かにほどく。",
     description:
       "あなたの纏う空気感は、安心と包容力の塊。そばにいるだけで呼吸が深くなります。",
@@ -142,6 +147,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "gourmet-sun",
     name: "グルメサンオーラ",
+    archetypeName: "飯テロ番長",
     catchCopy: "食欲と陽気さが混ざった、幸せなオレンジの光。",
     description:
       "あなたの纏う空気感は、食と笑いで場を明るくする太陽。一緒にいると自然と元気になります。",
@@ -155,6 +161,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "soft-peach",
     name: "ソフトピーチオーラ",
+    archetypeName: "距離感近すぎ系",
     catchCopy: "甘くて親しみやすい、近づきやすい桃色の余熱。",
     description:
       "あなたの纏う空気感は、誰にでも打ち解けやすいムード。場の緊張をそっと溶かします。",
@@ -168,6 +175,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "mystic-purple",
     name: "ミステリアスパープルオーラ",
+    archetypeName: "じわ惹き魔",
     catchCopy: "静かな紫の余韻が、言葉にしない魅力を漂わせる。",
     description:
       "あなたの纏う空気感は、落ち着きの中に惹力を秘めたムードメーカー。じわっと心に残ります。",
@@ -181,6 +189,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "chaos-neon",
     name: "陽気なカオスオーラ",
+    archetypeName: "盛り上げ番長",
     catchCopy: "予測不能なネオンが、場の温度を一瞬で上げる。",
     description:
       "あなたの纏う空気感は、場を沸かせるトリックスター。刺激とユーモアで周囲を巻き込みます。",
@@ -194,6 +203,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "dream-chaser",
     name: "ドリームチェイサーオーラ",
+    archetypeName: "夢語り野郎",
     catchCopy: "高く昇る光が、野心と可能性を語り始める。",
     description:
       "あなたの纏う空気感は、未来志向の推進力。目標に向かう姿が周囲を鼓舞します。",
@@ -207,6 +217,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "electric-cyan",
     name: "エレクトリックシアンオーラ",
+    archetypeName: "頭回り最速マン",
     catchCopy: "鋭い閃光が、知性とスピード感をまとって走る。",
     description:
       "あなたの纏う空気感は、頭の回転が速いスパーク。会話にキレとテンポを与えます。",
@@ -220,6 +231,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "imp-neon",
     name: "小悪魔ネオンオーラ",
+    archetypeName: "小悪魔天使",
     catchCopy: "甘さと鋭さが同居する、ギャップのネオンスパーク。",
     description:
       "あなたの纏う空気感は、予想外の魅力で人を惹きつけるハイブリッドタイプです。",
@@ -233,6 +245,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "midnight-moon",
     name: "ミッドナイトムーンオーラ",
+    archetypeName: "夜更かし詩人",
     catchCopy: "夜の静寂に溶ける、眠気と余白のシルバー光。",
     description:
       "あなたの纏う空気感は、落ち着いた夜の詩人。マイペースで独自の世界観を持っています。",
@@ -246,6 +259,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "otaku-galaxy",
     name: "オタク銀河オーラ",
+    archetypeName: "推し命銀河",
     catchCopy: "深宇宙のような情熱が、好きを全力で放つ。",
     description:
       "あなたの纏う空気感は、ニッチへの愛が輝く銀河。同好と出会うと一気に加速します。",
@@ -259,6 +273,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "crimson-rebel",
     name: "クリムゾンリベルオーラ",
+    archetypeName: "反骨番長",
     catchCopy: "熱を帯びた赤が、既存の枠を軽やかに壊す。",
     description:
       "あなたの纏う空気感は、反骨心と魅力が同居した炎。場の空気を自分色に染めます。",
@@ -272,6 +287,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "velvet-muse",
     name: "ベルベットミューズオーラ",
+    archetypeName: "雰囲気芸人",
     catchCopy: "深く静かなベルベットが、創造の余韻を残す。",
     description:
       "あなたの纏う空気感は、感性の余白が美しいアーティスト気質。言葉にならない魅力があります。",
@@ -285,6 +301,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "legendary-prism",
     name: "伝説のプリズムオーラ",
+    archetypeName: "全属性持ち神",
     catchCopy: "多面の光が交差し、唯一無二のスペクトラムを放つ。",
     description:
       "あなたの纏う空気感は、ジャンルを超えたレジェンド。どんな属性とも共鳴する稀な存在です。",
@@ -298,6 +315,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
   {
     id: "golden-oracle",
     name: "ゴールデンオラクルオーラ",
+    archetypeName: "説教聞かせマン",
     catchCopy: "金色の予兆が、運命のような説得力をまとう。",
     description:
       "あなたの纏う空気感は、言葉に重みがあるオラクル。周囲が自然と耳を傾けてしまいます。",
@@ -315,6 +333,7 @@ export const SECRET_AURA_TYPES: AuraType[] = [
   {
     id: "void-abyss",
     name: "虚無と深淵のヴォイドオーラ",
+    archetypeName: "虚無NPC",
     catchCopy: "光すら飲み込む黒が、静かに広がる。",
     description:
       "あなたの纏う空気感は、存在感と不在感が同時に立つ深淵。言葉にできない引力があります。",
@@ -328,6 +347,7 @@ export const SECRET_AURA_TYPES: AuraType[] = [
   {
     id: "god-calamity",
     name: "天変地異のゴッドオーラ",
+    archetypeName: "ラスボス候補",
     catchCopy: "矛盾する光が衝突し、神話級の轟きを生む。",
     description:
       "あなたの纏う空気感は、相反する力が同居した天変地異。見る者の常識を揺さぶります。",
@@ -341,6 +361,7 @@ export const SECRET_AURA_TYPES: AuraType[] = [
   {
     id: "absolute-crystal",
     name: "絶対零度のクリスタルオーラ",
+    archetypeName: "触れがたい美人",
     catchCopy: "氷点下の透明さが、すべてを映し切る。",
     description:
       "あなたの纏う空気感は、冷たく美しいクリスタル。触れにくい距離感が逆に惹きつけます。",
@@ -357,6 +378,71 @@ export const SECRET_AURA_TYPES: AuraType[] = [
 export const AURA_TYPES: AuraType[] = [...STANDARD_AURA_TYPES, ...SECRET_AURA_TYPES];
 
 export const ALL_AURA_TYPES: AuraType[] = [DORMANT_AURA, ...AURA_TYPES];
+
+/** 似たオーラをまとめる系統（図鑑の並び・色分け用） */
+export type AuraLineage = {
+  id: string;
+  /** ラブタイプ風の短いコード */
+  code: string;
+  name: string;
+  tagline: string;
+  /** 系統ヘッダーのアクセント色 */
+  accent: string;
+  accentSoft: string;
+  auraIds: readonly string[];
+};
+
+export const AURA_LINEAGES: readonly AuraLineage[] = [
+  {
+    id: "solar",
+    code: "SL",
+    name: "太陽系",
+    tagline: "陽キャ・癒し・距離感の近さ。そばにいると場が温まる系統。",
+    accent: "#fbbf24",
+    accentSoft: "rgba(251, 191, 36, 0.18)",
+    auraIds: ["sunrise-hero", "healing-mint", "gourmet-sun", "soft-peach"],
+  },
+  {
+    id: "chaos",
+    code: "CH",
+    name: "カオス系",
+    tagline: "盛り上げ・ギャップ・推し愛。予測不能で巻き込む系統。",
+    accent: "#e879f9",
+    accentSoft: "rgba(232, 121, 249, 0.18)",
+    auraIds: ["chaos-neon", "imp-neon", "otaku-galaxy", "crimson-rebel"],
+  },
+  {
+    id: "mystic",
+    code: "MY",
+    name: "神秘系",
+    tagline: "じわ惹き・クール・感性。静かに残る空気感の系統。",
+    accent: "#a78bfa",
+    accentSoft: "rgba(167, 139, 250, 0.2)",
+    auraIds: ["mystic-purple", "midnight-moon", "velvet-muse", "electric-cyan"],
+  },
+  {
+    id: "legend",
+    code: "LG",
+    name: "伝説系",
+    tagline: "野心・説得力・全属性。レア枠の光をまとう系統。",
+    accent: "#facc15",
+    accentSoft: "rgba(250, 204, 21, 0.16)",
+    auraIds: ["dream-chaser", "legendary-prism", "golden-oracle"],
+  },
+  {
+    id: "secret",
+    code: "SC",
+    name: "秘匿系",
+    tagline: "特殊条件でのみ発現する、幻のオーラたち。",
+    accent: "#c4b5fd",
+    accentSoft: "rgba(124, 58, 237, 0.22)",
+    auraIds: ["void-abyss", "god-calamity", "absolute-crystal"],
+  },
+];
+
+export function getAuraLineage(auraId: string): AuraLineage | undefined {
+  return AURA_LINEAGES.find((lineage) => lineage.auraIds.includes(auraId));
+}
 
 export const RARITY_LABELS: Record<AuraRarity, string> = {
   common: "コモン",
@@ -1025,11 +1111,11 @@ function buildSpecialMove(aura: AuraType, topWords: string[]): string {
 }
 
 function buildShareLine(aura: AuraType, topWords: string[], displayName?: string): string {
-  const who = displayName ? `${displayName}の` : "自分の";
+  const who = displayName ?? "俺";
   const shortName = aura.name.replace(/オーラ$/, "");
   const tags =
     topWords.length > 0 ? topWords.map((word) => `#${word}`).join(" ") : "#AuraMaker";
-  return `友達から見た${who}オーラ「${shortName}」\n${tags} #AuraMaker`;
+  return `友達から見た${who}、${aura.archetypeName}やったわ 🔮\n（${shortName}）\n${tags} #AuraMaker`;
 }
 
 function buildDailyFortune(userId: string | undefined, aura: AuraType): string {

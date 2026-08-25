@@ -322,7 +322,6 @@ export default function DashboardClient({
           <div className="mt-5 space-y-5">
             <div>
               <p className="text-sm font-semibold text-violet-100">1. 投票URLを送る</p>
-              <p className="mt-1 text-xs text-white/60">友達に投票してもらう本命ルート（LINEが一番効く）</p>
               <div className="mt-3 flex flex-col gap-3 md:flex-row">
                 <input
                   readOnly

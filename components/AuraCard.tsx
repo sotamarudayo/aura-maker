@@ -81,8 +81,11 @@ export default function AuraCard({
               </span>
             </div>
             <h2 className="mt-3 break-words text-2xl font-black leading-tight sm:text-3xl md:text-5xl">
-              {aura.name}
+              {aura.archetypeName}
             </h2>
+            <p className="mt-2 break-words text-sm font-semibold text-white/55 sm:text-base">
+              {aura.name}
+            </p>
             <p className="mt-3 break-words text-base text-cyan-100 sm:text-lg">{catchCopy}</p>
             <p className="mt-4 break-words text-sm text-white/80 sm:text-base">{profile.mainText}</p>
           </div>

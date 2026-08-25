@@ -29,7 +29,7 @@ export type VoteWordDef = {
 };
 
 export const VOTE_CATEGORY_LABELS: Record<VoteCategory | "all", string> = {
-  all: "すべて",
+  all: "おすすめ",
   visual: "ビジュアル",
   vibes: "バイブス",
   chaos: "ネタ",
@@ -279,6 +279,36 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     category: "visual",
     auraCategory: ["hero", "chaos", "imp"],
   },
+  {
+    id: "akunuketeru",
+    label: "垢抜けてる",
+    category: "visual",
+    auraCategory: ["hero", "warm", "legend"],
+  },
+  {
+    id: "meiryoku-sugoi",
+    label: "目力がすごい",
+    category: "visual",
+    auraCategory: ["hero", "intellect", "imp"],
+  },
+  {
+    id: "fashion-tsuyome",
+    label: "ファッション強め",
+    category: "visual",
+    auraCategory: ["hero", "cool", "legend"],
+  },
+  {
+    id: "bisei-waku",
+    label: "美形枠",
+    category: "visual",
+    auraCategory: ["hero", "cool", "crystal"],
+  },
+  {
+    id: "gyakko-de-kieru",
+    label: "逆光で消える",
+    category: "visual",
+    auraCategory: ["mystic", "cool", "imp"],
+  },
 
   // バイブス追加
   {
@@ -439,7 +469,7 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
   },
 ] as const;
 
-/** 「すべて」タブ用：よく選ばれる12語（全60語はカテゴリタブから） */
+/** 「おすすめ」タブ用：よく選ばれる12語（全語はカテゴリタブから） */
 export const RECOMMENDED_WORD_LABELS: readonly string[] = [
   "ギャップの鬼",
   "天才的バカ",

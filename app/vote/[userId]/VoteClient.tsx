@@ -8,10 +8,20 @@ import {
   VOTE_WORD_DEFS,
   getCategoryWordCount,
   getWordsByCategory,
+  RECOMMENDED_WORD_LABELS,
   type VoteCategory,
   type VoteWord,
+  type VoteWordDef,
 } from "@/lib/constants/words";
-import { buildServiceShareUrls, buildVotePageHeading, buildVotePageSubcopy, buildVoteSubmitLabel, buildVoteThanksMessage, SERVICE_SHARE_TEXT, VOTE_PAGE_FLOW } from "@/lib/constants/share";
+import {
+  buildServiceShareUrls,
+  buildVotePageHeading,
+  buildVotePageSubcopy,
+  buildVoteSubmitLabel,
+  buildVoteThanksMessage,
+  SERVICE_SHARE_TEXT,
+  VOTE_PAGE_FLOW,
+} from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
 import { markVoteSent, readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
 import { createClient } from "@/utils/supabase/client";
@@ -23,20 +33,24 @@ type VoteClientProps = {
 };
 
 const MAX_SELECT = 3;
-const FILTER_TABS: Array<VoteCategory | "all"> = [
-  "all",
-  "visual",
-  "vibes",
-  "chaos",
-  "gap",
-  "secret",
+
+const CATEGORY_SECTIONS: Array<{
+  id: string;
+  key: VoteCategory | "all";
+  label: string;
+}> = [
+  { id: "recommended", key: "all", label: VOTE_CATEGORY_LABELS.all },
+  { id: "visual", key: "visual", label: VOTE_CATEGORY_LABELS.visual },
+  { id: "vibes", key: "vibes", label: VOTE_CATEGORY_LABELS.vibes },
+  { id: "chaos", key: "chaos", label: VOTE_CATEGORY_LABELS.chaos },
+  { id: "gap", key: "gap", label: VOTE_CATEGORY_LABELS.gap },
+  { id: "secret", key: "secret", label: VOTE_CATEGORY_LABELS.secret },
 ];
 
 export default function VoteClient({ userId, displayName, siteUrl }: VoteClientProps) {
   const supabase = useMemo(() => createClient(), []);
   const [currentDisplayName, setCurrentDisplayName] = useState(() => displayName);
   const [selected, setSelected] = useState<VoteWord[]>([]);
-  const [category, setCategory] = useState<VoteCategory | "all">("all");
   const sent = useSyncExternalStore(
     subscribeVoteSent,
     () => readVoteSent(userId),
@@ -48,7 +62,19 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
   const serviceShareUrls = useMemo(() => buildServiceShareUrls(siteUrl), [siteUrl]);
 
   const isSelected = useMemo(() => new Set(selected), [selected]);
-  const visibleWords = useMemo(() => getWordsByCategory(category), [category]);
+
+  const sections = useMemo(
+    () =>
+      CATEGORY_SECTIONS.map((section) => {
+        const words: VoteWordDef[] = getWordsByCategory(section.key);
+        const count =
+          section.key === "all"
+            ? RECOMMENDED_WORD_LABELS.length
+            : getCategoryWordCount(section.key);
+        return { ...section, words, count };
+      }),
+    [],
+  );
 
   useEffect(() => {
     const channel = supabase
@@ -181,7 +207,7 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
   }
 
   return (
-    <main className="relative min-h-screen overflow-x-clip px-4 py-8 text-white sm:py-10">
+    <main className="relative min-h-screen overflow-x-clip px-4 py-8 pb-28 text-white sm:py-10 sm:pb-32">
       <AuraBackground />
       <section className="relative z-10 mx-auto w-full min-w-0 max-w-4xl rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur sm:p-6 md:p-8">
         <h1 className="break-words text-2xl font-black leading-tight sm:text-3xl">
@@ -202,65 +228,60 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
         </div>
 
         <p className="mt-3 text-xs text-white/55">
-          正直でもネタ多めでもOK。全{VOTE_WORD_DEFS.length}語から最大3つまで選べます。
+          正直でもネタ多めでもOK。全{VOTE_WORD_DEFS.length}語から最大3つまで選べます。カテゴリごとに全部並んでるので、スクロールして探してね。
         </p>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          {FILTER_TABS.map((tab) => {
-            const active = category === tab;
-            const countLabel =
-              tab === "all"
-                ? "おすすめ12"
-                : `${getCategoryWordCount(tab)}語`;
-            return (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setCategory(tab)}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition duration-200 ${
-                  active
-                    ? "bg-white text-black shadow-[0_0_18px_rgba(196,181,253,0.45)]"
-                    : "bg-white/10 text-white/85 hover:bg-white/20"
-                }`}
-              >
-                {VOTE_CATEGORY_LABELS[tab]}
-                <span className="ml-1 text-[10px] opacity-70">({countLabel})</span>
-              </button>
-            );
-          })}
+        <nav className="mt-5 flex flex-wrap gap-2" aria-label="カテゴリへジャンプ">
+          {sections.map((section) => (
+            <a
+              key={section.id}
+              href={`#vote-${section.id}`}
+              className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/20"
+            >
+              {section.label}
+              <span className="ml-1 text-[10px] opacity-60">({section.count})</span>
+            </a>
+          ))}
+        </nav>
+
+        <div className="mt-8 space-y-8">
+          {sections.map((section) => (
+            <div key={section.id} id={`vote-${section.id}`} className="scroll-mt-24">
+              <div className="mb-3 flex flex-wrap items-baseline gap-2 border-b border-white/10 pb-2">
+                <h2 className="text-base font-bold text-violet-100 sm:text-lg">{section.label}</h2>
+                <span className="text-xs text-white/45">{section.count}語</span>
+                {section.key === "all" ? (
+                  <span className="text-xs text-violet-200/80">🔥 よく選ばれる語</span>
+                ) : null}
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                {section.words.map((word) => {
+                  const selectedChip = isSelected.has(word.label);
+                  return (
+                    <button
+                      key={`${section.id}-${word.id}`}
+                      type="button"
+                      onClick={() => toggleWord(word.label)}
+                      className={`vote-chip rounded-full px-3 py-2 text-sm font-semibold transition duration-200 ${
+                        selectedChip
+                          ? "vote-chip-selected bg-violet-300 text-black"
+                          : "bg-white/10 text-white hover:scale-[1.03] hover:bg-white/20"
+                      }`}
+                    >
+                      {word.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {category === "all" ? (
-          <p className="mt-3 text-xs text-violet-200/90">
-            🔥 よく選ばれる12語。もっと探すなら上のカテゴリタブをタップ（全{VOTE_WORD_DEFS.length}語）
-          </p>
-        ) : (
-          <p className="mt-3 text-xs text-white/55">
-            {VOTE_CATEGORY_LABELS[category]}カテゴリから選べます
-          </p>
-        )}
+        {error ? <p className="mt-4 text-sm text-rose-300">{error}</p> : null}
+      </section>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {visibleWords.map((word) => {
-            const selectedChip = isSelected.has(word.label);
-            return (
-              <button
-                key={word.id}
-                type="button"
-                onClick={() => toggleWord(word.label)}
-                className={`vote-chip rounded-full px-3 py-2 text-sm font-semibold transition duration-200 ${
-                  selectedChip
-                    ? "vote-chip-selected bg-violet-300 text-black"
-                    : "bg-white/10 text-white hover:bg-white/20 hover:scale-[1.03]"
-                }`}
-              >
-                {word.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/15 bg-black/80 px-4 py-3 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-3 gap-y-2">
           <button
             type="button"
             disabled={sending || selected.length === 0}
@@ -269,13 +290,11 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
           >
             {sending ? "送信中..." : buildVoteSubmitLabel(selected.length)}
           </button>
-          <p className="min-w-0 break-words text-sm text-white/80">
+          <p className="min-w-0 flex-1 break-words text-sm text-white/80">
             選択中: {selected.join(" / ") || "なし"}
           </p>
         </div>
-
-        {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
-      </section>
+      </div>
     </main>
   );
 }

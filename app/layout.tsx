@@ -58,9 +58,13 @@ export const metadata: Metadata = {
     images: [ogImage.url],
   },
   icons: {
-    icon: [{ url: "/brand/auramaker-logo.png", type: "image/png" }],
-    apple: [{ url: "/brand/auramaker-logo.png", type: "image/png" }],
-    shortcut: ["/brand/auramaker-logo.png"],
+    icon: [
+      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/favicon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/brand/favicon-192.png", sizes: "192x192", type: "image/png" }],
+    shortcut: ["/favicon.ico"],
   },
   ...(googleSiteVerification
     ? {

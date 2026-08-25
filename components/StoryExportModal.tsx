@@ -376,8 +376,11 @@ function StoryLayout({
           {RARITY_LABELS[aura.rarity]}
         </span>
         <h3 style={{ marginTop: 10, fontSize: 20, fontWeight: 900, lineHeight: 1.25, color: "#fff" }}>
-          {aura.name}
+          {aura.archetypeName}
         </h3>
+        <p style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>
+          {aura.name}
+        </p>
         <p style={{ marginTop: 8, fontSize: 11, lineHeight: 1.45, color: "rgba(255,255,255,0.82)" }}>
           {shortMain}
         </p>
@@ -466,8 +469,11 @@ function CardLayout({
 
       <p style={{ marginTop: 4, fontSize: 11, color: "rgba(255,255,255,0.55)" }}>{displayName}</p>
       <h3 style={{ marginTop: 6, fontSize: 22, fontWeight: 900, lineHeight: 1.2, color: "#fff" }}>
-        {aura.name}
+        {aura.archetypeName}
       </h3>
+      <p style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>
+        {aura.name}
+      </p>
       <p style={{ marginTop: 6, fontSize: 10, lineHeight: 1.45, color: "rgba(255,255,255,0.78)" }}>
         {shortMain}
       </p>

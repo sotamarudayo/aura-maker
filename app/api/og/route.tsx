@@ -187,8 +187,18 @@ export async function GET(request: Request) {
           <div
             style={{
               marginTop: 16,
-              fontSize: 40,
-              fontWeight: 700,
+              fontSize: 48,
+              fontWeight: 900,
+              textShadow: "0 8px 40px rgba(168, 85, 247, 0.45)",
+            }}
+          >
+            {auraResult.aura.archetypeName}
+          </div>
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 28,
+              fontWeight: 600,
               color: "#c4b5fd",
             }}
           >
