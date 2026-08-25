@@ -116,10 +116,18 @@ export default function DashboardClient({
   const voteInviteText = buildVoteInviteSharePayload(displayName, voteUrl);
   const voteInviteShareUrls = buildVoteInviteShareUrls(displayName, voteUrl);
 
-  async function copyVoteUrl() {
+  async function copyVoteInvite() {
     await navigator.clipboard.writeText(voteInviteText);
-    trackEvent("copy_vote_url");
+    trackEvent("copy_vote_url", { with_message: true });
     setToastMessage("投票のお願い文＋URLをコピーしました");
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+  }
+
+  async function copyVoteUrlOnly() {
+    await navigator.clipboard.writeText(voteUrl);
+    trackEvent("copy_vote_url", { with_message: false });
+    setToastMessage("投票URLだけコピーしました");
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
@@ -327,7 +335,7 @@ export default function DashboardClient({
             <div>
               <p className="text-sm font-semibold text-violet-100">1. 投票をお願いする</p>
               <p className="mt-1 text-xs text-white/55">
-                URLだけだとドメインで誤解されやすいので、説明文つきで送るのがおすすめ。
+                説明文つきがおすすめ。すでに説明済みならURLだけでもOK。
               </p>
               <p className="mt-3 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
                 {voteInviteText}
@@ -335,10 +343,17 @@ export default function DashboardClient({
               <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={copyVoteUrl}
+                  onClick={copyVoteInvite}
                   className="rounded-full bg-violet-300 px-4 py-2 text-sm font-bold text-black"
                 >
                   お願い文＋URLをコピー
+                </button>
+                <button
+                  type="button"
+                  onClick={copyVoteUrlOnly}
+                  className="rounded-full bg-cyan-300/90 px-4 py-2 text-sm font-bold text-black"
+                >
+                  URLだけコピー
                 </button>
                 <a
                   className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"

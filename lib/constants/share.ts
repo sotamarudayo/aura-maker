@@ -28,13 +28,12 @@ export function buildVoteInviteDescription(displayName: string) {
 
 /**
  * 投票依頼を送るときの本文（URLの前にサービス説明を置く）
- * booklovers などのドメインで誤解されないように、先に AuraMaker を明示する
  */
 export function buildVoteInviteShareText(displayName: string) {
   return [
     "【AuraMaker】MBTIみたいな他人から見たタイプ診断🙏",
     `${displayName}の印象に合う言葉を、最大3つ選んで投票してほしい！`,
-    "匿名OK・約10秒。本の紹介とかじゃなくて、雰囲気キャラ診断です。",
+    "匿名OK・約10秒。",
   ].join("\n");
 }
 
