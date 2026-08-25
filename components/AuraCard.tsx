@@ -90,7 +90,25 @@ export default function AuraCard({
               <span className="rounded-full border border-white/25 bg-white/10 px-2 py-0.5 text-[11px] font-semibold">
                 {RARITY_LABELS[aura.rarity]}
               </span>
+              <span
+                className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
+                  profile.confidence === "provisional"
+                    ? "border-amber-300/50 bg-amber-500/20 text-amber-100"
+                    : profile.confidence === "growing"
+                      ? "border-cyan-300/40 bg-cyan-500/15 text-cyan-100"
+                      : "border-emerald-300/40 bg-emerald-500/15 text-emerald-100"
+                }`}
+              >
+                {profile.confidence === "provisional"
+                  ? "暫定"
+                  : profile.confidence === "growing"
+                    ? "育ち中"
+                    : "安定"}
+              </span>
             </div>
+            {profile.confidence !== "stable" ? (
+              <p className="mt-2 text-xs text-white/60">{profile.confidenceLabel}</p>
+            ) : null}
             <p className="mt-4 text-[11px] font-bold tracking-[0.28em] text-white/45">通り名</p>
             <h2
               className="mt-1 break-words text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
@@ -105,6 +123,21 @@ export default function AuraCard({
               {aura.archetypeName}
             </h2>
             <p className="mt-3 break-words text-base text-cyan-100 sm:text-lg">{catchCopy}</p>
+            {topWords.length > 0 ? (
+              <div className="mt-4">
+                <p className="text-[11px] font-bold tracking-[0.2em] text-white/45">診断の決め手</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {topWords.map((word) => (
+                    <span
+                      key={word}
+                      className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm font-semibold"
+                    >
+                      #{word}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <p className="mt-4 break-words text-sm text-white/80 sm:text-base">{profile.mainText}</p>
           </div>
 
@@ -191,22 +224,13 @@ export default function AuraCard({
             <p className="mt-2 text-sm text-cyan-100">{profile.dailyFortune}</p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {topWords.length > 0 ? (
-              topWords.map((word) => (
-                <span
-                  key={word}
-                  className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm font-semibold"
-                >
-                  #{word}
-                </span>
-              ))
-            ) : (
+          {topWords.length === 0 ? (
+            <div className="flex flex-wrap gap-2">
               <span className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-sm font-semibold text-white/70">
                 #覚醒待ち
               </span>
-            )}
-          </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

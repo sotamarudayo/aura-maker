@@ -2,6 +2,7 @@ import {
   getVoteWordDef,
   type AuraAttribute,
 } from "@/lib/constants/words";
+import { getWordResultFlavor } from "@/lib/constants/word-result-flavor";
 
 export type AuraRarity = "common" | "uncommon" | "rare" | "legendary" | "secret";
 
@@ -56,6 +57,8 @@ export type AuraAwakening = {
   hint: string;
 };
 
+export type AuraResultConfidence = "provisional" | "growing" | "stable";
+
 export type DynamicAuraProfile = {
   mainText: string;
   ecology: AuraEcology;
@@ -66,6 +69,9 @@ export type DynamicAuraProfile = {
   shareLine: string;
   dailyFortune: string;
   awakening: AuraAwakening;
+  /** 票数に応じた結果の確からしさ */
+  confidence: AuraResultConfidence;
+  confidenceLabel: string;
 };
 
 export type AuraCalculationOptions = {
@@ -933,6 +939,10 @@ function findContradictionDetail(topWords: string[]): AuraContradiction | null {
 
 function buildWitness(aura: AuraType, topWords: string[]): string {
   for (const word of topWords) {
+    const flavor = getWordResultFlavor(word);
+    if (flavor?.witness) {
+      return flavor.witness;
+    }
     const options = WITNESS_BY_WORD[word];
     if (options) {
       return pickStable(options, `witness:${word}:${aura.id}`);
@@ -947,27 +957,35 @@ function buildWitness(aura: AuraType, topWords: string[]): string {
   }
 
   const primary = topWords[0] ?? aura.name;
-  const nuance = WORD_NUANCE[primary] ?? primary;
+  const nuance =
+    getWordResultFlavor(primary)?.nuance ?? WORD_NUANCE[primary] ?? primary;
   return `周囲からは『${nuance}な人』として認識されています`;
 }
 
 function buildPraise(aura: AuraType, topWords: string[]): string {
   const primary = topWords[0];
-  const nuance = primary ? (WORD_NUANCE[primary] ?? primary) : aura.name;
+  const nuance = primary
+    ? (getWordResultFlavor(primary)?.nuance ?? WORD_NUANCE[primary] ?? primary)
+    : aura.name;
+  const wordJoin = topWords.length > 0 ? `「${topWords.join("・")}」` : "投票ワード";
 
   if (aura.rarity === "secret") {
-    return `禁断の組み合わせ「${topWords.join("・")}」が${aura.name}を覚醒させました。${nuance}な魅力は本物です。`;
+    return `禁断の組み合わせ${wordJoin}が${aura.archetypeName}（${aura.name}）を覚醒させました。${nuance}が核になっています。`;
   }
 
   if (aura.rarity === "legendary") {
-    return `総合評価は${aura.name}級。${nuance}が核で、友達から見たあなたはかなりレア枠です。`;
+    return `総合すると${aura.archetypeName}級。${wordJoin}の傾向から見て、${nuance}が軸のレア枠です。`;
   }
 
-  return `総合すると${aura.name}タイプ。${nuance}が際立っていて、友達目線でも相当好意的に見られています。`;
+  return `総合すると${aura.archetypeName}タイプ。${wordJoin}が効いていて、${nuance}が友達目線でも際立っています。`;
 }
 
 function buildPunchline(aura: AuraType, topWords: string[]): string {
   for (const word of topWords) {
+    const flavor = getWordResultFlavor(word);
+    if (flavor?.punchline) {
+      return flavor.punchline;
+    }
     const options = PUNCHLINE_BY_WORD[word];
     if (options) {
       return pickStable(options, `punch:${word}:${aura.id}`);
@@ -979,18 +997,13 @@ function buildPunchline(aura: AuraType, topWords: string[]): string {
     return pickStable(auraOptions, `punch-aura:${aura.id}`);
   }
 
-  return pickStable(
-    [
-      "ただし油断すると想定外の一面が漏れ出します",
-      "ただしテンション次第で周囲の予想を裏切ります",
-      "ただし本番以外は省エネモードになりがちです",
-    ],
-    `punch-default:${topWords.join("-")}:${aura.id}`,
-  );
+  return `ただし『${aura.archetypeName}』らしさが強く出すぎると、周囲の反応が割れがちです`;
 }
 
 function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
   for (const word of topWords) {
+    const flavor = getWordResultFlavor(word);
+    if (flavor?.ecology) return flavor.ecology;
     const ecology = ECOLOGY_BY_WORD[word];
     if (ecology) return ecology;
   }
@@ -1008,7 +1021,7 @@ function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
 
 const SPECIAL_MOVE_BY_WORD: Partial<Record<string, readonly string[]>> = {
   限界オタク: ["推し語り無双", "オタク語録ラッシュ"],
-  推ししか勝たん: ["推し一択爆発", "推し語りタイphoon"],
+  推ししか勝たん: ["推し一択爆発", "推し語り台風"],
   突然ボケる: ["不意打ちボケ", "空気白けてからの一撃"],
   既読スルー魔: ["既読スルーの極意", "返信保留フィニッシュ"],
   だるいのに有能: ["だる顔必殺仕事", "締切前覚醒"],
@@ -1133,6 +1146,10 @@ function buildCompatibility(aura: AuraType): AuraCompatibility {
 
 function buildSpecialMove(aura: AuraType, topWords: string[]): string {
   for (const word of topWords) {
+    const flavor = getWordResultFlavor(word);
+    if (flavor?.specialMove) {
+      return flavor.specialMove;
+    }
     const moves = SPECIAL_MOVE_BY_WORD[word];
     if (moves) {
       return pickStable(moves, `move:${word}:${aura.id}`);
@@ -1174,9 +1191,9 @@ function buildAwakening(votes: string[]): AuraAwakening {
   if (total === 0) {
     hint = "投票URLをシェアして覚醒させよう";
   } else if (total < 3) {
-    hint = `あと${3 - total}票でオーラが安定`;
+    hint = `あと${3 - total}票で暫定結果を卒業`;
   } else if (total < 10) {
-    hint = `あと${10 - total}票で覚醒度アップ`;
+    hint = `あと${10 - total}票で結果が安定しやすい`;
   } else if (unique < 8) {
     hint = "いろんな印象ワードが集まると進化の兆し";
   } else {
@@ -1186,12 +1203,37 @@ function buildAwakening(votes: string[]): AuraAwakening {
   return { percent, hint };
 }
 
+function buildResultConfidence(votes: string[]): {
+  confidence: AuraResultConfidence;
+  confidenceLabel: string;
+} {
+  const total = votes.length;
+  if (total < 3) {
+    return {
+      confidence: "provisional",
+      confidenceLabel: `暫定結果（まだ${total}票。あと${3 - total}票で暫定を卒業しやすい）`,
+    };
+  }
+  if (total < 10) {
+    return {
+      confidence: "growing",
+      confidenceLabel: `結果が育ち中（${total}票。あと${10 - total}票でより納得感アップ）`,
+    };
+  }
+  return {
+    confidence: "stable",
+    confidenceLabel: `結果が安定（${total}票）`,
+  };
+}
+
 function buildDynamicProfile(
   aura: AuraType,
   topWords: string[],
   votes: string[],
   options?: AuraCalculationOptions,
 ): DynamicAuraProfile {
+  const confidence = buildResultConfidence(votes);
+
   if (aura.id === "dormant" || topWords.length === 0) {
     return {
       mainText: aura.description,
@@ -1203,6 +1245,8 @@ function buildDynamicProfile(
       shareLine: buildShareLine(aura, topWords, options?.displayName),
       dailyFortune: "投票が集まると今日のオーラ占いが解放されます",
       awakening: buildAwakening(votes),
+      confidence: "provisional",
+      confidenceLabel: "暫定結果（投票待ち）",
     };
   }
 
@@ -1222,6 +1266,7 @@ function buildDynamicProfile(
     shareLine: buildShareLine(aura, topWords, options?.displayName),
     dailyFortune: buildDailyFortune(options?.userId, aura),
     awakening: buildAwakening(votes),
+    ...confidence,
   };
 }
 
@@ -1248,7 +1293,10 @@ function buildWordCounts(votes: string[]) {
 
 function personalizeCatchCopy(aura: AuraType, topWords: string[]) {
   if (topWords.length === 0) return aura.catchCopy;
-  return `${topWords.join("・")} が混ざり合う、${aura.catchCopy}`;
+  const flavored = topWords
+    .map((word) => getWordResultFlavor(word)?.nuance ?? word)
+    .join("・");
+  return `${flavored}が混ざり合う、${aura.catchCopy}`;
 }
 
 function hasAny(set: Set<string>, words: string[]) {
@@ -1304,26 +1352,49 @@ function resolveSecretAura(topWords: string[]): AuraType | null {
 function scoreAura(aura: AuraType, counts: Map<string, number>, topWords: string[]) {
   let score = 0;
 
+  const topAttrCounts = new Map<AuraAttribute, number>();
+  for (const word of topWords) {
+    const def = getVoteWordDef(word);
+    if (!def) continue;
+    for (const attr of def.auraCategory) {
+      topAttrCounts.set(attr, (topAttrCounts.get(attr) ?? 0) + 1);
+    }
+  }
+
   for (const [word, count] of counts) {
     if (aura.keywords.includes(word)) {
-      score += count * 3;
-      if (topWords.includes(word)) score += 4;
+      score += count * 4;
+      if (topWords.includes(word)) score += 6;
     }
 
     const def = getVoteWordDef(word);
     if (!def) continue;
     for (const attr of def.auraCategory) {
       if (aura.attributes.includes(attr)) {
-        score += count * 2;
-        if (topWords.includes(word)) score += 2;
+        score += count * 2.5;
+        if (topWords.includes(word)) score += 3;
       }
     }
   }
 
+  // 上位ワードの属性がオーラ属性と揃うほど納得感が増す
+  for (const attr of aura.attributes) {
+    const hits = topAttrCounts.get(attr) ?? 0;
+    score += hits * 5;
+  }
+
+  // 同系統っぽい属性が2つ以上重なるとさらに加点
+  const sharedTopAttrs = aura.attributes.filter((attr) => (topAttrCounts.get(attr) ?? 0) > 0);
+  if (sharedTopAttrs.length >= 2) score += 8;
+
   if (aura.rarity === "legendary") {
     const matchedKeywords = aura.keywords.filter((keyword) => counts.has(keyword)).length;
     if (matchedKeywords >= 3) score += 10;
-    else score -= 5;
+    else score -= 8;
+  }
+
+  if (aura.rarity === "secret") {
+    score -= 20;
   }
 
   return score;
@@ -1357,8 +1428,8 @@ export function calculateAuraType(
   }
 
   let bestAura =
-    STANDARD_AURA_TYPES.find((aura) => aura.id === "imp-neon") ?? STANDARD_AURA_TYPES[0];
-  let bestScore = -1;
+    STANDARD_AURA_TYPES.find((aura) => aura.id === "healing-mint") ?? STANDARD_AURA_TYPES[0]!;
+  let bestScore = Number.NEGATIVE_INFINITY;
 
   for (const aura of STANDARD_AURA_TYPES) {
     const score = scoreAura(aura, counts, topWords);

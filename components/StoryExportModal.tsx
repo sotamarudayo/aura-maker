@@ -461,22 +461,48 @@ function CardLayout({
         boxSizing: "border-box",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <p style={{ fontSize: 10, letterSpacing: "0.18em", fontWeight: 700, color: "rgba(196,181,253,0.95)" }}>
           AURA RESULT
         </p>
-        <span
-          style={{
-            borderRadius: 999,
-            border: "1px solid rgba(255,255,255,0.25)",
-            background: "rgba(255,255,255,0.1)",
-            padding: "2px 8px",
-            fontSize: 9,
-            fontWeight: 700,
-          }}
-        >
-          {RARITY_LABELS[aura.rarity]}
-        </span>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <span
+            style={{
+              borderRadius: 999,
+              border: "1px solid rgba(255,255,255,0.25)",
+              background: "rgba(255,255,255,0.1)",
+              padding: "2px 8px",
+              fontSize: 9,
+              fontWeight: 700,
+            }}
+          >
+            {RARITY_LABELS[aura.rarity]}
+          </span>
+          {profile.confidence !== "stable" ? (
+            <span
+              style={{
+                borderRadius: 999,
+                border:
+                  profile.confidence === "provisional"
+                    ? "1px solid rgba(252,211,77,0.5)"
+                    : "1px solid rgba(103,232,249,0.4)",
+                background:
+                  profile.confidence === "provisional"
+                    ? "rgba(245,158,11,0.2)"
+                    : "rgba(6,182,212,0.15)",
+                padding: "2px 8px",
+                fontSize: 9,
+                fontWeight: 700,
+                color:
+                  profile.confidence === "provisional"
+                    ? "rgba(254,243,199,0.95)"
+                    : "rgba(207,250,254,0.95)",
+              }}
+            >
+              {profile.confidence === "provisional" ? "暫定" : "育ち中"}
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <p style={{ marginTop: 4, fontSize: 11, color: "rgba(255,255,255,0.55)" }}>{displayName}</p>
