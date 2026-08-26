@@ -266,9 +266,14 @@ export default function AuraCard({
             ))}
           </div>
 
-          <p className="mt-5 break-words text-base font-black text-fuchsia-100 sm:text-lg">
-            💥「{profile.specialMove}」
-          </p>
+          <div className="mt-5 w-full max-w-md rounded-2xl border border-fuchsia-300/45 bg-gradient-to-br from-fuchsia-500/25 via-rose-500/15 to-violet-500/20 px-4 py-3.5 text-center shadow-[0_0_28px_rgba(232,121,249,0.22)]">
+            <p className="text-[11px] font-black tracking-[0.28em] text-fuchsia-100/90">
+              💥 必殺技
+            </p>
+            <p className="mt-1.5 break-words text-lg font-black leading-snug text-white sm:text-xl">
+              「{profile.specialMove}」
+            </p>
+          </div>
 
           <div className="mt-4 flex max-w-full flex-wrap justify-center gap-2">
             {topStatBadges.map((stat) => (
