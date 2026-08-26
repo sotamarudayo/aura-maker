@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 /** セッション更新が必要なルートだけ middleware で getUser する（公開ページのTTFB改善） */
 function needsSessionRefresh(pathname: string) {
   return (
+    pathname === "/" ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/auth") ||
     pathname.startsWith("/login")

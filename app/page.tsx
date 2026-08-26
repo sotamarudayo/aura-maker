@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import AnonymousStartButton from "@/components/AnonymousStartButton";
 import AuraBackground from "@/components/AuraBackground";
 import { AURA_TYPES } from "@/lib/constants/auras";
 import { SERVICE_SHARE_TEXT } from "@/lib/constants/share";
+import { createClient } from "@/utils/supabase/server";
 
 export const metadata: Metadata = {
   title: "AuraMaker | 友達から見た自分のオーラがわかる",
@@ -29,7 +31,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="relative min-h-screen overflow-x-clip px-4 py-8 text-white sm:py-12">
       <AuraBackground />

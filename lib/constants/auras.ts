@@ -132,7 +132,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 25% 20%, #fbbf24, transparent 45%), radial-gradient(circle at 80% 30%, #fb7185, transparent 50%), linear-gradient(135deg, #1a0f00 0%, #3b1d05 100%)",
     palette: { a: "#fbbf24", b: "#fb7185", c: "#f97316" },
-    keywords: ["ビジュ爆発", "圧倒的主人公", "カリスマ", "陽キャバイブス", "頼れる相棒", "シルエット強め", "写真写り良すぎ", "自撮りの鬼"],
+    keywords: ["ビジュ爆発", "圧倒的主人公", "カリスマ", "陽キャバイブス", "頼れる相棒", "シルエット強め", "写真写り良すぎ", "自撮りの鬼", "熱血", "負けず嫌い"],
     attributes: ["hero", "warm"],
     rarity: "common",
   },
@@ -146,7 +146,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 30% 25%, #6ee7b7, transparent 45%), radial-gradient(circle at 75% 70%, #67e8f9, transparent 50%), linear-gradient(135deg, #042f2e 0%, #0f172a 100%)",
     palette: { a: "#6ee7b7", b: "#67e8f9", c: "#34d399" },
-    keywords: ["癒やし枠", "マイナスイオン", "空気清浄機", "頼れる相棒", "実は寂しがり"],
+    keywords: ["癒やし枠", "マイナスイオン", "空気清浄機", "頼れる相棒", "実は寂しがり", "温厚", "面倒見いい"],
     attributes: ["heal", "warm"],
     rarity: "common",
   },
@@ -174,7 +174,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 30% 25%, #fda4af, transparent 45%), radial-gradient(circle at 70% 70%, #fecdd3, transparent 50%), linear-gradient(135deg, #2a1018 0%, #1a0a12 100%)",
     palette: { a: "#fda4af", b: "#fecdd3", c: "#fb7185" },
-    keywords: ["癒やし枠", "実は寂しがり", "平成レトロ", "ツンデレ", "クールに見えてドジ"],
+    keywords: ["癒やし枠", "実は寂しがり", "平成レトロ", "ツンデレ", "クールに見えてドジ", "天然", "温厚"],
     attributes: ["heal", "imp", "warm"],
     rarity: "uncommon",
   },
@@ -202,7 +202,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 25% 25%, #e879f9, transparent 45%), radial-gradient(circle at 75% 35%, #22d3ee, transparent 50%), radial-gradient(circle at 50% 80%, #f43f5e, transparent 55%), linear-gradient(135deg, #1a0520 0%, #0c1222 100%)",
     palette: { a: "#e879f9", b: "#22d3ee", c: "#f43f5e" },
-    keywords: ["深夜テンション", "治安悪め", "天才的バカ", "草不可避", "距離感バグ", "バグ技", "突然ボケる", "リアクション過剰"],
+    keywords: ["深夜テンション", "治安悪め", "天才的バカ", "草不可避", "距離感バグ", "バグ技", "突然ボケる", "リアクション過剰", "変態"],
     attributes: ["chaos", "imp"],
     rarity: "common",
   },
@@ -244,7 +244,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 30% 20%, #f472b6, transparent 45%), radial-gradient(circle at 70% 70%, #a855f7, transparent 50%), linear-gradient(135deg, #2a0a1f 0%, #1a1033 100%)",
     palette: { a: "#f472b6", b: "#a855f7", c: "#ec4899" },
-    keywords: ["ギャップの鬼", "ツンデレ", "クールに見えてドジ", "天然毒舌", "距離感バグ", "だるいのに有能", "口下手なのに毒舌", "人見知り"],
+    keywords: ["ギャップの鬼", "ツンデレ", "クールに見えてドジ", "天然毒舌", "距離感バグ", "だるいのに有能", "口下手なのに毒舌", "人見知り", "腹黒"],
     attributes: ["imp", "chaos"],
     rarity: "rare",
   },
@@ -258,7 +258,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 30% 25%, #94a3b8, transparent 45%), radial-gradient(circle at 70% 75%, #6366f1, transparent 50%), linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)",
     palette: { a: "#94a3b8", b: "#6366f1", c: "#818cf8" },
-    keywords: ["深夜テンション", "儚げ", "マイナスイオン", "透明感", "ミステリアス"],
+    keywords: ["深夜テンション", "儚げ", "マイナスイオン", "透明感", "ミステリアス", "冷徹"],
     attributes: ["cool", "mystic"],
     rarity: "rare",
   },
@@ -272,7 +272,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 20% 30%, #818cf8, transparent 45%), radial-gradient(circle at 80% 50%, #c084fc, transparent 50%), radial-gradient(circle at 50% 85%, #22d3ee, transparent 55%), linear-gradient(135deg, #0f0a2e 0%, #1a0a2e 100%)",
     palette: { a: "#818cf8", b: "#c084fc", c: "#22d3ee" },
-    keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC", "推し活の鬼", "推ししか勝たん"],
+    keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC", "推し活の鬼", "推ししか勝たん", "変態"],
     attributes: ["otaku", "chaos"],
     rarity: "uncommon",
   },

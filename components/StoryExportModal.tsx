@@ -127,28 +127,17 @@ export default function StoryExportModal({
     });
   }
 
-  async function handleDownload() {
-    if (exporting) return;
-    setExporting(true);
-    setError(null);
+  async function handleDownload(dataUrl?: string) {
+    const url = dataUrl ?? (await exportPng());
+    if (!url) throw new Error("画像の生成に失敗しました");
 
-    try {
-      const dataUrl = await exportPng();
-      if (!dataUrl) throw new Error("画像の生成に失敗しました");
-
-      const link = document.createElement("a");
-      link.download =
-        format === "story" ? "my_aura_story.png" : "my_aura_result.png";
-      link.href = dataUrl;
-      link.click();
-      trackEvent("export_result_image", { format, method: "download" });
-      onSaved?.();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "画像の生成に失敗しました";
-      setError(message);
-    } finally {
-      setExporting(false);
-    }
+    const link = document.createElement("a");
+    link.download =
+      format === "story" ? "my_aura_story.png" : "my_aura_result.png";
+    link.href = url;
+    link.click();
+    trackEvent("export_result_image", { format, method: "download" });
+    onSaved?.();
   }
 
   async function handleNativeShare() {
@@ -173,7 +162,8 @@ export default function StoryExportModal({
         trackEvent("export_result_image", { format, method: "native_share" });
         onSaved?.();
       } else {
-        await handleDownload();
+        // 端末シェア非対応時はダウンロードにフォールバック
+        await handleDownload(dataUrl);
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
@@ -196,7 +186,7 @@ export default function StoryExportModal({
           <div>
             <h2 className="text-xl font-bold">結果を画像でシェア</h2>
             <p className="mt-1 text-sm text-white/70">
-              診断結果カードをPNGで保存。Instagram / X / LINE にそのまま投稿できます。
+              診断結果カードを画像でシェア。Instagram / X / LINE にそのまま投稿できます。
             </p>
           </div>
           <button
@@ -274,7 +264,7 @@ export default function StoryExportModal({
           <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
             <button
               type="button"
-              onClick={handleDownload}
+              onClick={handleNativeShare}
               disabled={exporting}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-6 py-3 text-sm font-bold text-black disabled:opacity-70"
             >
@@ -284,16 +274,8 @@ export default function StoryExportModal({
                   生成中...
                 </>
               ) : (
-                "📥 PNGを保存する"
+                "📤 端末でシェア"
               )}
-            </button>
-            <button
-              type="button"
-              onClick={handleNativeShare}
-              disabled={exporting}
-              className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white disabled:opacity-70"
-            >
-              📤 端末でシェア
             </button>
             <button
               type="button"

@@ -467,20 +467,70 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     category: "secret",
     auraCategory: ["warm", "chaos", "hero"],
   },
+
+  // 性格・わかりやすい素の印象
+  {
+    id: "nekketsu",
+    label: "熱血",
+    category: "vibes",
+    auraCategory: ["hero", "warm", "chaos"],
+  },
+  {
+    id: "reitetsu",
+    label: "冷徹",
+    category: "vibes",
+    auraCategory: ["cool", "void", "intellect"],
+  },
+  {
+    id: "onkou",
+    label: "温厚",
+    category: "vibes",
+    auraCategory: ["heal", "warm"],
+  },
+  {
+    id: "hentai",
+    label: "変態",
+    category: "chaos",
+    auraCategory: ["chaos", "otaku", "imp"],
+  },
+  {
+    id: "tennen",
+    label: "天然",
+    category: "vibes",
+    auraCategory: ["warm", "heal", "chaos"],
+  },
+  {
+    id: "makezugirai",
+    label: "負けず嫌い",
+    category: "vibes",
+    auraCategory: ["hero", "chaos", "intellect"],
+  },
+  {
+    id: "mendoumi-ii",
+    label: "面倒見いい",
+    category: "vibes",
+    auraCategory: ["heal", "warm", "hero"],
+  },
+  {
+    id: "haraguro",
+    label: "腹黒",
+    category: "gap",
+    auraCategory: ["imp", "intellect", "void"],
+  },
 ] as const;
 
 /** 「おすすめ」タブ用：よく選ばれる12語（全語はカテゴリタブから） */
 export const RECOMMENDED_WORD_LABELS: readonly string[] = [
+  "熱血",
+  "温厚",
+  "冷徹",
+  "変態",
   "ギャップの鬼",
   "天才的バカ",
-  "草不可避",
   "限界オタク",
   "NPC",
   "だるいのに有能",
-  "突然ボケる",
-  "既読スルー魔",
-  "推ししか勝たん",
-  "リアクション過剰",
+  "天然",
   "カリスマ",
   "癒やし枠",
 ];

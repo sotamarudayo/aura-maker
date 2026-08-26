@@ -756,6 +756,94 @@ export const WORD_RESULT_FLAVOR: Record<string, WordResultFlavor> = {
     specialMove: "笑いの引力全開",
     punchline: "ただし『笑いの引力』が強く出すぎると周囲がついていけないことがあります",
   },
+  "熱血": {
+    nuance: "まっすぐ燃える情熱",
+    witness: "周囲からは『熱く語り出す人』として認識されています",
+    ecology: {
+      trigger: "仲間が落ち込む / 大事な勝負事",
+      sideEffect: "周囲のテンションが強制的に引き上げられる",
+      weakness: "冷静な会議 / 冷やかし",
+    },
+    specialMove: "熱血スピリット全開",
+    punchline: "ただし熱すぎると周りが少し引く瞬間もあります",
+  },
+  "冷徹": {
+    nuance: "感情を切る切れ味",
+    witness: "周囲からは『割り切れる人』として認識されています",
+    ecology: {
+      trigger: "決断が必要な場面 / トラブル対応",
+      sideEffect: "空気が一気に引き締まる",
+      weakness: "感傷トーク / ノリの飲み会",
+    },
+    specialMove: "冷徹ジャッジメント",
+    punchline: "ただし冷たさが強すぎると距離を取られがちです",
+  },
+  "温厚": {
+    nuance: "穏やかな安心感",
+    witness: "周囲からは『怒らなそうな人』として認識されています",
+    ecology: {
+      trigger: "もめごと / 疲れている人がいる時",
+      sideEffect: "場の温度がゆっくり戻る",
+      weakness: "煽り合い / 怒らせてくる相手",
+    },
+    specialMove: "温厚バリア展開",
+    punchline: "ただし優しさが裏目に出て頼みごとが増えがちです",
+  },
+  "変態": {
+    nuance: "常識の外側の好奇心",
+    witness: "周囲からは『一癖ある人』として認識されています",
+    ecology: {
+      trigger: "趣味トーク / 夜のノリ",
+      sideEffect: "会話のレーティングが突然上がる",
+      weakness: "堅い場 / 初対面の目上",
+    },
+    specialMove: "変態好奇心解放",
+    punchline: "ただし振り幅が大きすぎると説明が追いつきません",
+  },
+  "天然": {
+    nuance: "計算なしのずれ",
+    witness: "周囲からは『ほんわか天然な人』として認識されています",
+    ecology: {
+      trigger: "何気ない会話 / ボケが必要な瞬間",
+      sideEffect: "周囲が勝手に癒やされ始める",
+      weakness: "細かい指示 / 厳しい締切",
+    },
+    specialMove: "天然スマイル誤爆",
+    punchline: "ただし天然が強すぎると本気かギャグか判別不能になります",
+  },
+  "負けず嫌い": {
+    nuance: "負けを許せない芯",
+    witness: "周囲からは『絶対に引き下がらない人』として認識されています",
+    ecology: {
+      trigger: "勝負・比較・ちょっとした負け話",
+      sideEffect: "周囲の競争心まで刺激される",
+      weakness: "どうでもいい雑談勝負 / 本気を出さなくていい場",
+    },
+    specialMove: "負けず嫌いリベンジ",
+    punchline: "ただし勝ちにこだわりすぎると疲れが見え始めます",
+  },
+  "面倒見いい": {
+    nuance: "世話焼きの安心感",
+    witness: "周囲からは『つい頼ってしまう人』として認識されています",
+    ecology: {
+      trigger: "困ってる人がいる / 後輩がいる場",
+      sideEffect: "相談が集中し始める",
+      weakness: "自分のケア不足 / 頼みすぎる人",
+    },
+    specialMove: "面倒見いいサポート全開",
+    punchline: "ただし面倒を見すぎると自分の時間が消えます",
+  },
+  "腹黒": {
+    nuance: "笑顔の裏の計算",
+    witness: "周囲からは『なんか読めない人』として認識されています",
+    ecology: {
+      trigger: "駆け引き / 本音を隠したい場面",
+      sideEffect: "周囲が『本音どこ？』モードになる",
+      weakness: "素直さが求められる場 / 丸裸の雑談",
+    },
+    specialMove: "腹黒スマイル攻略",
+    punchline: "ただし腹黒がバレるとギャップで逆に人気が出ることもあります",
+  },
 };
 
 export function getWordResultFlavor(word: string): WordResultFlavor | undefined {

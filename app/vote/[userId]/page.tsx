@@ -75,13 +75,10 @@ export default async function VotePage({ params }: VotePageProps) {
     );
   }
 
-  const siteUrl = await resolveSiteUrl();
-
   return (
     <VoteClient
       userId={userId}
       displayName={profile.display_name ?? "名無しのオーラ使い"}
-      siteUrl={siteUrl}
     />
   );
 }

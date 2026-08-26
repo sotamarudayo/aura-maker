@@ -221,7 +221,7 @@ export default function DashboardClient({
       />
 
       {toastMessage ? (
-        <div className="pointer-events-none fixed left-1/2 top-6 z-30 -translate-x-1/2 rounded-full border border-violet-300/50 bg-black/70 px-5 py-2 text-sm font-semibold text-violet-100 shadow-xl backdrop-blur vote-toast">
+        <div className="pointer-events-none fixed left-1/2 top-20 z-[60] -translate-x-1/2 rounded-full border border-violet-300/50 bg-black/70 px-5 py-2 text-sm font-semibold text-violet-100 shadow-xl backdrop-blur vote-toast">
           {toastMessage}
         </div>
       ) : null}

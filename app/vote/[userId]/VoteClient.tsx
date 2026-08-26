@@ -14,12 +14,10 @@ import {
   type VoteWordDef,
 } from "@/lib/constants/words";
 import {
-  buildServiceShareUrls,
   buildVotePageHeading,
   buildVotePageSubcopy,
   buildVoteSubmitLabel,
   buildVoteThanksMessage,
-  SERVICE_SHARE_TEXT,
   VOTE_PAGE_FLOW,
   VOTE_PAGE_WHAT_IS_THIS,
 } from "@/lib/constants/share";
@@ -30,7 +28,6 @@ import { createClient } from "@/utils/supabase/client";
 type VoteClientProps = {
   userId: string;
   displayName: string;
-  siteUrl: string;
 };
 
 const MAX_SELECT = 3;
@@ -48,7 +45,7 @@ const CATEGORY_SECTIONS: Array<{
   { id: "secret", key: "secret", label: VOTE_CATEGORY_LABELS.secret },
 ];
 
-export default function VoteClient({ userId, displayName, siteUrl }: VoteClientProps) {
+export default function VoteClient({ userId, displayName }: VoteClientProps) {
   const supabase = useMemo(() => createClient(), []);
   const [currentDisplayName, setCurrentDisplayName] = useState(() => displayName);
   const [selected, setSelected] = useState<VoteWord[]>([]);
@@ -59,8 +56,6 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
   );
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copyMessage, setCopyMessage] = useState<string | null>(null);
-  const serviceShareUrls = useMemo(() => buildServiceShareUrls(siteUrl), [siteUrl]);
 
   const isSelected = useMemo(() => new Set(selected), [selected]);
 
@@ -142,13 +137,6 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
     setSending(false);
   }
 
-  async function copyServiceUrl() {
-    await navigator.clipboard.writeText(siteUrl);
-    trackEvent("copy_service_url", { source: "vote_thanks" });
-    setCopyMessage("サイトのURLをコピーしました！");
-    window.setTimeout(() => setCopyMessage(null), 1800);
-  }
-
   if (sent) {
     return (
       <main className="relative flex min-h-screen items-center justify-center overflow-x-clip px-4 py-8 text-white sm:py-10">
@@ -157,50 +145,13 @@ export default function VoteClient({ userId, displayName, siteUrl }: VoteClientP
           <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票ありがとう！</h1>
           <p className="mt-3 text-white/80">{buildVoteThanksMessage(currentDisplayName)}</p>
 
-          <div className="mt-8 space-y-3 text-left">
+          <div className="mt-8">
             <Link
               href="/"
               className="block rounded-full bg-violet-300 px-4 py-3 text-center text-sm font-bold leading-snug text-black sm:px-5"
             >
               あなたも自分のオーラを診断してみる？（1タップで作成）
             </Link>
-
-            <div className="rounded-xl border border-white/15 bg-white/5 p-4">
-              <p className="text-sm font-semibold text-violet-100">友達にこのサイトを教える</p>
-              <p className="mt-1 text-xs text-white/65">{SERVICE_SHARE_TEXT}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={copyServiceUrl}
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                >
-                  URLをコピー
-                </button>
-                {serviceShareUrls ? (
-                  <>
-                    <a
-                      href={serviceShareUrls.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                    >
-                      Xでシェア
-                    </a>
-                    <a
-                      href={serviceShareUrls.line}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                    >
-                      LINEでシェア
-                    </a>
-                  </>
-                ) : null}
-              </div>
-              {copyMessage ? (
-                <p className="mt-2 text-xs text-emerald-300">{copyMessage}</p>
-              ) : null}
-            </div>
           </div>
         </section>
       </main>
