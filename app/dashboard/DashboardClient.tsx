@@ -12,17 +12,7 @@ import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import { calculateAuraType } from "@/lib/constants/auras";
 import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
 import { groupVoterSessions } from "@/lib/chemi/group-voters";
-import {
-  buildServiceShareUrls,
-  buildVoteInviteSharePayload,
-  buildVoteInviteShareUrls,
-  SERVICE_SHARE_TEXT,
-} from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
-
-const StoryExportModal = dynamic(() => import("@/components/StoryExportModal"), {
-  ssr: false,
-});
 
 const ChemiExportModal = dynamic(() => import("@/components/ChemiExportModal"), {
   ssr: false,
@@ -62,7 +52,6 @@ export default function DashboardClient({
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [isAnonymous, setIsAnonymous] = useState(initialIsAnonymous);
   const [linkModalOpen, setLinkModalOpen] = useState(false);
-  const [storyModalOpen, setStoryModalOpen] = useState(false);
   const [votes, setVotes] = useState<VoteEntry[]>(initialVotes);
   const [pulseActive, setPulseActive] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -72,14 +61,13 @@ export default function DashboardClient({
   const [nameInput, setNameInput] = useState(initialDisplayName);
   const [nameError, setNameError] = useState<string | null>(null);
   const [isSavingName, setIsSavingName] = useState(false);
-  const [moreShareOpen, setMoreShareOpen] = useState(false);
   const [chemiOpen, setChemiOpen] = useState(false);
   const [chemiPartyB, setChemiPartyB] = useState<ChemiParty | null>(null);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
   const voteUrl = `${siteUrl}/vote/${userId}`;
-  const serviceShareUrls = useMemo(() => buildServiceShareUrls(siteUrl), [siteUrl]);
+  const resultUrl = `${siteUrl}/dashboard`;
 
   useEffect(() => {
     const channel = supabase
@@ -181,20 +169,6 @@ export default function DashboardClient({
   const palette = auraResult.aura.palette;
   const maxCount = ranking[0]?.[1] ?? 1;
   const resultShareText = auraResult.dynamicProfile.shareLine;
-  const encodedResultShareText = encodeURIComponent(resultShareText);
-  const encodedVoteUrl = encodeURIComponent(voteUrl);
-  const resultTwitterUrl = `https://twitter.com/intent/tweet?text=${encodedResultShareText}&url=${encodedVoteUrl}`;
-  const resultLineUrl = `https://line.me/R/msg/text/?${encodedResultShareText}%0A${encodedVoteUrl}`;
-  const voteInviteText = buildVoteInviteSharePayload(displayName, voteUrl);
-  const voteInviteShareUrls = buildVoteInviteShareUrls(displayName, voteUrl);
-
-  async function copyVoteInvite() {
-    await navigator.clipboard.writeText(voteInviteText);
-    trackEvent("copy_vote_url", { with_message: true });
-    setToastMessage("投票のお願い文＋URLをコピーしました");
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
-  }
 
   async function copyVoteUrlOnly() {
     await navigator.clipboard.writeText(voteUrl);
@@ -204,18 +178,26 @@ export default function DashboardClient({
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
 
-  async function copyServiceUrl() {
-    await navigator.clipboard.writeText(siteUrl);
-    trackEvent("copy_service_url", { source: "dashboard" });
-    setToastMessage("サイトのURLをコピーしました！");
+  async function copyResultUrl() {
+    await navigator.clipboard.writeText(resultUrl);
+    trackEvent("copy_result_url", { source: "dashboard" });
+    setToastMessage("結果URLをコピーしました");
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
 
-  async function copyShareLine() {
-    await navigator.clipboard.writeText(auraResult.dynamicProfile.shareLine);
+  async function copyResultShareUrl() {
+    await navigator.clipboard.writeText(`${resultShareText}\n${voteUrl}`);
     trackEvent("copy_share_line");
-    setToastMessage("シェア文をコピーしました！");
+    setToastMessage("結果共有文をコピーしました");
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+  }
+
+  async function copyServiceUrl() {
+    await navigator.clipboard.writeText(siteUrl);
+    trackEvent("copy_service_url", { source: "dashboard" });
+    setToastMessage("サイト紹介URLをコピーしました");
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
@@ -272,21 +254,6 @@ export default function DashboardClient({
         open={linkModalOpen}
         onClose={() => setLinkModalOpen(false)}
         onLinked={handleAccountLinked}
-      />
-
-      <StoryExportModal
-        open={storyModalOpen}
-        onClose={() => setStoryModalOpen(false)}
-        displayName={displayName}
-        aura={auraResult.aura}
-        profile={auraResult.dynamicProfile}
-        catchCopy={auraResult.personalizedCatchCopy}
-        topWords={auraResult.topWords}
-        onSaved={() => {
-          setToastMessage("画像を保存しました！");
-          if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-          toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
-        }}
       />
 
       {chemiPartyB ? (
@@ -370,142 +337,37 @@ export default function DashboardClient({
 
         <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
           <h2 className="text-xl font-bold">シェアして投票を集めよう</h2>
-          <p className="mt-1 text-sm text-white/70">まずはこの2つだけでOK。</p>
+          <p className="mt-1 text-sm text-white/70">必要な共有はこの4つでOK。</p>
 
-          <div className="mt-5 grid gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                trackEvent("open_story_export", { source: "dashboard_main" });
-                setStoryModalOpen(true);
-              }}
-              className="min-h-[3.5rem] rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
-            >
-              📸 Instagramストーリーで募集する
-            </button>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <button
               type="button"
               onClick={copyVoteUrlOnly}
-              className="min-h-[3.5rem] rounded-2xl border-2 border-cyan-200/80 bg-cyan-400 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
+              className="min-h-[3.5rem] rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
             >
-              🔗 投票URLをコピー
+              投票URLをコピー
             </button>
-          </div>
-
-          <div className="mt-5 border-t border-white/10 pt-4">
             <button
               type="button"
-              onClick={() => setMoreShareOpen((open) => !open)}
-              className="flex w-full items-center justify-between rounded-full border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/85"
-              aria-expanded={moreShareOpen}
+              onClick={copyResultUrl}
+              className="min-h-[3.5rem] rounded-2xl border-2 border-cyan-200/80 bg-cyan-400 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
             >
-              <span>その他の方法で共有</span>
-              <span aria-hidden>{moreShareOpen ? "∧" : "∨"}</span>
+              結果URLをコピー
             </button>
-
-            {moreShareOpen ? (
-              <div className="mt-4 space-y-5">
-                <div>
-                  <p className="text-sm font-semibold text-violet-100">投票をお願いする</p>
-                  <p className="mt-2 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
-                    {voteInviteText}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={copyVoteInvite}
-                      className="rounded-full bg-violet-300 px-4 py-2 text-sm font-bold text-black"
-                    >
-                      お願い文＋URLをコピー
-                    </button>
-                    <a
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                      href={voteInviteShareUrls.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent("share_vote_invite", { channel: "x" })}
-                    >
-                      X
-                    </a>
-                    <a
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                      href={voteInviteShareUrls.line}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent("share_vote_invite", { channel: "line" })}
-                    >
-                      LINE
-                    </a>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-violet-100">自分の結果をシェア</p>
-                  <p className="mt-2 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
-                    {resultShareText}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={copyShareLine}
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                    >
-                      シェア文をコピー
-                    </button>
-                    <a
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                      href={resultTwitterUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent("share_result", { channel: "x" })}
-                    >
-                      X
-                    </a>
-                    <a
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                      href={resultLineUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent("share_result", { channel: "line" })}
-                    >
-                      LINE
-                    </a>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm font-semibold text-cyan-100">サイト自体を紹介する</p>
-                  <p className="mt-1 text-xs text-white/60">{SERVICE_SHARE_TEXT}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={copyServiceUrl}
-                      className="rounded-full bg-cyan-200 px-4 py-2 text-sm font-bold text-black"
-                    >
-                      サイトURLをコピー
-                    </button>
-                    <a
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                      href={serviceShareUrls.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent("share_service", { channel: "x" })}
-                    >
-                      X
-                    </a>
-                    <a
-                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                      href={serviceShareUrls.line}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent("share_service", { channel: "line" })}
-                    >
-                      LINE
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ) : null}
+            <button
+              type="button"
+              onClick={copyResultShareUrl}
+              className="min-h-[3.5rem] rounded-2xl border border-white/30 bg-white/10 px-5 py-5 text-lg font-black leading-snug text-white shadow-lg sm:min-h-[4rem] sm:text-xl"
+            >
+              結果共有文をコピー
+            </button>
+            <button
+              type="button"
+              onClick={copyServiceUrl}
+              className="min-h-[3.5rem] rounded-2xl border border-emerald-200/70 bg-emerald-300 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
+            >
+              サイト紹介URLをコピー
+            </button>
           </div>
         </section>
 
