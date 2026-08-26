@@ -27,10 +27,15 @@ export type AuraType = {
   rarity: AuraRarity;
 };
 
-export type AuraEcology = {
+export type AuraEcologyCore = {
   trigger: string;
   sideEffect: string;
   weakness: string;
+};
+
+export type AuraEcology = AuraEcologyCore & {
+  /** よく観測される生息地 */
+  habitat: string;
 };
 
 export type AuraStats = {
@@ -73,6 +78,12 @@ export type DynamicAuraProfile = {
   mainText: string;
   /** 票数付きの診断根拠（多い順） */
   evidence: VoteEvidence[];
+  /** 周囲からの見え方（証言風） */
+  witnessText: string;
+  /** なぜこのオーラか（本編解説） */
+  readingText: string;
+  /** 二面性・影の解説 */
+  shadowText: string;
   ecology: AuraEcology;
   stats: AuraStats;
   specialMove: string;
@@ -112,6 +123,7 @@ const DORMANT_COMPATIBILITY: AuraCompatibility = {
 };
 
 const DORMANT_ECOLOGY: AuraEcology = {
+  habitat: "投票URLの拡散待ち / ダッシュボードの余白",
   trigger: "友達からの投票が届く / 投票URLが拡散される",
   sideEffect: "ダッシュボードのオーラ色が少しずつ立ち上がる",
   weakness: "URLをシェアしないと永久スリープモード",
@@ -793,7 +805,7 @@ const PUNCHLINE_BY_AURA: Partial<Record<string, readonly string[]>> = {
   "healing-mint": ["ただし自分の休息は後回しになりがちです"],
 };
 
-const ECOLOGY_BY_WORD: Partial<Record<string, AuraEcology>> = {
+const ECOLOGY_BY_WORD: Partial<Record<string, AuraEcologyCore>> = {
   限界オタク: {
     trigger: "推しの話題 / 新刊・新作の話",
     sideEffect: "周囲の会話が一方向に流れる",
@@ -901,7 +913,7 @@ const ECOLOGY_BY_WORD: Partial<Record<string, AuraEcology>> = {
   },
 };
 
-const ECOLOGY_BY_AURA: Partial<Record<string, AuraEcology>> = {
+const ECOLOGY_BY_AURA: Partial<Record<string, AuraEcologyCore>> = {
   "chaos-neon": {
     trigger: "テンション上昇 / 深夜0時を過ぎる",
     sideEffect: "近くにいる人の予測能力が一時的に低下する",
@@ -942,7 +954,7 @@ type DiagnosisCtx = {
 type AuraDiagnosisKit = {
   reading: (ctx: DiagnosisCtx) => string;
   shadow: (ctx: DiagnosisCtx) => string;
-  ecology: (ctx: DiagnosisCtx) => AuraEcology;
+  ecology: (ctx: DiagnosisCtx) => AuraEcologyCore;
 };
 
 function pairLabel(a: string, b: string) {
@@ -1289,7 +1301,13 @@ function buildDiagnosisReport(
   votes: string[],
   counts: Map<string, number>,
   contradiction: AuraContradiction | null,
-): { mainText: string; evidence: VoteEvidence[] } {
+): {
+  mainText: string;
+  evidence: VoteEvidence[];
+  witnessText: string;
+  readingText: string;
+  shadowText: string;
+} {
   const totalVotes = votes.length;
   const uniqueCount = counts.size;
   const evidence = buildVoteEvidence(counts, totalVotes);
@@ -1307,21 +1325,64 @@ function buildDiagnosisReport(
   };
   const kit = getDiagnosisKit(aura);
 
+  const evidenceLead = buildEvidenceLead(evidence, totalVotes, uniqueCount);
+  const readingText = kit.reading(ctx);
+  const witnessText = buildWitness(aura, topWords);
+  const support = buildSupportParagraph(evidence);
+  const contradictionLine = contradiction
+    ? `なお上位に「${contradiction.wordA}」と「${contradiction.wordB}」が同居しているため、${contradiction.text}`
+    : null;
+  const shadowText = kit.shadow(ctx);
+
   const paragraphs = [
-    buildEvidenceLead(evidence, totalVotes, uniqueCount),
-    kit.reading(ctx),
-    buildWitness(aura, topWords),
-    buildSupportParagraph(evidence),
-    contradiction
-      ? `なお上位に「${contradiction.wordA}」と「${contradiction.wordB}」が同居しているため、${contradiction.text}`
-      : null,
-    kit.shadow(ctx),
+    evidenceLead,
+    readingText,
+    witnessText,
+    support,
+    contradictionLine,
+    shadowText,
   ].filter((part): part is string => Boolean(part && part.trim().length > 0));
 
   return {
     mainText: paragraphs.join("\n\n"),
     evidence,
+    witnessText,
+    readingText,
+    shadowText,
   };
+}
+
+const HABITAT_BY_AURA: Partial<Record<string, string>> = {
+  "chaos-neon": "飲み会の中盤 / 深夜2時のタイムライン / グルチャが荒れた直後",
+  "sunrise-hero": "イベント本番前 / チームの危機 / 朝の集合場所",
+  "healing-mint": "誰かが落ち込んだ直後 / 休憩スペース / 静かな帰り道",
+  "gourmet-sun": "飯テロタイムライン / 夜のラーメン屋 / 休日のランチ会",
+  "soft-peach": "少人数の雑談圏 / 帰り道の立ち話 / 既読が続くDM",
+  "mystic-purple": "夜の深い話 / 少人数の考察会 / 静かなカフェの隅",
+  "dream-chaser": "目標を語る夜 / 新しい挑戦の前夜 / 進路相談の席",
+  "electric-cyan": "議論が白熱した場 / 企画の詰まり / 勉強会のホワイトボード前",
+  "imp-neon": "油断した雑談 / 気心知れた相手との夜 / ギャップがバレる瞬間",
+  "midnight-moon": "深夜帯のチャット / 静かな余白 / 終電後の余韻",
+  "otaku-galaxy": "推し語り会場 / 同好との遭遇 / 新作リリース日のTL",
+  "crimson-rebel": "理不尽な空気の直後 / ノリが乗った夜 / 枠を壊したくなる場",
+  "velvet-muse": "良い光のあたる場所 / 写真映えする角 / 静かな注目の中心",
+  "mythic-quill": "物語の語り場 / 解釈が割れる話題 / 長編トークの席",
+  "legendary-prism": "役割が複数求められる場 / 多面性が刺さる集まり",
+  "golden-oracle": "相談が集まる席 / 判断に迷う空気 / まとめ役が必要な瞬間",
+  "void-abyss": "大人数の端 / 名前を呼ばれた瞬間 / 静かな視線の交差点",
+  "phantom-mirror": "相手が変わった瞬間 / 役割の切り替え現場 / 初対面と親しい場の境界",
+  "god-calamity": "矛盾が同時発火する本番 / 常識が一時停止する夜",
+  "absolute-crystal": "距離が必要な場 / クリアな空気 / 静かな視線の交差",
+};
+
+function buildHabitat(aura: AuraType, topWords: string[]): string {
+  const mapped = HABITAT_BY_AURA[aura.id];
+  if (mapped) return mapped;
+  const primary = topWords[0];
+  if (primary) {
+    return `「${primary}」が自然に出る場 / 気心知れた友達の輪 / 夜の余白`;
+  }
+  return "友達との日常の隙間 / SNSのタイムライン";
 }
 
 function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
@@ -1329,7 +1390,7 @@ function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
   const b = topWords[1] ?? a;
   const c = topWords[2] ?? b;
   const kit = getDiagnosisKit(aura);
-  return kit.ecology({
+  const core = kit.ecology({
     aura,
     a,
     b,
@@ -1338,6 +1399,10 @@ function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
     totalVotes: 0,
     uniqueCount: topWords.length,
   });
+  return {
+    habitat: buildHabitat(aura, topWords),
+    ...core,
+  };
 }
 
 const SPECIAL_MOVE_BY_WORD: Partial<Record<string, readonly string[]>> = {
@@ -1711,6 +1776,9 @@ function buildDynamicProfile(
     return {
       mainText: aura.description,
       evidence: [],
+      witnessText: "まだ票が集まっていないため、周囲からの見え方は観測待ちです。",
+      readingText: aura.description,
+      shadowText: "投票が集まると、二面性や影のトリセツも立ち上がります。",
       ecology: DORMANT_ECOLOGY,
       stats: DORMANT_STATS,
       specialMove: "（覚醒待ち）",
@@ -1725,7 +1793,7 @@ function buildDynamicProfile(
   }
 
   const contradiction = findContradictionDetail(topWords);
-  const { mainText, evidence } = buildDiagnosisReport(
+  const { mainText, evidence, witnessText, readingText, shadowText } = buildDiagnosisReport(
     aura,
     topWords,
     votes,
@@ -1736,6 +1804,9 @@ function buildDynamicProfile(
   return {
     mainText,
     evidence,
+    witnessText,
+    readingText,
+    shadowText,
     ecology: buildEcology(aura, topWords),
     stats: buildStats(votes),
     specialMove: buildSpecialMove(aura, topWords),

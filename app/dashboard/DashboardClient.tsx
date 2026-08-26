@@ -59,6 +59,7 @@ export default function DashboardClient({
   const [nameInput, setNameInput] = useState(initialDisplayName);
   const [nameError, setNameError] = useState<string | null>(null);
   const [isSavingName, setIsSavingName] = useState(false);
+  const [moreShareOpen, setMoreShareOpen] = useState(false);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
@@ -212,6 +213,7 @@ export default function DashboardClient({
         displayName={displayName}
         aura={auraResult.aura}
         profile={auraResult.dynamicProfile}
+        catchCopy={auraResult.personalizedCatchCopy}
         topWords={auraResult.topWords}
         onSaved={() => {
           setToastMessage("画像を保存しました！");
@@ -228,38 +230,31 @@ export default function DashboardClient({
 
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl space-y-6">
         {isAnonymous ? (
-          <section className="rounded-2xl border border-amber-300/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-rose-500/10 p-5 backdrop-blur">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="space-y-2">
-                <p className="font-semibold text-amber-100">
-                  ⚠️ ゲスト利用中：ブラウザを閉じるとデータが消える可能性があります。結果を永久保存する
-                </p>
-                <p className="text-sm text-white/75">
-                  🔔 誰かが投票した時の通知を受け取る（アカウント連携後に利用可能）
-                </p>
-              </div>
+          <section className="rounded-2xl border border-amber-300/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-rose-500/10 p-3 backdrop-blur sm:p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm font-semibold text-amber-100">
+                ゲスト利用中：結果を残すならアカウント連携を
+              </p>
               <button
                 type="button"
                 onClick={() => {
                   trackEvent("open_link_account");
                   setLinkModalOpen(true);
                 }}
-                className="shrink-0 rounded-full bg-amber-200 px-5 py-2.5 text-sm font-bold text-black"
+                className="shrink-0 rounded-full bg-amber-200 px-4 py-2 text-sm font-bold text-black"
               >
-                アカウントを連携して保存
+                アカウントを連携
               </button>
             </div>
           </section>
         ) : (
-          <section className="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-4 backdrop-blur">
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-emerald-300 px-3 py-1 text-xs font-bold text-black">
+          <section className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 backdrop-blur">
+            <p className="text-xs text-emerald-100 sm:text-sm">
+              <span className="mr-2 rounded-full bg-emerald-300 px-2 py-0.5 text-[10px] font-bold text-black">
                 保護済み
               </span>
-              <p className="text-sm text-emerald-100">
-                アカウント連携済み。投票データは安全に保存されています。
-              </p>
-            </div>
+              アカウント連携済み。投票データは保存されています。
+            </p>
           </section>
         )}
 
@@ -270,13 +265,153 @@ export default function DashboardClient({
           topWords={auraResult.topWords}
           hasVotes={ranking.length > 0}
           pulse={pulseActive}
+          displayName={displayName}
         />
+
+        <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
+          <h2 className="text-xl font-bold">シェアして投票を集めよう</h2>
+          <p className="mt-1 text-sm text-white/70">まずはこの2つだけでOK。</p>
+
+          <div className="mt-5 grid gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                trackEvent("open_story_export", { source: "dashboard_main" });
+                setStoryModalOpen(true);
+              }}
+              className="min-h-[3.5rem] rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
+            >
+              📸 Instagramストーリーで募集する
+            </button>
+            <button
+              type="button"
+              onClick={copyVoteUrlOnly}
+              className="min-h-[3.5rem] rounded-2xl border-2 border-cyan-200/80 bg-cyan-400 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
+            >
+              🔗 投票URLをコピー
+            </button>
+          </div>
+
+          <div className="mt-5 border-t border-white/10 pt-4">
+            <button
+              type="button"
+              onClick={() => setMoreShareOpen((open) => !open)}
+              className="flex w-full items-center justify-between rounded-full border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white/85"
+              aria-expanded={moreShareOpen}
+            >
+              <span>その他の方法で共有</span>
+              <span aria-hidden>{moreShareOpen ? "∧" : "∨"}</span>
+            </button>
+
+            {moreShareOpen ? (
+              <div className="mt-4 space-y-5">
+                <div>
+                  <p className="text-sm font-semibold text-violet-100">投票をお願いする</p>
+                  <p className="mt-2 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
+                    {voteInviteText}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={copyVoteInvite}
+                      className="rounded-full bg-violet-300 px-4 py-2 text-sm font-bold text-black"
+                    >
+                      お願い文＋URLをコピー
+                    </button>
+                    <a
+                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
+                      href={voteInviteShareUrls.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("share_vote_invite", { channel: "x" })}
+                    >
+                      X
+                    </a>
+                    <a
+                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
+                      href={voteInviteShareUrls.line}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("share_vote_invite", { channel: "line" })}
+                    >
+                      LINE
+                    </a>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-violet-100">自分の結果をシェア</p>
+                  <p className="mt-2 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
+                    {resultShareText}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={copyShareLine}
+                      className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
+                    >
+                      シェア文をコピー
+                    </button>
+                    <a
+                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
+                      href={resultTwitterUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("share_result", { channel: "x" })}
+                    >
+                      X
+                    </a>
+                    <a
+                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
+                      href={resultLineUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("share_result", { channel: "line" })}
+                    >
+                      LINE
+                    </a>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm font-semibold text-cyan-100">サイト自体を紹介する</p>
+                  <p className="mt-1 text-xs text-white/60">{SERVICE_SHARE_TEXT}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={copyServiceUrl}
+                      className="rounded-full bg-cyan-200 px-4 py-2 text-sm font-bold text-black"
+                    >
+                      サイトURLをコピー
+                    </button>
+                    <a
+                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
+                      href={serviceShareUrls.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("share_service", { channel: "x" })}
+                    >
+                      X
+                    </a>
+                    <a
+                      className="rounded-full bg-white/15 px-4 py-2 text-sm"
+                      href={serviceShareUrls.line}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackEvent("share_service", { channel: "line" })}
+                    >
+                      LINE
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </section>
 
         <header className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="min-w-0 break-words text-xl font-black sm:text-2xl">
-              {displayName} さんのダッシュボード
-            </h1>
+            <h1 className="min-w-0 break-words text-lg font-black sm:text-xl">表示名の編集</h1>
             {!isEditingName ? (
               <button
                 type="button"
@@ -326,134 +461,10 @@ export default function DashboardClient({
               </div>
               {nameError ? <p className="mt-2 text-sm text-rose-300">{nameError}</p> : null}
             </div>
-          ) : null}
+          ) : (
+            <p className="mt-2 text-sm text-white/65">{displayName}</p>
+          )}
         </header>
-
-        <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
-          <h2 className="text-xl font-bold">シェア</h2>
-          <p className="mt-1 text-sm text-white/70">
-            投票を集めて結果を伸ばすなら、ここだけでOK。
-          </p>
-
-          <div className="mt-5 space-y-5">
-            <div>
-              <p className="text-sm font-semibold text-violet-100">1. 投票をお願いする</p>
-              <p className="mt-1 text-xs text-white/55">
-                説明文つきがおすすめ。すでに説明済みならURLだけでもOK。
-              </p>
-              <p className="mt-3 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
-                {voteInviteText}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={copyVoteInvite}
-                  className="rounded-full bg-violet-300 px-4 py-2 text-sm font-bold text-black"
-                >
-                  お願い文＋URLをコピー
-                </button>
-                <button
-                  type="button"
-                  onClick={copyVoteUrlOnly}
-                  className="rounded-full bg-cyan-300/90 px-4 py-2 text-sm font-bold text-black"
-                >
-                  URLだけコピー
-                </button>
-                <a
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                  href={voteInviteShareUrls.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent("share_vote_invite", { channel: "x" })}
-                >
-                  Xでお願い
-                </a>
-                <a
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                  href={voteInviteShareUrls.line}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent("share_vote_invite", { channel: "line" })}
-                >
-                  LINEでお願い
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-semibold text-violet-100">2. 自分の結果をシェア</p>
-              <p className="mt-2 whitespace-pre-line break-words rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white/80">
-                {resultShareText}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setStoryModalOpen(true)}
-                  className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2 text-sm font-bold text-black"
-                >
-                  📸 画像でシェア
-                </button>
-                <button
-                  type="button"
-                  onClick={copyShareLine}
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold"
-                >
-                  シェア文をコピー
-                </button>
-                <a
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                  href={resultTwitterUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent("share_result", { channel: "x" })}
-                >
-                  Xで共有
-                </a>
-                <a
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                  href={resultLineUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent("share_result", { channel: "line" })}
-                >
-                  LINEで共有
-                </a>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm font-semibold text-cyan-100">3. サイト自体を紹介する</p>
-              <p className="mt-1 text-xs text-white/60">{SERVICE_SHARE_TEXT}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={copyServiceUrl}
-                  className="rounded-full bg-cyan-200 px-4 py-2 text-sm font-bold text-black"
-                >
-                  サイトURLをコピー
-                </button>
-                <a
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                  href={serviceShareUrls.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent("share_service", { channel: "x" })}
-                >
-                  Xで紹介
-                </a>
-                <a
-                  className="rounded-full bg-white/15 px-4 py-2 text-sm"
-                  href={serviceShareUrls.line}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent("share_service", { channel: "line" })}
-                >
-                  LINEで紹介
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
 
         <div className="flex justify-center">
           <Link

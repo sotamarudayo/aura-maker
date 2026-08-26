@@ -15,6 +15,7 @@ type StoryExportModalProps = {
   displayName: string;
   aura: AuraType;
   profile: DynamicAuraProfile;
+  catchCopy: string;
   topWords: string[];
   onSaved?: () => void;
 };
@@ -27,54 +28,63 @@ const STAT_META = [
   { key: "gap" as const, label: "ギャップ", color: "#22d3ee" },
 ];
 
-function ExportBrandFooter() {
+function ExportBrandFooter({ compact = false }: { compact?: boolean }) {
   return (
-    <div style={{ paddingTop: 4, textAlign: "center" }}>
+    <div style={{ paddingTop: compact ? 2 : 4, textAlign: "center" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/logo-mark.png"
           alt=""
-          width={22}
-          height={22}
-          style={{ borderRadius: "50%", display: "block", width: 22, height: 22 }}
+          width={compact ? 18 : 22}
+          height={compact ? 18 : 22}
+          style={{
+            borderRadius: "50%",
+            display: "block",
+            width: compact ? 18 : 22,
+            height: compact ? 18 : 22,
+          }}
         />
-        <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)", margin: 0 }}>
+        <p
+          style={{
+            fontSize: compact ? 9 : 10,
+            fontWeight: 700,
+            color: "rgba(255,255,255,0.45)",
+            margin: 0,
+          }}
+        >
           AuraMaker
         </p>
       </div>
-      <p style={{ marginTop: 4, marginBottom: 0, fontSize: 9, color: "rgba(255,255,255,0.28)" }}>
+      <p
+        style={{
+          marginTop: 3,
+          marginBottom: 0,
+          fontSize: 8,
+          color: "rgba(255,255,255,0.28)",
+        }}
+      >
         友達から見たオーラ診断
       </p>
     </div>
   );
 }
 
-function buildExportBlurb(mainText: string, maxLen: number) {
-  const parts = mainText
-    .split(/\n\n+/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-  const preferred =
-    parts.find((part) => !part.includes("票・") && !part.startsWith("今回の診断")) ??
-    parts[1] ??
-    parts[0] ??
-    "";
-  if (preferred.length <= maxLen) return preferred;
-  const sliced = preferred.slice(0, maxLen);
-  const safe = sliced.replace(/\s+\S*$/, "").trimEnd();
-  return `${safe || sliced}…`;
-}
-
-function StoryOrb({ palette }: { palette: AuraType["palette"] }) {
-  const size = 112;
+function StoryOrb({
+  palette,
+  size = 145,
+}: {
+  palette: AuraType["palette"];
+  size?: number;
+}) {
+  const glow = size + 52;
   return (
     <div
       style={{
         position: "relative",
         width: size,
         height: size,
-        margin: "18px auto 0",
+        margin: "10px auto 0",
         flexShrink: 0,
       }}
     >
@@ -83,13 +93,28 @@ function StoryOrb({ palette }: { palette: AuraType["palette"] }) {
           position: "absolute",
           left: "50%",
           top: "50%",
-          width: size + 36,
-          height: size + 36,
-          marginLeft: -(size + 36) / 2,
-          marginTop: -(size + 36) / 2,
+          width: glow + 28,
+          height: glow + 28,
+          marginLeft: -(glow + 28) / 2,
+          marginTop: -(glow + 28) / 2,
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${palette.a}aa 0%, ${palette.b}55 42%, transparent 72%)`,
-          filter: "blur(12px)",
+          background: `radial-gradient(circle, ${palette.a}cc 0%, ${palette.b}66 38%, ${palette.c}33 58%, transparent 74%)`,
+          filter: "blur(16px)",
+          opacity: 1,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: glow,
+          height: glow,
+          marginLeft: -glow / 2,
+          marginTop: -glow / 2,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${palette.a}88 0%, ${palette.b}44 45%, transparent 70%)`,
+          filter: "blur(8px)",
           opacity: 0.95,
         }}
       />
@@ -106,7 +131,11 @@ function StoryOrb({ palette }: { palette: AuraType["palette"] }) {
             radial-gradient(circle at 50% 78%, ${palette.c} 0%, transparent 52%),
             linear-gradient(160deg, #16112a 0%, #0a0818 100%)
           `,
-          boxShadow: `inset 0 0 18px rgba(255,255,255,0.12), 0 0 28px ${palette.a}66`,
+          boxShadow: `
+            inset 0 0 22px rgba(255,255,255,0.16),
+            0 0 36px ${palette.a}88,
+            0 0 64px ${palette.b}55
+          `,
         }}
       />
     </div>
@@ -166,6 +195,7 @@ export default function StoryExportModal({
   displayName,
   aura,
   profile,
+  catchCopy,
   topWords,
   onSaved,
 }: StoryExportModalProps) {
@@ -177,7 +207,6 @@ export default function StoryExportModal({
   if (!open) return null;
 
   const words = topWords.slice(0, 3);
-  const shortMain = buildExportBlurb(profile.mainText, format === "story" ? 70 : 90);
 
   async function exportPng(): Promise<string | null> {
     if (!canvasRef.current) return null;
@@ -224,7 +253,6 @@ export default function StoryExportModal({
         trackEvent("export_result_image", { format, method: "native_share" });
         onSaved?.();
       } else {
-        // 端末シェア非対応時はダウンロードにフォールバック
         await handleDownload(dataUrl);
       }
     } catch (err) {
@@ -307,9 +335,8 @@ export default function StoryExportModal({
               <StoryLayout
                 displayName={displayName}
                 aura={aura}
-                shortMain={shortMain}
                 specialMove={profile.specialMove}
-                words={words}
+                stats={profile.stats}
                 palette={aura.palette}
               />
             ) : (
@@ -317,7 +344,7 @@ export default function StoryExportModal({
                 displayName={displayName}
                 aura={aura}
                 profile={profile}
-                shortMain={shortMain}
+                catchCopy={catchCopy}
                 words={words}
               />
             )}
@@ -358,16 +385,14 @@ export default function StoryExportModal({
 function StoryLayout({
   displayName,
   aura,
-  shortMain,
   specialMove,
-  words,
+  stats,
   palette,
 }: {
   displayName: string;
   aura: AuraType;
-  shortMain: string;
   specialMove: string;
-  words: string[];
+  stats: DynamicAuraProfile["stats"];
   palette: AuraType["palette"];
 }) {
   return (
@@ -376,133 +401,173 @@ function StoryLayout({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        padding: "28px 20px 18px",
         boxSizing: "border-box",
       }}
     >
-      <div style={{ textAlign: "center" }}>
+      {/* コンテンツ領域（下部15%はリンクスタンプ用に空ける） */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "85%",
+          padding: "18px 16px 6px",
+          boxSizing: "border-box",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ textAlign: "center", flexShrink: 0 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 11,
+              letterSpacing: "0.22em",
+              color: "rgba(233,213,255,0.9)",
+              fontWeight: 700,
+            }}
+          >
+            My Aura is...
+          </p>
+          <p
+            style={{
+              marginTop: 4,
+              marginBottom: 0,
+              fontSize: 11,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.7)",
+            }}
+          >
+            {displayName}
+          </p>
+        </div>
+
+        <StoryOrb palette={palette} size={140} />
+
+        <div style={{ marginTop: 6, textAlign: "center", flexShrink: 0 }}>
+          <span
+            style={{
+              display: "inline-block",
+              borderRadius: 999,
+              border: "1px solid rgba(255,255,255,0.25)",
+              background: "rgba(255,255,255,0.08)",
+              padding: "2px 10px",
+              fontSize: 9,
+              fontWeight: 700,
+            }}
+          >
+            {RARITY_LABELS[aura.rarity]}
+          </span>
+          <p
+            style={{
+              marginTop: 8,
+              marginBottom: 0,
+              fontSize: 8,
+              fontWeight: 700,
+              letterSpacing: "0.22em",
+              color: "rgba(255,255,255,0.4)",
+            }}
+          >
+            通り名
+          </p>
+          <h3
+            style={{
+              marginTop: 2,
+              marginBottom: 0,
+              fontSize: 36,
+              fontWeight: 900,
+              lineHeight: 1.05,
+              color: "#fff",
+              textShadow: `0 0 28px ${palette.a}cc, 0 0 48px ${palette.b}66`,
+            }}
+          >
+            {aura.archetypeName}
+          </h3>
+          <p
+            style={{
+              marginTop: 3,
+              marginBottom: 0,
+              fontSize: 10,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.5)",
+            }}
+          >
+            {aura.name}
+          </p>
+          <p
+            style={{
+              marginTop: 8,
+              marginBottom: 0,
+              fontSize: 12,
+              fontWeight: 700,
+              lineHeight: 1.35,
+              color: "rgba(165,243,252,0.95)",
+            }}
+          >
+            {aura.catchCopy}
+          </p>
+          <p
+            style={{
+              marginTop: 8,
+              marginBottom: 0,
+              fontSize: 13,
+              fontWeight: 800,
+              lineHeight: 1.3,
+              color: "rgba(244,114,182,0.98)",
+            }}
+          >
+            💥「{specialMove}」
+          </p>
+        </div>
+
+        <div
+          style={{
+            marginTop: 10,
+            borderRadius: 10,
+            border: "1px solid rgba(255,255,255,0.14)",
+            background: "rgba(255,255,255,0.06)",
+            padding: "8px 10px",
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            {STAT_META.map((stat) => (
+              <MiniStatBar
+                key={stat.key}
+                label={stat.label}
+                value={stats[stat.key]}
+                color={stat.color}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop: "auto", paddingTop: 4 }}>
+          <ExportBrandFooter compact />
+        </div>
+      </div>
+
+      {/* Instagramリンクスタンプ用の下部余白（約15%） */}
+      <div
+        style={{
+          height: "15%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxSizing: "border-box",
+          borderTop: "1px dashed rgba(255,255,255,0.12)",
+          background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 100%)",
+        }}
+      >
         <p
           style={{
             margin: 0,
-            fontSize: 12,
-            letterSpacing: "0.22em",
-            color: "rgba(233,213,255,0.9)",
-            fontWeight: 700,
-          }}
-        >
-          My Aura is...
-        </p>
-        <p style={{ marginTop: 6, marginBottom: 0, fontSize: 11, color: "rgba(255,255,255,0.65)" }}>
-          {displayName}
-        </p>
-      </div>
-
-      <StoryOrb palette={palette} />
-
-      <div style={{ marginTop: 14, textAlign: "center" }}>
-        <span
-          style={{
-            display: "inline-block",
-            borderRadius: 999,
-            border: "1px solid rgba(255,255,255,0.25)",
-            background: "rgba(255,255,255,0.08)",
-            padding: "3px 10px",
-            fontSize: 10,
-            fontWeight: 700,
-          }}
-        >
-          {RARITY_LABELS[aura.rarity]}
-        </span>
-        <p
-          style={{
-            marginTop: 10,
-            marginBottom: 0,
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: "0.2em",
-            color: "rgba(255,255,255,0.4)",
-          }}
-        >
-          通り名
-        </p>
-        <h3
-          style={{
-            marginTop: 4,
-            marginBottom: 0,
-            fontSize: 28,
-            fontWeight: 900,
-            lineHeight: 1.15,
-            color: "#fff",
-            textShadow: `0 0 24px ${palette.a}aa`,
-          }}
-        >
-          {aura.archetypeName}
-        </h3>
-        <p
-          style={{
-            marginTop: 4,
-            marginBottom: 0,
             fontSize: 10,
             fontWeight: 600,
-            color: "rgba(255,255,255,0.5)",
+            letterSpacing: "0.06em",
+            color: "rgba(255,255,255,0.28)",
           }}
         >
-          {aura.name}
+          ここにリンクを配置 👇
         </p>
-        <p
-          style={{
-            marginTop: 10,
-            marginBottom: 0,
-            fontSize: 11,
-            lineHeight: 1.5,
-            color: "rgba(255,255,255,0.82)",
-          }}
-        >
-          {shortMain}
-        </p>
-        <p
-          style={{
-            marginTop: 10,
-            marginBottom: 0,
-            fontSize: 12,
-            fontWeight: 800,
-            lineHeight: 1.35,
-            color: "rgba(244,114,182,0.95)",
-          }}
-        >
-          💥「{specialMove}」
-        </p>
-      </div>
-
-      <div
-        style={{
-          marginTop: 14,
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 6,
-        }}
-      >
-        {(words.length > 0 ? words : ["覚醒待ち"]).map((word) => (
-          <span
-            key={word}
-            style={{
-              borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.22)",
-              background: "rgba(255,255,255,0.12)",
-              padding: "4px 9px",
-              fontSize: 10,
-              fontWeight: 700,
-              color: "#f5f3ff",
-            }}
-          >
-            #{word}
-          </span>
-        ))}
-      </div>
-
-      <div style={{ marginTop: "auto", paddingTop: 18 }}>
-        <ExportBrandFooter />
       </div>
     </div>
   );
@@ -512,13 +577,13 @@ function CardLayout({
   displayName,
   aura,
   profile,
-  shortMain,
+  catchCopy,
   words,
 }: {
   displayName: string;
   aura: AuraType;
   profile: DynamicAuraProfile;
-  shortMain: string;
+  catchCopy: string;
   words: string[];
 }) {
   return (
@@ -527,15 +592,31 @@ function CardLayout({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        padding: "18px 16px 14px",
+        padding: "22px 18px 16px",
         boxSizing: "border-box",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <p style={{ fontSize: 10, letterSpacing: "0.18em", fontWeight: 700, color: "rgba(196,181,253,0.95)" }}>
+      <div style={{ textAlign: "center" }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 11,
+            letterSpacing: "0.2em",
+            fontWeight: 700,
+            color: "rgba(196,181,253,0.95)",
+          }}
+        >
           AURA RESULT
         </p>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+        <p style={{ marginTop: 4, marginBottom: 0, fontSize: 11, color: "rgba(255,255,255,0.65)" }}>
+          {displayName}
+        </p>
+      </div>
+
+      <StoryOrb palette={aura.palette} size={128} />
+
+      <div style={{ marginTop: 10, textAlign: "center" }}>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
           <span
             style={{
               borderRadius: 999,
@@ -573,59 +654,104 @@ function CardLayout({
             </span>
           ) : null}
         </div>
-      </div>
 
-      <p style={{ marginTop: 4, fontSize: 11, color: "rgba(255,255,255,0.55)" }}>{displayName}</p>
-      <p style={{ marginTop: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)" }}>
-        通り名
-      </p>
-      <h3
-        style={{
-          marginTop: 4,
-          fontSize: 26,
-          fontWeight: 900,
-          lineHeight: 1.15,
-          color: "#fff",
-          textShadow: `0 0 22px ${aura.palette.a}aa`,
-        }}
-      >
-        {aura.archetypeName}
-      </h3>
-      <p style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>
-        {aura.name}
-      </p>
-      <p style={{ marginTop: 6, fontSize: 10, lineHeight: 1.45, color: "rgba(255,255,255,0.78)" }}>
-        {shortMain}
-      </p>
+        <p
+          style={{
+            marginTop: 10,
+            marginBottom: 0,
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: "0.2em",
+            color: "rgba(255,255,255,0.4)",
+          }}
+        >
+          通り名
+        </p>
+        <h3
+          style={{
+            marginTop: 4,
+            marginBottom: 0,
+            fontSize: 32,
+            fontWeight: 900,
+            lineHeight: 1.08,
+            color: "#fff",
+            textShadow: `0 0 24px ${aura.palette.a}aa`,
+          }}
+        >
+          {aura.archetypeName}
+        </h3>
+        <p
+          style={{
+            marginTop: 4,
+            marginBottom: 0,
+            fontSize: 10,
+            fontWeight: 600,
+            color: "rgba(255,255,255,0.5)",
+          }}
+        >
+          {aura.name}
+        </p>
+        <p
+          style={{
+            marginTop: 10,
+            marginBottom: 0,
+            fontSize: 13,
+            fontWeight: 700,
+            lineHeight: 1.4,
+            color: "rgba(165,243,252,0.95)",
+          }}
+        >
+          {catchCopy}
+        </p>
+      </div>
 
       <div
         style={{
-          marginTop: 10,
+          marginTop: 12,
           borderRadius: 10,
           border: "1px solid rgba(244,114,182,0.35)",
           background: "rgba(236,72,153,0.12)",
-          padding: "8px 10px",
+          padding: "10px 12px",
+          textAlign: "center",
         }}
       >
-        <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(251,207,232,0.9)" }}>💥 必殺技</p>
-        <p style={{ marginTop: 3, fontSize: 12, fontWeight: 800, color: "#fce7f3" }}>
+        <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: "rgba(251,207,232,0.9)" }}>
+          💥 必殺技
+        </p>
+        <p
+          style={{
+            marginTop: 4,
+            marginBottom: 0,
+            fontSize: 14,
+            fontWeight: 800,
+            color: "#fce7f3",
+          }}
+        >
           「{profile.specialMove}」
         </p>
       </div>
 
       <div
         style={{
-          marginTop: 8,
+          marginTop: 10,
           borderRadius: 10,
           border: "1px solid rgba(255,255,255,0.14)",
           background: "rgba(255,255,255,0.05)",
-          padding: "8px 10px",
+          padding: "10px 12px",
         }}
       >
-        <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(196,181,253,0.9)", marginBottom: 6 }}>
+        <p
+          style={{
+            margin: 0,
+            marginBottom: 8,
+            fontSize: 9,
+            fontWeight: 700,
+            color: "rgba(196,181,253,0.9)",
+          }}
+        >
           ステータス
         </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {STAT_META.map((stat) => (
             <MiniStatBar
               key={stat.key}
@@ -639,74 +765,13 @@ function CardLayout({
 
       <div
         style={{
-          marginTop: 8,
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 6,
+          marginTop: 10,
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 5,
         }}
       >
-        <div
-          style={{
-            borderRadius: 8,
-            border: "1px solid rgba(52,211,153,0.35)",
-            background: "rgba(16,185,129,0.12)",
-            padding: "6px 8px",
-          }}
-        >
-          <p style={{ fontSize: 8, fontWeight: 700, color: "rgba(167,243,208,0.9)" }}>🔗 相性</p>
-          <p style={{ marginTop: 2, fontSize: 10, fontWeight: 700, color: "#d1fae5", lineHeight: 1.25 }}>
-            {profile.compatibility.good.name}
-          </p>
-        </div>
-        <div
-          style={{
-            borderRadius: 8,
-            border: "1px solid rgba(251,113,133,0.35)",
-            background: "rgba(244,63,94,0.12)",
-            padding: "6px 8px",
-          }}
-        >
-          <p style={{ fontSize: 8, fontWeight: 700, color: "rgba(254,202,202,0.9)" }}>⚔️ 相克</p>
-          <p style={{ marginTop: 2, fontSize: 10, fontWeight: 700, color: "#fecdd3", lineHeight: 1.25 }}>
-            {profile.compatibility.bad.name}
-          </p>
-        </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 8,
-          borderRadius: 10,
-          border: "1px solid rgba(167,139,250,0.35)",
-          background: "rgba(139,92,246,0.12)",
-          padding: "7px 10px",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(221,214,254,0.95)" }}>覚醒度</p>
-          <p style={{ fontSize: 11, fontWeight: 800, color: "#ede9fe" }}>{profile.awakening.percent}%</p>
-        </div>
-        <div
-          style={{
-            marginTop: 5,
-            height: 6,
-            borderRadius: 999,
-            background: "rgba(0,0,0,0.35)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${profile.awakening.percent}%`,
-              height: "100%",
-              borderRadius: 999,
-              background: "linear-gradient(90deg, #a78bfa, #f0abfc, #67e8f9)",
-            }}
-          />
-        </div>
-      </div>
-
-      <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 5 }}>
         {(words.length > 0 ? words : ["覚醒待ち"]).map((word) => (
           <span
             key={word}
@@ -725,7 +790,9 @@ function CardLayout({
         ))}
       </div>
 
-      <ExportBrandFooter />
+      <div style={{ marginTop: "auto", paddingTop: 12 }}>
+        <ExportBrandFooter />
+      </div>
     </div>
   );
 }
