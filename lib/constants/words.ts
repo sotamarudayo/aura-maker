@@ -410,7 +410,7 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     auraCategory: ["otaku", "chaos", "hero"],
   },
 
-  // ど変態野郎系（行動観察寄り・結果がバレにくい語）
+  // むっつりど変態系（行動観察寄り・結果がバレにくい語）
   {
     id: "hanashi-kyuu-ni-koku",
     label: "話が急に濃くなる",
