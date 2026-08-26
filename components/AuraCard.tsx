@@ -1,8 +1,8 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
-import { RARITY_LABELS } from "@/lib/constants/auras";
+import { getAuraById, getAuraLineage, RARITY_LABELS, SECRET_FLAVOR } from "@/lib/constants/auras";
 
 type AuraCardProps = {
   aura: AuraType;
@@ -38,6 +38,114 @@ function StatBar({ label, value, color }: { label: string; value: number; color:
   );
 }
 
+type CompatPreview = {
+  kind: "good" | "bad";
+  aura: AuraType;
+};
+
+function CompatibilityAuraModal({
+  preview,
+  onClose,
+}: {
+  preview: CompatPreview;
+  onClose: () => void;
+}) {
+  const { aura, kind } = preview;
+  const isSecret = aura.rarity === "secret";
+  const lineage = getAuraLineage(aura.id);
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-end justify-center bg-black/75 px-4 py-6 sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${aura.archetypeName}の特徴`}
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/20 bg-zinc-950 p-5 text-white shadow-2xl sm:p-6"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <p
+            className={`text-xs font-semibold tracking-[0.18em] ${
+              kind === "good" ? "text-emerald-200" : "text-rose-200"
+            }`}
+          >
+            {kind === "good" ? "🔗 相性の良いオーラ" : "⚔️ 相克オーラ"}
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/70"
+          >
+            閉じる
+          </button>
+        </div>
+
+        <div className="mt-5 flex flex-col items-center text-center">
+          {isSecret ? (
+            <div className="relative h-24 w-24 rounded-full border border-violet-400/40 bg-zinc-950 shadow-[0_0_28px_rgba(124,58,237,0.45)]">
+              <div className="absolute inset-0 flex items-center justify-center text-3xl font-black text-violet-200/80">
+                ?
+              </div>
+            </div>
+          ) : (
+            <div
+              className="h-24 w-24 rounded-full border border-white/20 shadow-lg"
+              style={{
+                background: aura.gradient,
+                boxShadow: `0 0 28px ${aura.palette.a}66`,
+              }}
+            />
+          )}
+
+          <span className="mt-4 rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold">
+            {RARITY_LABELS[aura.rarity]}
+          </span>
+          {lineage ? (
+            <p className="mt-2 text-[11px] font-semibold tracking-[0.18em]" style={{ color: lineage.accent }}>
+              {lineage.name}
+            </p>
+          ) : null}
+          <h3 className="mt-2 break-words text-2xl font-black leading-tight">
+            {isSecret ? "？？？（シークレット）" : aura.archetypeName}
+          </h3>
+          {!isSecret ? (
+            <p className="mt-1 break-words text-sm text-white/55">{aura.name}</p>
+          ) : null}
+          <p className="mt-3 break-words text-sm text-cyan-100/90">
+            {isSecret ? "条件は明かされない、幻の光。" : aura.catchCopy}
+          </p>
+          <p className="mt-3 break-words text-sm leading-relaxed text-white/75">
+            {isSecret ? SECRET_FLAVOR : aura.description}
+          </p>
+          {!isSecret && aura.keywords.length > 0 ? (
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {aura.keywords.slice(0, 6).map((word) => (
+                <span
+                  key={word}
+                  className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80"
+                >
+                  #{word}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AuraCard({
   aura,
   catchCopy,
@@ -46,6 +154,15 @@ export default function AuraCard({
   hasVotes,
   pulse = false,
 }: AuraCardProps) {
+  const [compatPreview, setCompatPreview] = useState<CompatPreview | null>(null);
+
+  function openCompat(kind: "good" | "bad") {
+    const targetId = kind === "good" ? profile.compatibility.good.id : profile.compatibility.bad.id;
+    const target = getAuraById(targetId);
+    if (!target) return;
+    setCompatPreview({ kind, aura: target });
+  }
+
   return (
     <section
       className="min-w-0 rounded-3xl border border-white/20 bg-black/35 p-4 backdrop-blur sm:p-6 md:p-8"
@@ -221,18 +338,28 @@ export default function AuraCard({
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3">
+            <button
+              type="button"
+              onClick={() => openCompat("good")}
+              className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-left transition hover:border-emerald-300/50 hover:bg-emerald-500/15 active:scale-[0.99]"
+            >
               <p className="text-xs font-semibold text-emerald-200">🔗 相性の良いオーラ</p>
-              <p className="mt-1 text-sm font-semibold text-emerald-100">
+              <p className="mt-1 break-words text-sm font-semibold text-emerald-100">
                 {profile.compatibility.good.name}
               </p>
-            </div>
-            <div className="rounded-xl border border-rose-400/30 bg-rose-500/10 p-3">
+              <p className="mt-2 text-[11px] text-emerald-100/60">タップで特徴を見る</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => openCompat("bad")}
+              className="rounded-xl border border-rose-400/30 bg-rose-500/10 p-3 text-left transition hover:border-rose-300/50 hover:bg-rose-500/15 active:scale-[0.99]"
+            >
               <p className="text-xs font-semibold text-rose-200">⚔️ 相克オーラ</p>
-              <p className="mt-1 text-sm font-semibold text-rose-100">
+              <p className="mt-1 break-words text-sm font-semibold text-rose-100">
                 {profile.compatibility.bad.name}
               </p>
-            </div>
+              <p className="mt-2 text-[11px] text-rose-100/60">タップで特徴を見る</p>
+            </button>
           </div>
 
           <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-4">
@@ -265,6 +392,10 @@ export default function AuraCard({
           ) : null}
         </div>
       </div>
+
+      {compatPreview ? (
+        <CompatibilityAuraModal preview={compatPreview} onClose={() => setCompatPreview(null)} />
+      ) : null}
     </section>
   );
 }

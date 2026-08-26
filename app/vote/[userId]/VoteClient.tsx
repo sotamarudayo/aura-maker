@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import AuraBackground from "@/components/AuraBackground";
 import OpenInBrowserCta from "@/components/OpenInBrowserCta";
@@ -145,11 +146,18 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
           <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票ありがとう！</h1>
           <p className="mt-3 text-white/80">{buildVoteThanksMessage(currentDisplayName)}</p>
 
-          <div className="mt-8">
-            <OpenInBrowserCta
+          <div className="mt-8 space-y-3">
+            <Link
               href="/"
               className="block rounded-full bg-violet-300 px-4 py-3 text-center text-sm font-bold leading-snug text-black sm:px-5"
-              label="あなたも自分のオーラを診断してみる？（1タップで作成）"
+            >
+              このままオーラ診断を始める
+            </Link>
+            <OpenInBrowserCta
+              href="/"
+              inAppOnly
+              className="block rounded-full border border-white/30 bg-white/10 px-4 py-3 text-center text-sm font-semibold leading-snug text-white sm:px-5"
+              label="Safari / Chromeで開いて診断する"
             />
           </div>
         </section>
