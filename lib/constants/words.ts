@@ -441,56 +441,8 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     category: "chaos",
     auraCategory: ["chaos", "imp", "warm"],
   },
-  {
-    id: "eroi-hanashi",
-    label: "エロい話振ってくる",
-    category: "chaos",
-    auraCategory: ["chaos", "imp", "warm"],
-  },
-  {
-    id: "fukabori-ma",
-    label: "深掘り魔",
-    category: "chaos",
-    auraCategory: ["chaos", "intellect", "otaku"],
-  },
-  {
-    id: "seiheki-bare",
-    label: "性癖バレ",
-    category: "gap",
-    auraCategory: ["imp", "chaos", "otaku"],
-  },
-  {
-    id: "hanashi-kikoka",
-    label: "話きこか系",
-    category: "chaos",
-    auraCategory: ["chaos", "imp", "warm"],
-  },
-  {
-    id: "yoru-no-bukatsu",
-    label: "夜の部活動",
-    category: "secret",
-    auraCategory: ["chaos", "otaku", "void"],
-  },
 
-  // メンヘラかまってちゃん系
-  {
-    id: "menhera",
-    label: "メンヘラ",
-    category: "gap",
-    auraCategory: ["imp", "void", "heal"],
-  },
-  {
-    id: "kamatte-chan",
-    label: "かまってちゃん",
-    category: "gap",
-    auraCategory: ["imp", "warm", "heal"],
-  },
-  {
-    id: "shounin-yokkyuu",
-    label: "承認欲求強め",
-    category: "vibes",
-    auraCategory: ["imp", "hero", "warm"],
-  },
+  // メンヘラかまってちゃん系（名前直球は投票語から除外）
   {
     id: "aijou-kakunin",
     label: "愛情確認魔",
@@ -498,16 +450,16 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     auraCategory: ["imp", "heal", "warm"],
   },
   {
-    id: "henchin-machi",
-    label: "返信待ちパニック",
-    category: "gap",
-    auraCategory: ["void", "imp", "chaos"],
+    id: "amae-jouzu",
+    label: "甘え上手",
+    category: "vibes",
+    auraCategory: ["warm", "heal", "imp"],
   },
   {
-    id: "renraku-konai",
-    label: "連絡こないと不安",
-    category: "gap",
-    auraCategory: ["void", "heal", "imp"],
+    id: "kidoku-made-seizon",
+    label: "既読つくまで生存",
+    category: "chaos",
+    auraCategory: ["void", "imp", "chaos"],
   },
   {
     id: "miteru-kei",
@@ -520,24 +472,6 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     label: "情緒ジェットコースター",
     category: "gap",
     auraCategory: ["chaos", "imp", "void"],
-  },
-  {
-    id: "amae-jouzu",
-    label: "甘え上手",
-    category: "vibes",
-    auraCategory: ["warm", "heal", "imp"],
-  },
-  {
-    id: "suterare-fuan",
-    label: "捨てられ不安",
-    category: "gap",
-    auraCategory: ["void", "heal", "imp"],
-  },
-  {
-    id: "kidoku-made-seizon",
-    label: "既読つくまで生存",
-    category: "chaos",
-    auraCategory: ["void", "imp", "chaos"],
   },
   {
     id: "sabishisa-bakudan",
@@ -663,8 +597,8 @@ export const RECOMMENDED_WORD_LABELS: readonly string[] = [
   "変態",
   "どしたん話きこか？",
   "性癖開示",
-  "メンヘラ",
-  "かまってちゃん",
+  "愛情確認魔",
+  "既読つくまで生存",
   "ギャップの鬼",
   "天才的バカ",
   "限界オタク",

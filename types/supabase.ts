@@ -105,6 +105,51 @@ export type Database = {
           },
         ];
       };
+      aura_fusions: {
+        Row: {
+          id: string;
+          inviter_id: string;
+          invitee_id: string | null;
+          invite_token: string;
+          status: string;
+          created_at: string;
+          accepted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          inviter_id: string;
+          invitee_id?: string | null;
+          invite_token: string;
+          status?: string;
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          inviter_id?: string;
+          invitee_id?: string | null;
+          invite_token?: string;
+          status?: string;
+          created_at?: string;
+          accepted_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "aura_fusions_inviter_id_fkey";
+            columns: ["inviter_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "aura_fusions_invitee_id_fkey";
+            columns: ["invitee_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

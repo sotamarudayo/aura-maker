@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import AuraBackground from "@/components/AuraBackground";
 import { normalizeVoteWords } from "@/lib/votes/validate";
-import { resolveSiteUrl } from "@/lib/utils/site-url";
 import { createClient } from "@/utils/supabase/server";
 import SuccessClient from "./SuccessClient";
 
@@ -39,26 +38,7 @@ export default async function VoteSuccessPage({ params, searchParams }: SuccessP
     );
   }
 
-  const { data: votes } = await supabase
-    .from("votes")
-    .select("word, is_self_vote")
-    .eq("target_user_id", userId);
-
-  const friendWords = (votes ?? [])
-    .filter((vote) => !vote.is_self_vote)
-    .map((vote) => vote.word);
-  const selfWords = (votes ?? [])
-    .filter((vote) => vote.is_self_vote)
-    .map((vote) => vote.word);
-  const targetAuraWords = friendWords.length > 0 ? friendWords : selfWords;
-  const siteUrl = await resolveSiteUrl();
-
   return (
-    <SuccessClient
-      targetDisplayName={profile.display_name ?? "名無しのオーラ使い"}
-      targetAuraWords={targetAuraWords}
-      voterWords={voterWords}
-      siteUrl={siteUrl}
-    />
+    <SuccessClient targetDisplayName={profile.display_name ?? "名無しのオーラ使い"} />
   );
 }
