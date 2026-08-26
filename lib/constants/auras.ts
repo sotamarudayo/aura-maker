@@ -59,8 +59,20 @@ export type AuraAwakening = {
 
 export type AuraResultConfidence = "provisional" | "growing" | "stable";
 
+/** 診断の根拠になった投票ワード */
+export type VoteEvidence = {
+  word: string;
+  count: number;
+  percent: number;
+  rank: number;
+  /** 最多 / 決め手 など */
+  badge?: string;
+};
+
 export type DynamicAuraProfile = {
   mainText: string;
+  /** 票数付きの診断根拠（多い順） */
+  evidence: VoteEvidence[];
   ecology: AuraEcology;
   stats: AuraStats;
   specialMove: string;
@@ -962,22 +974,112 @@ function buildWitness(aura: AuraType, topWords: string[]): string {
   return `周囲からは『${nuance}な人』として認識されています`;
 }
 
-function buildPraise(aura: AuraType, topWords: string[]): string {
+function wordNuance(word: string): string {
+  return getWordResultFlavor(word)?.nuance ?? WORD_NUANCE[word] ?? word;
+}
+
+function buildVoteEvidence(
+  counts: Map<string, number>,
+  totalVotes: number,
+): VoteEvidence[] {
+  if (totalVotes === 0) return [];
+
+  const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "ja"));
+  return ranked.slice(0, 5).map(([word, count], index) => {
+    const percent = Math.round((count / totalVotes) * 100);
+    let badge: string | undefined;
+    if (index === 0) badge = "最多";
+    else if (index === 1) badge = "有力";
+    else if (index === 2) badge = "決め手";
+    return { word, count, percent, rank: index + 1, badge };
+  });
+}
+
+function buildDominanceParagraph(
+  evidence: VoteEvidence[],
+  totalVotes: number,
+  uniqueCount: number,
+): string {
+  const top = evidence[0];
+  if (!top) return "";
+
+  const nuance = wordNuance(top.word);
+  if (evidence.length === 1) {
+    return `現時点の投票${totalVotes}票はほぼ「${top.word}」に集中（${top.count}票・${top.percent}%）。友達目線の第一印象は『${nuance}』でほぼ固まっています。`;
+  }
+
+  if (top.percent >= 45) {
+    return `全${totalVotes}票・${uniqueCount}種類のうち、「${top.word}」が${top.count}票（${top.percent}%）で突出。『${nuance}』が診断の主軸になっています。`;
+  }
+
+  if (top.percent >= 30) {
+    return `全${totalVotes}票のなかで「${top.word}」が${top.count}票（${top.percent}%）と最多。『${nuance}』がはっきり見えています。`;
+  }
+
+  return `全${totalVotes}票・${uniqueCount}種類とバラけつつも、先頭は「${top.word}」（${top.count}票・${top.percent}%）。『${nuance}』がわずかにリードしています。`;
+}
+
+function buildComboParagraph(aura: AuraType, evidence: VoteEvidence[]): string {
+  const a = evidence[0];
+  const b = evidence[1];
+  const c = evidence[2];
+  if (!a) return "";
+
+  if (a && b && c) {
+    return `さらに「${b.word}」（${b.count}票）と「${c.word}」（${c.count}票）が同時に上位へ食い込んだ結果、単体の印象ではなく『${wordNuance(a.word)}×${wordNuance(b.word)}×${wordNuance(c.word)}』の混成として${aura.archetypeName}（${aura.name}）に着地しました。`;
+  }
+
+  if (a && b) {
+    return `決め手は「${a.word}」だけでなく「${b.word}」（${b.count}票）とのセット感。『${wordNuance(a.word)}』に『${wordNuance(b.word)}』が乗ったことで、${aura.archetypeName}タイプとして読み取れます。`;
+  }
+
+  return `この一票集中から、${aura.archetypeName}（${aura.name}）としての輪郭が立ち上がっています。`;
+}
+
+function buildSupportParagraph(evidence: VoteEvidence[]): string | null {
+  if (evidence.length < 4) return null;
+  const extras = evidence.slice(3);
+  const joined = extras.map((item) => `「${item.word}」${item.count}票`).join("、");
+  return `補助線として${joined}も入っており、メイン印象を裏打ちするサブ要素になっています。`;
+}
+
+function buildCautionParagraph(aura: AuraType, topWords: string[]): string {
   const primary = topWords[0];
-  const nuance = primary
-    ? (getWordResultFlavor(primary)?.nuance ?? WORD_NUANCE[primary] ?? primary)
-    : aura.name;
-  const wordJoin = topWords.length > 0 ? `「${topWords.join("・")}」` : "投票ワード";
-
-  if (aura.rarity === "secret") {
-    return `禁断の組み合わせ${wordJoin}が${aura.archetypeName}（${aura.name}）を覚醒させました。${nuance}が核になっています。`;
+  if (primary) {
+    const flavor = getWordResultFlavor(primary);
+    if (flavor?.punchline) return flavor.punchline;
+    const options = PUNCHLINE_BY_WORD[primary];
+    if (options) return pickStable(options, `punch:${primary}:${aura.id}`);
   }
+  return buildPunchline(aura, topWords);
+}
 
-  if (aura.rarity === "legendary") {
-    return `総合すると${aura.archetypeName}級。${wordJoin}の傾向から見て、${nuance}が軸のレア枠です。`;
-  }
+function buildDiagnosisReport(
+  aura: AuraType,
+  topWords: string[],
+  votes: string[],
+  counts: Map<string, number>,
+  contradiction: AuraContradiction | null,
+): { mainText: string; evidence: VoteEvidence[] } {
+  const totalVotes = votes.length;
+  const uniqueCount = counts.size;
+  const evidence = buildVoteEvidence(counts, totalVotes);
 
-  return `総合すると${aura.archetypeName}タイプ。${wordJoin}が効いていて、${nuance}が友達目線でも際立っています。`;
+  const paragraphs = [
+    buildDominanceParagraph(evidence, totalVotes, uniqueCount),
+    buildComboParagraph(aura, evidence),
+    buildWitness(aura, topWords),
+    buildSupportParagraph(evidence),
+    contradiction
+      ? `なお上位に「${contradiction.wordA}」と「${contradiction.wordB}」が同居しているため、${contradiction.text}`
+      : null,
+    buildCautionParagraph(aura, topWords),
+  ].filter((part): part is string => Boolean(part && part.trim().length > 0));
+
+  return {
+    mainText: paragraphs.join("\n\n"),
+    evidence,
+  };
 }
 
 function buildPunchline(aura: AuraType, topWords: string[]): string {
@@ -1001,12 +1103,19 @@ function buildPunchline(aura: AuraType, topWords: string[]): string {
 }
 
 function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
-  for (const word of topWords) {
-    const flavor = getWordResultFlavor(word);
-    if (flavor?.ecology) return flavor.ecology;
-    const ecology = ECOLOGY_BY_WORD[word];
-    if (ecology) return ecology;
+  const flavors = topWords
+    .map((word) => getWordResultFlavor(word)?.ecology ?? ECOLOGY_BY_WORD[word])
+    .filter(Boolean) as AuraEcology[];
+
+  if (flavors.length >= 2) {
+    return {
+      trigger: `${flavors[0]!.trigger} ／ ${flavors[1]!.trigger}`,
+      sideEffect: flavors[0]!.sideEffect,
+      weakness: flavors[1]!.weakness,
+    };
   }
+
+  if (flavors[0]) return flavors[0];
 
   const auraEcology = ECOLOGY_BY_AURA[aura.id];
   if (auraEcology) return auraEcology;
@@ -1145,6 +1254,17 @@ function buildCompatibility(aura: AuraType): AuraCompatibility {
 }
 
 function buildSpecialMove(aura: AuraType, topWords: string[]): string {
+  const primary = topWords[0];
+  const secondary = topWords[1];
+
+  if (primary && secondary) {
+    const moveA =
+      getWordResultFlavor(primary)?.specialMove ??
+      SPECIAL_MOVE_BY_WORD[primary]?.[0] ??
+      `${primary}全開`;
+    return `${moveA} × ${secondary}`;
+  }
+
   for (const word of topWords) {
     const flavor = getWordResultFlavor(word);
     if (flavor?.specialMove) {
@@ -1156,14 +1276,14 @@ function buildSpecialMove(aura: AuraType, topWords: string[]): string {
     }
   }
 
-  const primary = topWords[0] ?? "オーラ";
+  const fallback = topWords[0] ?? "オーラ";
   return pickStable(
     [
-      `究極・${primary}フィニッシュ`,
-      `秘技「${primary}全開」`,
-      `${primary}の領域展開`,
+      `究極・${fallback}フィニッシュ`,
+      `秘技「${fallback}全開」`,
+      `${fallback}の領域展開`,
     ],
-    `move-default:${aura.id}:${primary}`,
+    `move-default:${aura.id}:${fallback}`,
   );
 }
 
@@ -1233,10 +1353,12 @@ function buildDynamicProfile(
   options?: AuraCalculationOptions,
 ): DynamicAuraProfile {
   const confidence = buildResultConfidence(votes);
+  const counts = buildWordCounts(votes);
 
   if (aura.id === "dormant" || topWords.length === 0) {
     return {
       mainText: aura.description,
+      evidence: [],
       ecology: DORMANT_ECOLOGY,
       stats: DORMANT_STATS,
       specialMove: "（覚醒待ち）",
@@ -1251,13 +1373,17 @@ function buildDynamicProfile(
   }
 
   const contradiction = findContradictionDetail(topWords);
-  const witness = buildWitness(aura, topWords);
-  const praise = buildPraise(aura, topWords);
-  const punchline = buildPunchline(aura, topWords);
-  const mainText = [witness, praise, punchline].filter(Boolean).join("");
+  const { mainText, evidence } = buildDiagnosisReport(
+    aura,
+    topWords,
+    votes,
+    counts,
+    contradiction,
+  );
 
   return {
     mainText,
+    evidence,
     ecology: buildEcology(aura, topWords),
     stats: buildStats(votes),
     specialMove: buildSpecialMove(aura, topWords),
@@ -1293,10 +1419,13 @@ function buildWordCounts(votes: string[]) {
 
 function personalizeCatchCopy(aura: AuraType, topWords: string[]) {
   if (topWords.length === 0) return aura.catchCopy;
-  const flavored = topWords
-    .map((word) => getWordResultFlavor(word)?.nuance ?? word)
-    .join("・");
-  return `${flavored}が混ざり合う、${aura.catchCopy}`;
+  if (topWords.length === 1) {
+    return `「${topWords[0]}」が効いている、${aura.catchCopy}`;
+  }
+  if (topWords.length === 2) {
+    return `「${topWords[0]}」×「${topWords[1]}」が混ざる、${aura.catchCopy}`;
+  }
+  return `「${topWords[0]}」を軸に「${topWords[1]}」「${topWords[2]}」が乗る、${aura.catchCopy}`;
 }
 
 function hasAny(set: Set<string>, words: string[]) {

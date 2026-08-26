@@ -123,7 +123,29 @@ export default function AuraCard({
               {aura.archetypeName}
             </h2>
             <p className="mt-3 break-words text-base text-cyan-100 sm:text-lg">{catchCopy}</p>
-            {topWords.length > 0 ? (
+            {profile.evidence.length > 0 ? (
+              <div className="mt-4">
+                <p className="text-[11px] font-bold tracking-[0.2em] text-white/45">診断の決め手</p>
+                <ul className="mt-2 space-y-2">
+                  {profile.evidence.slice(0, 3).map((item) => (
+                    <li
+                      key={item.word}
+                      className="flex flex-wrap items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2"
+                    >
+                      <span className="text-sm font-semibold">#{item.word}</span>
+                      <span className="text-xs tabular-nums text-white/70">
+                        {item.count}票・{item.percent}%
+                      </span>
+                      {item.badge ? (
+                        <span className="rounded-full border border-violet-300/40 bg-violet-500/20 px-2 py-0.5 text-[10px] font-bold text-violet-100">
+                          {item.badge}
+                        </span>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : topWords.length > 0 ? (
               <div className="mt-4">
                 <p className="text-[11px] font-bold tracking-[0.2em] text-white/45">診断の決め手</p>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -138,7 +160,14 @@ export default function AuraCard({
                 </div>
               </div>
             ) : null}
-            <p className="mt-4 break-words text-sm text-white/80 sm:text-base">{profile.mainText}</p>
+            <div className="mt-4 space-y-3">
+              <p className="text-[11px] font-bold tracking-[0.2em] text-white/45">診断レポート</p>
+              {profile.mainText.split("\n\n").map((paragraph, index) => (
+                <p key={index} className="break-words text-sm leading-relaxed text-white/80 sm:text-base">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           </div>
 
           {profile.contradiction ? (
