@@ -148,11 +148,17 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const [{ data: profile }, { data: votes }] = await Promise.all([
       supabase.from("profiles").select("display_name").eq("id", userId).maybeSingle(),
-      supabase.from("votes").select("word").eq("target_user_id", userId),
+      supabase.from("votes").select("word, is_self_vote").eq("target_user_id", userId),
     ]);
 
     const displayName = profile?.display_name ?? "Anonymous";
-    const voteWords = (votes ?? []).map((vote) => vote.word);
+    const friendWords = (votes ?? [])
+      .filter((vote) => !vote.is_self_vote)
+      .map((vote) => vote.word);
+    const selfWords = (votes ?? [])
+      .filter((vote) => vote.is_self_vote)
+      .map((vote) => vote.word);
+    const voteWords = friendWords.length > 0 ? friendWords : selfWords;
     const auraResult = calculateAuraType(voteWords);
     const topWords = getTopWords(voteWords);
     const wordsLabel =

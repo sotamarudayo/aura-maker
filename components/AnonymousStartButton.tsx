@@ -73,7 +73,7 @@ export default function AnonymousStartButton({
     }
 
     trackEvent("start_anonymous", { has_display_name: true });
-    router.push("/dashboard");
+    router.push("/onboarding/self-vote");
     router.refresh();
   }
 

@@ -1,19 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import AuraBackground from "@/components/AuraBackground";
 import OpenInBrowserCta from "@/components/OpenInBrowserCta";
-import {
-  VOTE_CATEGORY_LABELS,
-  VOTE_WORD_DEFS,
-  getCategoryWordCount,
-  getWordsByCategory,
-  RECOMMENDED_WORD_LABELS,
-  type VoteCategory,
-  type VoteWord,
-  type VoteWordDef,
-} from "@/lib/constants/words";
+import VoteWordPicker, { VOTE_PICKER_MAX } from "@/components/VoteWordPicker";
 import {
   buildVotePageHeading,
   buildVotePageSubcopy,
@@ -23,55 +15,42 @@ import {
   VOTE_PAGE_WHAT_IS_THIS,
 } from "@/lib/constants/share";
 import { trackEvent } from "@/lib/analytics";
-import { markVoteSent, readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
+import { checkVoteStatus, submitVotesViaApi } from "@/lib/votes/client";
+import { readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
 import { createClient } from "@/utils/supabase/client";
+import type { VoteWord } from "@/lib/constants/words";
 
 type VoteClientProps = {
   userId: string;
   displayName: string;
 };
 
-const MAX_SELECT = 3;
-
-const CATEGORY_SECTIONS: Array<{
-  id: string;
-  key: VoteCategory | "all";
-  label: string;
-}> = [
-  { id: "recommended", key: "all", label: VOTE_CATEGORY_LABELS.all },
-  { id: "visual", key: "visual", label: VOTE_CATEGORY_LABELS.visual },
-  { id: "vibes", key: "vibes", label: VOTE_CATEGORY_LABELS.vibes },
-  { id: "chaos", key: "chaos", label: VOTE_CATEGORY_LABELS.chaos },
-  { id: "gap", key: "gap", label: VOTE_CATEGORY_LABELS.gap },
-  { id: "secret", key: "secret", label: VOTE_CATEGORY_LABELS.secret },
-];
-
 export default function VoteClient({ userId, displayName }: VoteClientProps) {
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [currentDisplayName, setCurrentDisplayName] = useState(() => displayName);
   const [selected, setSelected] = useState<VoteWord[]>([]);
-  const sent = useSyncExternalStore(
+  const localSent = useSyncExternalStore(
     subscribeVoteSent,
     () => readVoteSent(userId),
     () => false,
   );
+  const [serverSent, setServerSent] = useState(false);
+  const sent = localSent || serverSent;
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isSelected = useMemo(() => new Set(selected), [selected]);
-
-  const sections = useMemo(
-    () =>
-      CATEGORY_SECTIONS.map((section) => {
-        const words: VoteWordDef[] = getWordsByCategory(section.key);
-        const count =
-          section.key === "all"
-            ? RECOMMENDED_WORD_LABELS.length
-            : getCategoryWordCount(section.key);
-        return { ...section, words, count };
-      }),
-    [],
-  );
+  useEffect(() => {
+    let cancelled = false;
+    void checkVoteStatus(userId).then((alreadyVoted) => {
+      if (!cancelled && alreadyVoted) {
+        setServerSent(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   useEffect(() => {
     const channel = supabase
@@ -104,7 +83,7 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
       if (prev.includes(word)) {
         return prev.filter((item) => item !== word);
       }
-      if (prev.length >= MAX_SELECT) {
+      if (prev.length >= VOTE_PICKER_MAX) {
         return prev;
       }
       return [...prev, word];
@@ -120,22 +99,19 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
     setSending(true);
     setError(null);
 
-    const rows = selected.map((word) => ({
-      target_user_id: userId,
-      word,
-    }));
-
-    const { error: insertError } = await supabase.from("votes").insert(rows);
-
-    if (insertError) {
-      setError(insertError.message);
+    const result = await submitVotesViaApi(userId, selected);
+    if (!result.ok) {
+      if (result.code === "duplicate_vote") {
+        setServerSent(true);
+      }
+      setError(result.error);
       setSending(false);
       return;
     }
 
-    markVoteSent(userId);
     trackEvent("vote_submit", { word_count: selected.length });
-    setSending(false);
+    const wordsQuery = selected.map((word) => encodeURIComponent(word)).join(",");
+    router.push(`/vote/${userId}/success?words=${wordsQuery}`);
   }
 
   if (sent) {
@@ -143,9 +119,8 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
       <main className="relative flex min-h-screen items-center justify-center overflow-x-clip px-4 py-8 text-white sm:py-10">
         <AuraBackground />
         <section className="relative z-10 w-full min-w-0 max-w-xl rounded-2xl border border-white/20 bg-black/40 p-5 text-center backdrop-blur sm:p-8">
-          <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票ありがとう！</h1>
+          <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票済みです</h1>
           <p className="mt-3 text-white/80">{buildVoteThanksMessage(currentDisplayName)}</p>
-
           <div className="mt-8 space-y-3">
             <Link
               href="/"
@@ -193,55 +168,7 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
           </ol>
         </div>
 
-        <p className="mt-3 text-xs text-white/55">
-          正直でもネタ多めでもOK。全{VOTE_WORD_DEFS.length}語から最大3つ。カテゴリごとに並んでるので、スクロールして探してね。
-        </p>
-
-        <nav className="mt-5 flex flex-wrap gap-2" aria-label="カテゴリへジャンプ">
-          {sections.map((section) => (
-            <a
-              key={section.id}
-              href={`#vote-${section.id}`}
-              className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/20"
-            >
-              {section.label}
-              <span className="ml-1 text-[10px] opacity-60">({section.count})</span>
-            </a>
-          ))}
-        </nav>
-
-        <div className="mt-8 space-y-8">
-          {sections.map((section) => (
-            <div key={section.id} id={`vote-${section.id}`} className="scroll-mt-24">
-              <div className="mb-3 flex flex-wrap items-baseline gap-2 border-b border-white/10 pb-2">
-                <h2 className="text-base font-bold text-violet-100 sm:text-lg">{section.label}</h2>
-                <span className="text-xs text-white/45">{section.count}語</span>
-                {section.key === "all" ? (
-                  <span className="text-xs text-violet-200/80">🔥 よく選ばれる語</span>
-                ) : null}
-              </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                {section.words.map((word) => {
-                  const selectedChip = isSelected.has(word.label);
-                  return (
-                    <button
-                      key={`${section.id}-${word.id}`}
-                      type="button"
-                      onClick={() => toggleWord(word.label)}
-                      className={`vote-chip rounded-full px-3 py-2 text-sm font-semibold transition duration-200 ${
-                        selectedChip
-                          ? "vote-chip-selected bg-violet-300 text-black"
-                          : "bg-white/10 text-white hover:scale-[1.03] hover:bg-white/20"
-                      }`}
-                    >
-                      {word.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+        <VoteWordPicker selected={selected} onToggle={toggleWord} disabled={sending} />
 
         {error ? <p className="mt-4 text-sm text-rose-300">{error}</p> : null}
       </section>

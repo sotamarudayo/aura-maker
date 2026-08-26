@@ -6,6 +6,7 @@ function needsSessionRefresh(pathname: string) {
   return (
     pathname === "/" ||
     pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/onboarding") ||
     pathname.startsWith("/auth") ||
     pathname.startsWith("/login")
   );

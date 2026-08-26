@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { resolveAnonymousDisplayName } from "@/lib/utils/nickname";
-import { resolveSiteUrl } from "@/lib/utils/site-url";
-import DashboardClient from "./DashboardClient";
+import SelfVoteClient from "./SelfVoteClient";
 
 function fallbackName(email?: string | null) {
   if (!email) return "Anonymous";
@@ -26,7 +25,7 @@ function resolveDisplayName(
   );
 }
 
-export default async function DashboardPage() {
+export default async function SelfVotePage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,6 +41,10 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .maybeSingle();
 
+  if (profile?.self_vote_completed) {
+    redirect("/dashboard");
+  }
+
   const displayName = resolveDisplayName(user, profile?.display_name);
 
   if (!profile) {
@@ -50,38 +53,12 @@ export default async function DashboardPage() {
       display_name: displayName,
       self_vote_completed: false,
     });
-    redirect("/onboarding/self-vote");
-  }
-
-  if (!profile.display_name) {
+  } else if (!profile.display_name) {
     await supabase
       .from("profiles")
       .update({ display_name: displayName })
       .eq("id", user.id);
   }
 
-  if (!profile.self_vote_completed) {
-    redirect("/onboarding/self-vote");
-  }
-
-  const { data: votes } = await supabase
-    .from("votes")
-    .select("word, is_self_vote, voter_fingerprint")
-    .eq("target_user_id", user.id);
-
-  const siteUrl = await resolveSiteUrl();
-
-  return (
-    <DashboardClient
-      userId={user.id}
-      initialDisplayName={displayName}
-      initialVotes={(votes ?? []).map((vote) => ({
-        word: vote.word,
-        isSelfVote: vote.is_self_vote ?? false,
-        voterFingerprint: vote.voter_fingerprint ?? null,
-      }))}
-      initialIsAnonymous={user.is_anonymous ?? false}
-      siteUrl={siteUrl}
-    />
-  );
+  return <SelfVoteClient userId={user.id} displayName={displayName} />;
 }

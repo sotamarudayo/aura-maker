@@ -8,7 +8,10 @@ import { createClient } from "@/utils/supabase/client";
 import AuraBackground from "@/components/AuraBackground";
 import AuraCard from "@/components/AuraCard";
 import LinkAccountModal from "@/components/LinkAccountModal";
+import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import { calculateAuraType } from "@/lib/constants/auras";
+import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
+import { groupVoterSessions } from "@/lib/chemi/group-voters";
 import {
   buildServiceShareUrls,
   buildVoteInviteSharePayload,
@@ -21,10 +24,20 @@ const StoryExportModal = dynamic(() => import("@/components/StoryExportModal"), 
   ssr: false,
 });
 
+const ChemiExportModal = dynamic(() => import("@/components/ChemiExportModal"), {
+  ssr: false,
+});
+
+type VoteEntry = {
+  word: string;
+  isSelfVote: boolean;
+  voterFingerprint: string | null;
+};
+
 type DashboardClientProps = {
   userId: string;
   initialDisplayName: string;
-  initialWords: string[];
+  initialVotes: VoteEntry[];
   initialIsAnonymous: boolean;
   siteUrl: string;
 };
@@ -40,7 +53,7 @@ function buildCounts(words: string[]) {
 export default function DashboardClient({
   userId,
   initialDisplayName,
-  initialWords,
+  initialVotes,
   initialIsAnonymous,
   siteUrl,
 }: DashboardClientProps) {
@@ -50,7 +63,7 @@ export default function DashboardClient({
   const [isAnonymous, setIsAnonymous] = useState(initialIsAnonymous);
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [storyModalOpen, setStoryModalOpen] = useState(false);
-  const [words, setWords] = useState<string[]>(initialWords);
+  const [votes, setVotes] = useState<VoteEntry[]>(initialVotes);
   const [pulseActive, setPulseActive] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [totalPopTick, setTotalPopTick] = useState(0);
@@ -60,6 +73,8 @@ export default function DashboardClient({
   const [nameError, setNameError] = useState<string | null>(null);
   const [isSavingName, setIsSavingName] = useState(false);
   const [moreShareOpen, setMoreShareOpen] = useState(false);
+  const [chemiOpen, setChemiOpen] = useState(false);
+  const [chemiPartyB, setChemiPartyB] = useState<ChemiParty | null>(null);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
@@ -79,20 +94,27 @@ export default function DashboardClient({
         },
         (payload) => {
           const word = payload.new.word;
+          const isSelfVote = payload.new.is_self_vote === true;
+          const voterFingerprint =
+            typeof payload.new.voter_fingerprint === "string"
+              ? payload.new.voter_fingerprint
+              : null;
           if (typeof word === "string") {
-            setWords((prev) => [word, ...prev]);
-            setPulseActive(true);
-            setToastMessage(`新しい投票が届きました！ (+${word})`);
-            setTotalPopTick((prev) => prev + 1);
-            setLastVotedWord(word);
+            setVotes((prev) => [{ word, isSelfVote, voterFingerprint }, ...prev]);
+            if (!isSelfVote) {
+              setPulseActive(true);
+              setToastMessage(`新しい投票が届きました！ (+${word})`);
+              setTotalPopTick((prev) => prev + 1);
+              setLastVotedWord(word);
 
-            if (pulseTimerRef.current) window.clearTimeout(pulseTimerRef.current);
-            if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-            if (wordTimerRef.current) window.clearTimeout(wordTimerRef.current);
+              if (pulseTimerRef.current) window.clearTimeout(pulseTimerRef.current);
+              if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+              if (wordTimerRef.current) window.clearTimeout(wordTimerRef.current);
 
-            pulseTimerRef.current = window.setTimeout(() => setPulseActive(false), 720);
-            toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
-            wordTimerRef.current = window.setTimeout(() => setLastVotedWord(null), 1200);
+              pulseTimerRef.current = window.setTimeout(() => setPulseActive(false), 720);
+              toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+              wordTimerRef.current = window.setTimeout(() => setLastVotedWord(null), 1200);
+            }
           }
         },
       )
@@ -106,11 +128,56 @@ export default function DashboardClient({
     };
   }, [supabase, userId]);
 
-  const ranking = useMemo(() => buildCounts(words), [words]);
-  const auraResult = useMemo(
-    () => calculateAuraType(words, { userId, displayName }),
-    [words, userId, displayName],
+  const selfWords = useMemo(
+    () => votes.filter((vote) => vote.isSelfVote).map((vote) => vote.word),
+    [votes],
   );
+  const friendWords = useMemo(
+    () => votes.filter((vote) => !vote.isSelfVote).map((vote) => vote.word),
+    [votes],
+  );
+  const auraWords = friendWords.length > 0 ? friendWords : selfWords;
+  const rankingWords = friendWords.length > 0 ? friendWords : selfWords;
+
+  const ranking = useMemo(() => buildCounts(rankingWords), [rankingWords]);
+  const auraResult = useMemo(
+    () => calculateAuraType(auraWords, { userId, displayName }),
+    [auraWords, userId, displayName],
+  );
+  const auraSourceLabel =
+    friendWords.length > 0 ? "友達目線" : selfWords.length > 0 ? "自己診断（暫定）" : "観測待ち";
+
+  const ownerParty: ChemiParty = useMemo(() => {
+    const result = calculateAuraType(auraWords, { userId, displayName });
+    return {
+      displayName,
+      aura: result.aura,
+      topWords: result.topWords,
+    };
+  }, [auraWords, userId, displayName]);
+
+  const voterSessions = useMemo(
+    () =>
+      groupVoterSessions(
+        votes.map((vote) => ({
+          word: vote.word,
+          isSelfVote: vote.isSelfVote,
+          voterFingerprint: vote.voterFingerprint,
+        })),
+      ),
+    [votes],
+  );
+
+  function openChemiWithSession(session: (typeof voterSessions)[number]) {
+    const friendResult = calculateAuraType(session.words, { displayName: session.label });
+    setChemiPartyB({
+      displayName: session.label,
+      aura: friendResult.aura,
+      topWords: friendResult.topWords,
+    });
+    setChemiOpen(true);
+    trackEvent("open_chemi_export", { source: "dashboard_voter_list" });
+  }
   const palette = auraResult.aura.palette;
   const maxCount = ranking[0]?.[1] ?? 1;
   const resultShareText = auraResult.dynamicProfile.shareLine;
@@ -222,6 +289,24 @@ export default function DashboardClient({
         }}
       />
 
+      {chemiPartyB ? (
+        <ChemiExportModal
+          open={chemiOpen}
+          onClose={() => {
+            setChemiOpen(false);
+            setChemiPartyB(null);
+          }}
+          partyA={ownerParty}
+          partyB={chemiPartyB}
+          siteUrl={siteUrl}
+          onSaved={() => {
+            setToastMessage("ケミカードを保存しました！");
+            if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+            toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+          }}
+        />
+      ) : null}
+
       {toastMessage ? (
         <div className="pointer-events-none fixed left-1/2 top-20 z-[60] -translate-x-1/2 rounded-full border border-violet-300/50 bg-black/70 px-5 py-2 text-sm font-semibold text-violet-100 shadow-xl backdrop-blur vote-toast">
           {toastMessage}
@@ -258,15 +343,30 @@ export default function DashboardClient({
           </section>
         )}
 
+        <div className="flex justify-center">
+          <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white/75">
+            表示中: {auraSourceLabel}
+          </span>
+        </div>
+
         <AuraCard
           aura={auraResult.aura}
           catchCopy={auraResult.personalizedCatchCopy}
           profile={auraResult.dynamicProfile}
           topWords={auraResult.topWords}
-          hasVotes={ranking.length > 0}
+          hasVotes={auraWords.length > 0}
           pulse={pulseActive}
           displayName={displayName}
         />
+
+        {selfWords.length > 0 && friendWords.length > 0 ? (
+          <SelfFriendGapCard
+            displayName={displayName}
+            userId={userId}
+            selfWords={selfWords}
+            friendWords={friendWords}
+          />
+        ) : null}
 
         <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
           <h2 className="text-xl font-bold">シェアして投票を集めよう</h2>
@@ -475,14 +575,48 @@ export default function DashboardClient({
           </Link>
         </div>
 
+        {voterSessions.length > 0 ? (
+          <section className="rounded-2xl border border-fuchsia-300/30 bg-black/35 p-4 backdrop-blur sm:p-6">
+            <h2 className="text-xl font-bold">投票してくれた友達</h2>
+            <p className="mt-1 text-sm text-white/65">
+              匿名の投票セッションごとにケミカードを作成できます。
+            </p>
+            <ul className="mt-4 space-y-3">
+              {voterSessions.map((session) => (
+                <li
+                  key={session.fingerprint}
+                  className="flex flex-col gap-3 rounded-xl border border-white/15 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-white">{session.label}</p>
+                    <p className="mt-1 text-sm text-white/60">
+                      {session.words.map((word) => `#${word}`).join(" ")}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openChemiWithSession(session)}
+                    className="shrink-0 rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2.5 text-sm font-black text-black"
+                  >
+                    ✨ この人とケミカードを作る
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         <section className="grid gap-6 lg:grid-cols-2">
           <article className="rounded-2xl border border-white/20 bg-black/35 p-6 backdrop-blur">
             <h2 className="text-xl font-bold">ランキング</h2>
             <p className="mt-1 text-sm text-white/70">
-              総投票数:{" "}
+              {friendWords.length > 0 ? "友達からの投票" : "自己診断"}の集計 · 総投票数:{" "}
               <span key={totalPopTick} className="vote-pop font-semibold text-violet-200">
-                {words.length}
+                {rankingWords.length}
               </span>
+              {friendWords.length > 0 && selfWords.length > 0 ? (
+                <span className="text-white/50">（うち友達 {friendWords.length} / 自己 {selfWords.length}）</span>
+              ) : null}
             </p>
             <ul className="mt-4 space-y-2">
               {ranking.slice(0, 10).map(([word, count], index) => (
@@ -526,7 +660,7 @@ export default function DashboardClient({
                 );
               })}
               {ranking.length === 0 ? (
-                <p className="text-white/70">まだ投票がありません。上の投票URLをシェアしてみましょう。</p>
+                <p className="text-white/70">まだ集計できる投票がありません。</p>
               ) : null}
             </div>
           </article>
