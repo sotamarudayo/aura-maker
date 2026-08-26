@@ -347,7 +347,11 @@ export default function AuraCard({
               <p className="mt-1 break-words text-sm font-semibold text-emerald-100">
                 {profile.compatibility.good.name}
               </p>
-              <p className="mt-2 text-[11px] text-emerald-100/60">タップで特徴を見る</p>
+              <p className="mt-2 text-[11px] text-emerald-100/60">
+                {profile.compatibility.good.name === "？？？"
+                  ? "タップでヒントを見る"
+                  : "タップで特徴を見る"}
+              </p>
             </button>
             <button
               type="button"
@@ -358,7 +362,11 @@ export default function AuraCard({
               <p className="mt-1 break-words text-sm font-semibold text-rose-100">
                 {profile.compatibility.bad.name}
               </p>
-              <p className="mt-2 text-[11px] text-rose-100/60">タップで特徴を見る</p>
+              <p className="mt-2 text-[11px] text-rose-100/60">
+                {profile.compatibility.bad.name === "？？？"
+                  ? "タップでヒントを見る"
+                  : "タップで特徴を見る"}
+              </p>
             </button>
           </div>
 

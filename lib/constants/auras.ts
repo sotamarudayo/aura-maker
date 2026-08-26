@@ -1460,8 +1460,14 @@ function buildCompatibility(aura: AuraType): AuraCompatibility {
   }
 
   return {
-    good: { id: bestGood.id, name: bestGood.name },
-    bad: { id: bestBad.id, name: bestBad.name },
+    good: {
+      id: bestGood.id,
+      name: bestGood.rarity === "secret" ? "？？？" : bestGood.name,
+    },
+    bad: {
+      id: bestBad.id,
+      name: bestBad.rarity === "secret" ? "？？？" : bestBad.name,
+    },
   };
 }
 
