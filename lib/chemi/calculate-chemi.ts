@@ -44,6 +44,20 @@ function buildChemName(auraA: AuraType, auraB: AuraType, shared: string[]): stri
     return "危険な爆走コンビ";
   }
   if (
+    auraA.archetypeName === "ど変態野郎" ||
+    auraB.archetypeName === "ど変態野郎" ||
+    auraA.id === "hentai-nebula" ||
+    auraB.id === "hentai-nebula"
+  ) {
+    return "禁忌好奇心コンビ";
+  }
+  if (
+    auraA.id === "menhera-pulse" ||
+    auraB.id === "menhera-pulse"
+  ) {
+    return "かまって共依存コンビ";
+  }
+  if (
     (hasAttribute(auraA, "mystic") && hasAttribute(auraB, "void")) ||
     (hasAttribute(auraA, "void") && hasAttribute(auraB, "mystic"))
   ) {

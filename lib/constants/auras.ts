@@ -203,6 +203,35 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     rarity: "uncommon",
   },
   {
+    id: "menhera-pulse",
+    name: "メンヘラパルスオーラ",
+    archetypeName: "メンヘラかまってちゃん",
+    catchCopy: "既読の速度で心拍数が変わる。かまってくれないと世界が終わる。",
+    description:
+      "あなたの纏う空気感は、愛情確認と寂しさが混ざったパルス光。反応が遅いと情緒が天候速報になるタイプです。",
+    gradient:
+      "radial-gradient(circle at 28% 24%, #fda4af, transparent 42%), radial-gradient(circle at 72% 40%, #c084fc, transparent 48%), radial-gradient(circle at 50% 82%, #67e8f9, transparent 52%), linear-gradient(150deg, #2a0a18 0%, #1a0a2e 55%, #05030b 100%)",
+    palette: { a: "#fda4af", b: "#c084fc", c: "#67e8f9" },
+    keywords: [
+      "メンヘラ",
+      "かまってちゃん",
+      "承認欲求強め",
+      "愛情確認魔",
+      "返信待ちパニック",
+      "連絡こないと不安",
+      "「見てる？」系",
+      "情緒ジェットコースター",
+      "甘え上手",
+      "捨てられ不安",
+      "既読つくまで生存",
+      "寂しさ爆弾",
+      "実は寂しがり",
+      "距離感バグ",
+    ],
+    attributes: ["imp", "heal", "void"],
+    rarity: "rare",
+  },
+  {
     id: "mystic-purple",
     name: "ミステリアスパープルオーラ",
     archetypeName: "じわ惹き魔",
@@ -226,9 +255,38 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 25% 25%, #e879f9, transparent 45%), radial-gradient(circle at 75% 35%, #22d3ee, transparent 50%), radial-gradient(circle at 50% 80%, #f43f5e, transparent 55%), linear-gradient(135deg, #1a0520 0%, #0c1222 100%)",
     palette: { a: "#e879f9", b: "#22d3ee", c: "#f43f5e" },
-    keywords: ["深夜テンション", "治安悪め", "天才的バカ", "草不可避", "距離感バグ", "バグ技", "突然ボケる", "リアクション過剰", "変態"],
+    keywords: ["深夜テンション", "治安悪め", "天才的バカ", "草不可避", "距離感バグ", "バグ技", "突然ボケる", "リアクション過剰", "飲み会の潤滑油"],
     attributes: ["chaos", "imp"],
     rarity: "common",
+  },
+  {
+    id: "hentai-nebula",
+    name: "禁忌ネオンオーラ",
+    archetypeName: "ど変態野郎",
+    catchCopy: "好奇心が常にフルスロットル。禁断の質問を笑顔で投下する。",
+    description:
+      "あなたの纏う空気感は、好きと沼と変態性が混ざった禁忌ネオン。場の空気を一瞬で『え？』に変える天才です。",
+    gradient:
+      "radial-gradient(circle at 22% 28%, #f472b6, transparent 42%), radial-gradient(circle at 78% 35%, #a855f7, transparent 48%), radial-gradient(circle at 48% 82%, #22d3ee, transparent 52%), linear-gradient(145deg, #2a0518 0%, #1a0533 55%, #05030b 100%)",
+    palette: { a: "#f472b6", b: "#a855f7", c: "#22d3ee" },
+    keywords: [
+      "変態",
+      "どしたん話きこか？",
+      "性癖開示",
+      "禁断質問魔",
+      "夜の沼トーク",
+      "下ネタ上等",
+      "エロい話振ってくる",
+      "深掘り魔",
+      "性癖バレ",
+      "話きこか系",
+      "夜の部活動",
+      "狂気",
+      "沼",
+      "腹黒",
+    ],
+    attributes: ["chaos", "imp", "otaku"],
+    rarity: "rare",
   },
   {
     id: "dream-chaser",
@@ -296,7 +354,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     gradient:
       "radial-gradient(circle at 20% 30%, #818cf8, transparent 45%), radial-gradient(circle at 80% 50%, #c084fc, transparent 50%), radial-gradient(circle at 50% 85%, #22d3ee, transparent 55%), linear-gradient(135deg, #0f0a2e 0%, #1a0a2e 100%)",
     palette: { a: "#818cf8", b: "#c084fc", c: "#22d3ee" },
-    keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC", "推し活の鬼", "推ししか勝たん", "変態"],
+    keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC", "推し活の鬼", "推ししか勝たん"],
     attributes: ["otaku", "chaos"],
     rarity: "uncommon",
   },
@@ -458,7 +516,7 @@ export const AURA_LINEAGES: readonly AuraLineage[] = [
     tagline: "陽キャ・癒し・距離感の近さ。そばにいると場が温まる系統。",
     accent: "#fbbf24",
     accentSoft: "rgba(251, 191, 36, 0.18)",
-    auraIds: ["sunrise-hero", "healing-mint", "soft-peach", "gourmet-sun"],
+    auraIds: ["sunrise-hero", "healing-mint", "soft-peach", "menhera-pulse", "gourmet-sun"],
   },
   {
     id: "chaos",
@@ -467,7 +525,7 @@ export const AURA_LINEAGES: readonly AuraLineage[] = [
     tagline: "盛り上げ・ギャップ・推し愛。予測不能で巻き込む系統。",
     accent: "#e879f9",
     accentSoft: "rgba(232, 121, 249, 0.18)",
-    auraIds: ["chaos-neon", "otaku-galaxy", "imp-neon", "crimson-rebel"],
+    auraIds: ["chaos-neon", "hentai-nebula", "otaku-galaxy", "imp-neon", "crimson-rebel"],
   },
   {
     id: "mystic",
@@ -798,6 +856,8 @@ const PUNCHLINE_BY_WORD: Record<string, readonly string[]> = {
 
 const PUNCHLINE_BY_AURA: Partial<Record<string, readonly string[]>> = {
   "chaos-neon": ["ただし予測不能すぎて友達が毎回ドキドキしています"],
+  "hentai-nebula": ["ただし禁断質問のタイミングを外すと空気が凍ることがあります"],
+  "menhera-pulse": ["ただし既読が遅いと情緒の天気が急変することがあります"],
   "otaku-galaxy": ["ただし推しの話になると周囲の会話参加権が剥奪されます"],
   "imp-neon": ["ただしギャップで毎回ツッコミどころが更新されます"],
   "midnight-moon": ["ただし夜型モードの時だけ語彙力が上がります"],
@@ -810,6 +870,121 @@ const ECOLOGY_BY_WORD: Partial<Record<string, AuraEcologyCore>> = {
     trigger: "推しの話題 / 新刊・新作の話",
     sideEffect: "周囲の会話が一方向に流れる",
     weakness: "ネタバレ / 推しの炎上",
+  },
+  変態: {
+    trigger: "好きな話題 / ひらめき",
+    sideEffect: "周囲がツッコミ役に就く",
+    weakness: "真面目な場 / 初対面",
+  },
+  "どしたん話きこか？": {
+    trigger: "深夜帯 / 二人きり",
+    sideEffect: "話題が一気に夜側へ寄る",
+    weakness: "朝イチ / フォーマルな場",
+  },
+  性癖開示: {
+    trigger: "酒が入った後 / 深い話",
+    sideEffect: "会話の濃度が急上昇する",
+    weakness: "堅い公式の場",
+  },
+  禁断質問魔: {
+    trigger: "沈黙 / 油断した瞬間",
+    sideEffect: "周囲が固まる",
+    weakness: "プライバシー重視の相手",
+  },
+  夜の沼トーク: {
+    trigger: "22時以降 / 帰りのチャット",
+    sideEffect: "睡眠時間が削られる",
+    weakness: "翌朝の予定",
+  },
+  下ネタ上等: {
+    trigger: "ノリが乗った集まり",
+    sideEffect: "下ネタゲージが上がる",
+    weakness: "初対面のフォーマル",
+  },
+  "エロい話振ってくる": {
+    trigger: "雑談が伸びた時",
+    sideEffect: "話題ジャンルが突然変わる",
+    weakness: "真面目な相談中",
+  },
+  深掘り魔: {
+    trigger: "相手の好きな話題",
+    sideEffect: "会話がインタビュー化する",
+    weakness: "浅い雑談だけしたい日",
+  },
+  性癖バレ: {
+    trigger: "油断したリアクション",
+    sideEffect: "周囲が察する",
+    weakness: "隠し通したい場面",
+  },
+  話きこか系: {
+    trigger: "テンション上昇 / 長いDM",
+    sideEffect: "会話が急に親密になる",
+    weakness: "朝のテンション",
+  },
+  夜の部活動: {
+    trigger: "終電後 / 深夜帯",
+    sideEffect: "昼間の自分が別人に見える",
+    weakness: "早寝宣言",
+  },
+  メンヘラ: {
+    trigger: "連絡が途切れた時 / 既読が遅い時",
+    sideEffect: "周囲の返信速度が上がる",
+    weakness: "予定が詰まった日 / 返信遅れ連続",
+  },
+  かまってちゃん: {
+    trigger: "放置された瞬間 / 話題の中心が自分以外",
+    sideEffect: "周囲がかまう役に就く",
+    weakness: "忙しい相手 / 大人数の場",
+  },
+  承認欲求強め: {
+    trigger: "投稿した直後 / リアクション待ち",
+    sideEffect: "いいね確認が止まらなくなる",
+    weakness: "反応が薄い日",
+  },
+  愛情確認魔: {
+    trigger: "沈黙が長い時 / 二人きりの会話",
+    sideEffect: "『好き？』確認が増加する",
+    weakness: "確認疲れした相手",
+  },
+  返信待ちパニック: {
+    trigger: "送信直後 / 既読がつかない",
+    sideEffect: "周囲の既読確認も誘発される",
+    weakness: "相手が会議中",
+  },
+  連絡こないと不安: {
+    trigger: "既読スルー / 予定変更",
+    sideEffect: "近くの人が気にしてくれる",
+    weakness: "突如の予定キャンセル",
+  },
+  "「見てる？」系": {
+    trigger: "ストーリー投稿後 / 深夜DM",
+    sideEffect: "相手が反応プレッシャーを感じる",
+    weakness: "見ない主義の相手",
+  },
+  情緒ジェットコースター: {
+    trigger: "感情が動いた瞬間 / 夜",
+    sideEffect: "場の温度が急上昇・急降下する",
+    weakness: "冷静さが必要な場",
+  },
+  甘え上手: {
+    trigger: "気心知れた相手 / 弱音を吐ける空気",
+    sideEffect: "周囲の保護欲が起動する",
+    weakness: "初対面 / 厳しい上司",
+  },
+  捨てられ不安: {
+    trigger: "既読が遅い / 予定が合わない日",
+    sideEffect: "愛情確認の回数が増える",
+    weakness: "距離を取りたい相手",
+  },
+  既読つくまで生存: {
+    trigger: "メッセージ送信直後",
+    sideEffect: "相手の既読速度が試される",
+    weakness: "オフラインの相手",
+  },
+  寂しさ爆弾: {
+    trigger: "一人時間 / 返信待ち",
+    sideEffect: "周囲が急にかまいたくなる",
+    weakness: "相手のキャパ不足",
   },
   深夜テンション: {
     trigger: "22時以降 / 飲み会の2軒目",
@@ -919,6 +1094,16 @@ const ECOLOGY_BY_AURA: Partial<Record<string, AuraEcologyCore>> = {
     sideEffect: "近くにいる人の予測能力が一時的に低下する",
     weakness: "真面目な会議 / 静かな図書館",
   },
+  "hentai-nebula": {
+    trigger: "好きな話題 / 禁断の質問が浮かんだ瞬間",
+    sideEffect: "周囲の常識ゲージが一時的に溶ける",
+    weakness: "真面目な自己紹介 / 上司がいる場",
+  },
+  "menhera-pulse": {
+    trigger: "既読が遅い時 / かまってほしい瞬間",
+    sideEffect: "周囲の返信速度と保護欲が上がる",
+    weakness: "予定が詰まった日 / 反応が薄い相手",
+  },
   "otaku-galaxy": {
     trigger: "好きなカルチャーの話 / 同好と出会う",
     sideEffect: "周囲の会話速度が上がる",
@@ -972,6 +1157,28 @@ const DIAGNOSIS_BY_AURA: Partial<Record<string, AuraDiagnosisKit>> = {
       trigger: `友達との集まり / 会話が止まりかけた瞬間 / 「${a}」が自然に出る空気`,
       sideEffect: `周囲のノリが一段階上がり、『楽しい枠』『潤滑油枠』として期待され始める`,
       weakness: `静かで真剣な場 / 盛り上げ役を休みたい日 / 「${b}」を求められる連続出勤`,
+    }),
+  },
+  "hentai-nebula": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が刺さっている人は、好奇心のブレーキが薄い『ど変態野郎』タイプ。周りからは『質問が深すぎる』『好きの解像度が高すぎる』『でも話してて面白い』と思われやすく、場の空気を一瞬で沼に引きずり込みます。`,
+    shadow: () =>
+      `好奇心は最大の武器ですが、相手の温度を見ずに禁断質問を投げると引かれることも。『この沼、一緒に入る？』の許可取りができると、ど変態も愛されるキャラになります。`,
+    ecology: ({ a }) => ({
+      trigger: `好きな話の深掘り / 夜のテンション / 「${a}」が出る瞬間`,
+      sideEffect: `周囲の常識が一時停止し、ツッコミと笑いが同時発生する`,
+      weakness: `堅い公式の場 / 興味ゼロの相手への直球質問`,
+    }),
+  },
+  "menhera-pulse": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、愛情確認と寂しさが表裏一体の『メンヘラかまってちゃん』タイプ。周りからは『かまうと喜ぶ』『反応が遅いと不安そう』『でも愛され方は上手い』と思われやすく、関係性の温度計になりがちです。`,
+    shadow: () =>
+      `かまってほしい気持ちは本音ですが、確認が連続すると相手の電池が切れます。『不安になった理由』を一言添えるだけで、かまってちゃんも長続きする愛されキャラになります。`,
+    ecology: ({ a }) => ({
+      trigger: `既読待ち / 一人時間 / 「${a}」が疼く瞬間`,
+      sideEffect: `周囲がかまう役・安心材料役に回り始める`,
+      weakness: `返信が滞る繁忙期 / 反応の薄い相手との長期戦`,
     }),
   },
   "sunrise-hero": {
@@ -1354,6 +1561,8 @@ function buildDiagnosisReport(
 
 const HABITAT_BY_AURA: Partial<Record<string, string>> = {
   "chaos-neon": "飲み会の中盤 / 深夜2時のタイムライン / グルチャが荒れた直後",
+  "hentai-nebula": "深夜の沼トーク / 好きを深掘りする雑談 / 禁断質問が浮かぶ瞬間",
+  "menhera-pulse": "返信待ちのDM / 深夜の『見てる？』 / 予定が合わない日の余白",
   "sunrise-hero": "イベント本番前 / チームの危機 / 朝の集合場所",
   "healing-mint": "誰かが落ち込んだ直後 / 休憩スペース / 静かな帰り道",
   "gourmet-sun": "飯テロタイムライン / 夜のラーメン屋 / 休日のランチ会",
@@ -1551,6 +1760,28 @@ const MOVE_SNIPPET: Partial<Record<string, string>> = {
   冷徹: "冷徹ジャッジ",
   温厚: "温厚バリア",
   変態: "好奇心解放",
+  "どしたん話きこか？": "話きこかビーム",
+  性癖開示: "性癖フル開示",
+  禁断質問魔: "禁断質問連打",
+  夜の沼トーク: "夜沼ダイブ",
+  下ネタ上等: "下ネタ上等宣言",
+  "エロい話振ってくる": "エロ話誘導",
+  深掘り魔: "深掘り無限ループ",
+  性癖バレ: "性癖バレフラッシュ",
+  話きこか系: "話きこか召喚",
+  夜の部活動: "夜部活動開始",
+  メンヘラ: "情緒フルスイング",
+  かまってちゃん: "かまって召喚",
+  承認欲求強め: "承認欲求バースト",
+  愛情確認魔: "愛情確認連打",
+  返信待ちパニック: "返信待ちパニック",
+  連絡こないと不安: "連絡催促ビーム",
+  "「見てる？」系": "見てる？確認砲",
+  情緒ジェットコースター: "情緒ジェット",
+  甘え上手: "甘えスキル全開",
+  捨てられ不安: "捨てられ不安バリア",
+  既読つくまで生存: "既読待ちサバイバル",
+  寂しさ爆弾: "寂しさ爆弾投下",
   天然: "天然誤爆",
   負けず嫌い: "リベンジ点火",
   面倒見いい: "世話焼き護衛",
@@ -1675,6 +1906,10 @@ function buildSpecialMove(aura: AuraType, topWords: string[]): string {
     // 通り名ごとの味付け
     if (aura.id === "chaos-neon") {
       mashups.unshift(`大音量${sb}`, `${sa}滑走`, `宴会級${sa}`);
+    } else if (aura.id === "hentai-nebula") {
+      mashups.unshift(`禁断${sa}`, `ど変態・${sb}解放`, `${sa}沼ダイブ`);
+    } else if (aura.id === "menhera-pulse") {
+      mashups.unshift(`かまって${sa}`, `メンヘラ・${sb}確認`, `${sa}情緒ジェット`);
     } else if (aura.id === "healing-mint") {
       mashups.unshift(`${sa}浄化解禁`, `穏やかなる${sb}`);
     } else if (aura.id === "imp-neon") {

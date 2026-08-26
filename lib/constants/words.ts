@@ -410,6 +410,142 @@ export const VOTE_WORD_DEFS: VoteWordDef[] = [
     auraCategory: ["otaku", "chaos", "hero"],
   },
 
+  // ど変態野郎・エロがる系
+  {
+    id: "doshitan-hanashi",
+    label: "どしたん話きこか？",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "otaku"],
+  },
+  {
+    id: "seiheki-kaiji",
+    label: "性癖開示",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "otaku"],
+  },
+  {
+    id: "kindan-shitsumon",
+    label: "禁断質問魔",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "intellect"],
+  },
+  {
+    id: "yoru-no-numa",
+    label: "夜の沼トーク",
+    category: "chaos",
+    auraCategory: ["chaos", "otaku", "mystic"],
+  },
+  {
+    id: "shimeta-jouto",
+    label: "下ネタ上等",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "warm"],
+  },
+  {
+    id: "eroi-hanashi",
+    label: "エロい話振ってくる",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "warm"],
+  },
+  {
+    id: "fukabori-ma",
+    label: "深掘り魔",
+    category: "chaos",
+    auraCategory: ["chaos", "intellect", "otaku"],
+  },
+  {
+    id: "seiheki-bare",
+    label: "性癖バレ",
+    category: "gap",
+    auraCategory: ["imp", "chaos", "otaku"],
+  },
+  {
+    id: "hanashi-kikoka",
+    label: "話きこか系",
+    category: "chaos",
+    auraCategory: ["chaos", "imp", "warm"],
+  },
+  {
+    id: "yoru-no-bukatsu",
+    label: "夜の部活動",
+    category: "secret",
+    auraCategory: ["chaos", "otaku", "void"],
+  },
+
+  // メンヘラかまってちゃん系
+  {
+    id: "menhera",
+    label: "メンヘラ",
+    category: "gap",
+    auraCategory: ["imp", "void", "heal"],
+  },
+  {
+    id: "kamatte-chan",
+    label: "かまってちゃん",
+    category: "gap",
+    auraCategory: ["imp", "warm", "heal"],
+  },
+  {
+    id: "shounin-yokkyuu",
+    label: "承認欲求強め",
+    category: "vibes",
+    auraCategory: ["imp", "hero", "warm"],
+  },
+  {
+    id: "aijou-kakunin",
+    label: "愛情確認魔",
+    category: "gap",
+    auraCategory: ["imp", "heal", "warm"],
+  },
+  {
+    id: "henchin-machi",
+    label: "返信待ちパニック",
+    category: "gap",
+    auraCategory: ["void", "imp", "chaos"],
+  },
+  {
+    id: "renraku-konai",
+    label: "連絡こないと不安",
+    category: "gap",
+    auraCategory: ["void", "heal", "imp"],
+  },
+  {
+    id: "miteru-kei",
+    label: "「見てる？」系",
+    category: "chaos",
+    auraCategory: ["imp", "warm", "chaos"],
+  },
+  {
+    id: "joucho-jet",
+    label: "情緒ジェットコースター",
+    category: "gap",
+    auraCategory: ["chaos", "imp", "void"],
+  },
+  {
+    id: "amae-jouzu",
+    label: "甘え上手",
+    category: "vibes",
+    auraCategory: ["warm", "heal", "imp"],
+  },
+  {
+    id: "suterare-fuan",
+    label: "捨てられ不安",
+    category: "gap",
+    auraCategory: ["void", "heal", "imp"],
+  },
+  {
+    id: "kidoku-made-seizon",
+    label: "既読つくまで生存",
+    category: "chaos",
+    auraCategory: ["void", "imp", "chaos"],
+  },
+  {
+    id: "sabishisa-bakudan",
+    label: "寂しさ爆弾",
+    category: "gap",
+    auraCategory: ["heal", "void", "imp"],
+  },
+
   // ギャップ追加
   {
     id: "darui-non-yuuno",
@@ -525,6 +661,10 @@ export const RECOMMENDED_WORD_LABELS: readonly string[] = [
   "温厚",
   "冷徹",
   "変態",
+  "どしたん話きこか？",
+  "性癖開示",
+  "メンヘラ",
+  "かまってちゃん",
   "ギャップの鬼",
   "天才的バカ",
   "限界オタク",
