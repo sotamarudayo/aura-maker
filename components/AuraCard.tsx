@@ -111,7 +111,7 @@ export default function AuraCard({
             ) : null}
             <p className="mt-4 text-[11px] font-bold tracking-[0.28em] text-white/45">通り名</p>
             <h2
-              className="mt-1 break-words text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
+              className="mt-1 break-words text-[clamp(1.75rem,8vw,4.5rem)] font-black leading-[1.08] tracking-tight"
               style={{
                 backgroundImage: `linear-gradient(120deg, #fff 0%, ${aura.palette.a} 42%, ${aura.palette.b} 78%, ${aura.palette.c} 100%)`,
                 WebkitBackgroundClip: "text",
@@ -182,17 +182,18 @@ export default function AuraCard({
 
           <div className="rounded-xl border border-white/15 bg-white/5 p-4">
             <p className="text-xs font-semibold tracking-[0.18em] text-violet-200">生態データ</p>
+            <p className="mt-1 text-xs text-white/50">通り名と上位ワードから読み解いた行動パターン</p>
             <ul className="mt-2 space-y-1.5 text-sm text-white/75">
               <li>
-                <span className="font-semibold text-cyan-100/90">⚡ 発動条件:</span>{" "}
+                <span className="font-semibold text-cyan-100/90">⚡ 発動しやすい場面:</span>{" "}
                 {profile.ecology.trigger}
               </li>
               <li>
-                <span className="font-semibold text-cyan-100/90">💥 副作用:</span>{" "}
+                <span className="font-semibold text-cyan-100/90">💥 周りへの影響:</span>{" "}
                 {profile.ecology.sideEffect}
               </li>
               <li>
-                <span className="font-semibold text-cyan-100/90">🩹 弱点:</span>{" "}
+                <span className="font-semibold text-cyan-100/90">🩹 つまずきやすい点:</span>{" "}
                 {profile.ecology.weakness}
               </li>
             </ul>
@@ -200,7 +201,9 @@ export default function AuraCard({
 
           <div className="rounded-xl border border-fuchsia-400/30 bg-fuchsia-500/10 p-4">
             <p className="text-xs font-semibold tracking-[0.18em] text-fuchsia-200">💥 必殺技</p>
-            <p className="mt-2 text-base font-bold text-fuchsia-100">「{profile.specialMove}」</p>
+            <p className="mt-2 break-words text-base font-bold leading-snug text-fuchsia-100 sm:text-lg">
+              「{profile.specialMove}」
+            </p>
           </div>
 
           <div className="rounded-xl border border-white/15 bg-white/5 p-4">

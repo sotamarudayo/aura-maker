@@ -29,7 +29,7 @@ const STAT_META = [
 
 function ExportBrandFooter() {
   return (
-    <div style={{ marginTop: "auto", paddingTop: 8, textAlign: "center" }}>
+    <div style={{ paddingTop: 4, textAlign: "center" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -37,13 +37,78 @@ function ExportBrandFooter() {
           alt=""
           width={22}
           height={22}
-          style={{ borderRadius: 999, display: "block" }}
+          style={{ borderRadius: "50%", display: "block", width: 22, height: 22 }}
         />
-        <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>AuraMaker</p>
+        <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.45)", margin: 0 }}>
+          AuraMaker
+        </p>
       </div>
-      <p style={{ marginTop: 4, fontSize: 9, color: "rgba(255,255,255,0.28)" }}>
+      <p style={{ marginTop: 4, marginBottom: 0, fontSize: 9, color: "rgba(255,255,255,0.28)" }}>
         友達から見たオーラ診断
       </p>
+    </div>
+  );
+}
+
+function buildExportBlurb(mainText: string, maxLen: number) {
+  const parts = mainText
+    .split(/\n\n+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const preferred =
+    parts.find((part) => !part.includes("票・") && !part.startsWith("今回の診断")) ??
+    parts[1] ??
+    parts[0] ??
+    "";
+  if (preferred.length <= maxLen) return preferred;
+  const sliced = preferred.slice(0, maxLen);
+  const safe = sliced.replace(/\s+\S*$/, "").trimEnd();
+  return `${safe || sliced}…`;
+}
+
+function StoryOrb({ palette }: { palette: AuraType["palette"] }) {
+  const size = 112;
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: size,
+        height: size,
+        margin: "18px auto 0",
+        flexShrink: 0,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: size + 36,
+          height: size + 36,
+          marginLeft: -(size + 36) / 2,
+          marginTop: -(size + 36) / 2,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${palette.a}aa 0%, ${palette.b}55 42%, transparent 72%)`,
+          filter: "blur(12px)",
+          opacity: 0.95,
+        }}
+      />
+      <div
+        style={{
+          position: "relative",
+          width: size,
+          height: size,
+          borderRadius: "50%",
+          overflow: "hidden",
+          background: `
+            radial-gradient(circle at 32% 28%, ${palette.a} 0%, transparent 48%),
+            radial-gradient(circle at 74% 40%, ${palette.b} 0%, transparent 50%),
+            radial-gradient(circle at 50% 78%, ${palette.c} 0%, transparent 52%),
+            linear-gradient(160deg, #16112a 0%, #0a0818 100%)
+          `,
+          boxShadow: `inset 0 0 18px rgba(255,255,255,0.12), 0 0 28px ${palette.a}66`,
+        }}
+      />
     </div>
   );
 }
@@ -112,10 +177,7 @@ export default function StoryExportModal({
   if (!open) return null;
 
   const words = topWords.slice(0, 3);
-  const shortMain =
-    profile.mainText.length > (format === "story" ? 48 : 72)
-      ? `${profile.mainText.slice(0, format === "story" ? 48 : 72)}…`
-      : profile.mainText;
+  const shortMain = buildExportBlurb(profile.mainText, format === "story" ? 70 : 90);
 
   async function exportPng(): Promise<string | null> {
     if (!canvasRef.current) return null;
@@ -309,41 +371,35 @@ function StoryLayout({
   palette: AuraType["palette"];
 }) {
   return (
-    <div className="flex h-full flex-col px-5 pt-7">
-      <div className="text-center">
-        <p style={{ fontSize: 12, letterSpacing: "0.22em", color: "rgba(233,213,255,0.9)", fontWeight: 700 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        padding: "28px 20px 18px",
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ textAlign: "center" }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12,
+            letterSpacing: "0.22em",
+            color: "rgba(233,213,255,0.9)",
+            fontWeight: 700,
+          }}
+        >
           My Aura is...
         </p>
-        <p style={{ marginTop: 6, fontSize: 11, color: "rgba(255,255,255,0.65)" }}>{displayName}</p>
+        <p style={{ marginTop: 6, marginBottom: 0, fontSize: 11, color: "rgba(255,255,255,0.65)" }}>
+          {displayName}
+        </p>
       </div>
 
-      <div className="relative mx-auto mt-5 h-32 w-32">
-        <div
-          style={{
-            position: "absolute",
-            inset: "-18%",
-            borderRadius: "9999px",
-            background: `radial-gradient(circle, ${palette.a}aa 0%, ${palette.b}66 40%, transparent 70%)`,
-            filter: "blur(10px)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: "18%",
-            borderRadius: "9999px",
-            background: `
-              radial-gradient(circle at 32% 28%, ${palette.a} 0%, transparent 48%),
-              radial-gradient(circle at 74% 40%, ${palette.b} 0%, transparent 50%),
-              radial-gradient(circle at 50% 78%, ${palette.c} 0%, transparent 52%),
-              linear-gradient(160deg, #16112a 0%, #0a0818 100%)
-            `,
-            boxShadow: `0 0 28px ${palette.a}66`,
-          }}
-        />
-      </div>
+      <StoryOrb palette={palette} />
 
-      <div className="mt-4 text-center">
+      <div style={{ marginTop: 14, textAlign: "center" }}>
         <span
           style={{
             display: "inline-block",
@@ -357,12 +413,22 @@ function StoryLayout({
         >
           {RARITY_LABELS[aura.rarity]}
         </span>
-        <p style={{ marginTop: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", color: "rgba(255,255,255,0.4)" }}>
+        <p
+          style={{
+            marginTop: 10,
+            marginBottom: 0,
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: "0.2em",
+            color: "rgba(255,255,255,0.4)",
+          }}
+        >
           通り名
         </p>
         <h3
           style={{
             marginTop: 4,
+            marginBottom: 0,
             fontSize: 28,
             fontWeight: 900,
             lineHeight: 1.15,
@@ -372,18 +438,51 @@ function StoryLayout({
         >
           {aura.archetypeName}
         </h3>
-        <p style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>
+        <p
+          style={{
+            marginTop: 4,
+            marginBottom: 0,
+            fontSize: 10,
+            fontWeight: 600,
+            color: "rgba(255,255,255,0.5)",
+          }}
+        >
           {aura.name}
         </p>
-        <p style={{ marginTop: 8, fontSize: 11, lineHeight: 1.45, color: "rgba(255,255,255,0.82)" }}>
+        <p
+          style={{
+            marginTop: 10,
+            marginBottom: 0,
+            fontSize: 11,
+            lineHeight: 1.5,
+            color: "rgba(255,255,255,0.82)",
+          }}
+        >
           {shortMain}
         </p>
-        <p style={{ marginTop: 8, fontSize: 11, fontWeight: 700, color: "rgba(244,114,182,0.95)" }}>
+        <p
+          style={{
+            marginTop: 10,
+            marginBottom: 0,
+            fontSize: 12,
+            fontWeight: 800,
+            lineHeight: 1.35,
+            color: "rgba(244,114,182,0.95)",
+          }}
+        >
           💥「{specialMove}」
         </p>
       </div>
 
-      <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6 }}>
+      <div
+        style={{
+          marginTop: 14,
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 6,
+        }}
+      >
         {(words.length > 0 ? words : ["覚醒待ち"]).map((word) => (
           <span
             key={word}
@@ -402,18 +501,7 @@ function StoryLayout({
         ))}
       </div>
 
-      <div
-        style={{
-          marginTop: "auto",
-          minHeight: 72,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          paddingBottom: 16,
-        }}
-      >
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>AuraMakerで診断</p>
+      <div style={{ marginTop: "auto", paddingTop: 18 }}>
         <ExportBrandFooter />
       </div>
     </div>

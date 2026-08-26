@@ -929,6 +929,278 @@ const ECOLOGY_BY_AURA: Partial<Record<string, AuraEcology>> = {
   },
 };
 
+type DiagnosisCtx = {
+  aura: AuraType;
+  a: string;
+  b: string;
+  c: string;
+  evidence: VoteEvidence[];
+  totalVotes: number;
+  uniqueCount: number;
+};
+
+type AuraDiagnosisKit = {
+  reading: (ctx: DiagnosisCtx) => string;
+  shadow: (ctx: DiagnosisCtx) => string;
+  ecology: (ctx: DiagnosisCtx) => AuraEcology;
+};
+
+function pairLabel(a: string, b: string) {
+  return a === b ? `「${a}」` : `「${a}」と「${b}」`;
+}
+
+/** 通り名ごとの読み解き診断（票を解釈する本編） */
+const DIAGNOSIS_BY_AURA: Partial<Record<string, AuraDiagnosisKit>> = {
+  "chaos-neon": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位に来る人は、私生活の集まりでも場を動かそうとするタイプ。周りからは『この人がいると楽しい』『空気が明るくなる』と思われやすい傾向があります。盛り上げは偶然ではなく、リアクションやノリで場を支える習慣として染みついています。`,
+    shadow: ({ a }) =>
+      `一方で「${a}」が強く出すぎると、静かな場や本気の話で周囲がついていけなくなることも。盛り上げ役を休みたい日は、意識して省エネモードに切り替えるとバランスが取りやすいです。`,
+    ecology: ({ a, b }) => ({
+      trigger: `友達との集まり / 会話が止まりかけた瞬間 / 「${a}」が自然に出る空気`,
+      sideEffect: `周囲のノリが一段階上がり、『楽しい枠』『潤滑油枠』として期待され始める`,
+      weakness: `静かで真剣な場 / 盛り上げ役を休みたい日 / 「${b}」を求められる連続出勤`,
+    }),
+  },
+  "sunrise-hero": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が効いている人は、困っている場や本番で前に出やすい太陽タイプ。友達からは『頼りになる』『主人公感がある』と見られやすく、自然と中心に置かれがちです。`,
+    shadow: () =>
+      `ただし主役枠を背負いすぎると、休む許可を自分に出せなくなりがち。サブ役や見守る役を意識的に選ぶと、周囲との距離も長く保ちやすいです。`,
+    ecology: ({ a }) => ({
+      trigger: `チームが困った時 / 本番直前 / 「${a}」が求められる場面`,
+      sideEffect: `周囲が自然とフォロー役に回り、期待値がじわじわ上がる`,
+      weakness: `目立てない日 / 主役を休みたい時 / 過剰な期待の連続`,
+    }),
+  },
+  "healing-mint": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が目立つ人は、そばにいるだけで場の呼吸が深くなるタイプ。周りからは『落ち着く』『話しやすい』と思われやすく、相談や愚痴の受け皿になりやすい傾向があります。`,
+    shadow: () =>
+      `優しさが武器になる反面、自分の不調を後回しにして消耗しやすいのが影。頼まれる前に、自分の充電時間を確保できるかが長く続くコツです。`,
+    ecology: ({ a }) => ({
+      trigger: `誰かが落ち込んでいる時 / 場が荒れた直後 / 「${a}」が欲しくなる空気`,
+      sideEffect: `周囲のテンションが安定し、相談が集中し始める`,
+      weakness: `自分が限界の日 / 休めない連続シフト / 褒められすぎて逃げ場がない時`,
+    }),
+  },
+  "gourmet-sun": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、食や笑いなど日常の幸福で人を巻き込む太陽。『一緒にいると元気が出る』『話題が尽きない』印象を持たれやすいです。`,
+    shadow: () =>
+      `陽気さが強すぎると、疲れている相手には刺激が勝ちすぎることがあります。相手の空腹と心の余白を同時に見るのが、このタイプの上級プレイです。`,
+    ecology: ({ a }) => ({
+      trigger: `ご飯の話 / 夜のノリ / 「${a}」が伝染する集まり`,
+      sideEffect: `周囲の食欲とテンションが同時に上がる`,
+      weakness: `静かな食事 / ダイエット宣言中の友人 / 朝イチの冷静な会議`,
+    }),
+  },
+  "soft-peach": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が効く人は、距離の縮め方が上手くて親しみやすいタイプ。周りからは『打ち解けやすい』『なんか安心する』と感じられやすいです。`,
+    shadow: () =>
+      `近さは魅力ですが、相手によっては距離感の更新が追いつかないことも。好意と遠慮のバランスを言語化できると、誤解が減ります。`,
+    ecology: ({ a }) => ({
+      trigger: `気心知れた相手 / 少人数の雑談 / 「${a}」が出やすいゆるい場`,
+      sideEffect: `周囲の警戒が解け、会話が早く親密になる`,
+      weakness: `フォーマルな初対面 / 距離を取りたい相手 / 誤解されやすい冗談`,
+    }),
+  },
+  "mystic-purple": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、すぐに全部を見せない神秘枠。周りからは『読めないけど惹かれる』『深そう』と思われやすく、考察したくなる存在感があります。`,
+    shadow: () =>
+      `ミステリー感は強い武器ですが、閉じすぎると孤立や誤解の温床にもなります。信頼できる相手には意図的に一枚めくるのが長続きのコツです。`,
+    ecology: ({ a }) => ({
+      trigger: `夜の深い話 / 少人数 / 「${a}」が自然に滲む沈黙`,
+      sideEffect: `周囲が勝手に考察を始め、印象が濃く残る`,
+      weakness: `雑談だけの場 / 急な自己開示要求 / 説明しすぎるプレッシャー`,
+    }),
+  },
+  "dream-chaser": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が効いている人は、未来の話や目標で周囲を引っ張るタイプ。『夢がある』『前を向いてる』と見られやすく、話を聞く側も元気をもらいやすいです。`,
+    shadow: () =>
+      `理想が強いぶん、今ここを軽く見られたり、周囲が置いていかれた感じを持つこともあります。足元の小さな達成も一緒に祝えると説得力が増します。`,
+    ecology: ({ a }) => ({
+      trigger: `目標の話 / 新しい挑戦の前夜 / 「${a}」が火がつく瞬間`,
+      sideEffect: `周囲の野心ゲージが上がり、行動したくなる`,
+      weakness: `現実の雑務だけが続く日 / 夢を茶化される空気`,
+    }),
+  },
+  "electric-cyan": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、頭の回転と切れ味で場を動かすタイプ。周りからは『鋭い』『話が早い』と見られやすく、議論や企画で存在感が出ます。`,
+    shadow: () =>
+      `切れ味が強すぎると、雑談や感情の話では刺さりすぎることがあります。正しさより温度を優先するモードを持てると、人間関係の耐久度が上がります。`,
+    ecology: ({ a }) => ({
+      trigger: `議論 / 企画の詰まり / 「${a}」が刺さる知的な場`,
+      sideEffect: `会話の解像度が上がり、周囲が思考モードに入る`,
+      weakness: `感情だけの場 / 説明時間の制限 / 雑談オンリー`,
+    }),
+  },
+  "imp-neon": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が同居する人は、見せ方と中身の落差で人を惹きつけるギャップ型。周りからは『予想外が面白い』『一筋縄ではいかない』と思われやすいです。`,
+    shadow: () =>
+      `ギャップは武器ですが、演じ続けすぎると本音の置き場がなくなります。安心できる相手の前では、わざとギャップを消す時間も必要です。`,
+    ecology: ({ a }) => ({
+      trigger: `油断した瞬間 / 親しい相手との雑談 / 「${a}」が顔を出す隙`,
+      sideEffect: `周囲がツッコミと考察を同時に始め、印象が更新される`,
+      weakness: `完璧を演じ続ける日 / ギャップを説明させられる場`,
+    }),
+  },
+  "midnight-moon": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、夜や余白の時間で本領を発揮するタイプ。周りからは『マイペース』『夜に強い』『静かな引力がある』と見られやすいです。`,
+    shadow: () =>
+      `夜型の魅力は強い一方、昼間のテンション差で誤解されやすいのが影。朝の自分と夜の自分の取扱説明書を一言持っておくと楽です。`,
+    ecology: ({ a }) => ({
+      trigger: `夜更かしの会話 / 静かな余白 / 「${a}」が滲む深夜帯`,
+      sideEffect: `周囲の語彙と感性が夜モードに切り替わる`,
+      weakness: `早朝の予定 / 強制的なハイテンション場`,
+    }),
+  },
+  "otaku-galaxy": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が強い人は、好きへの熱量が銀河級のタイプ。周りからは『推しが尊い』『好きなものの話が面白い』と思われやすく、同好が集まると一気に中心になります。`,
+    shadow: () =>
+      `熱量が強すぎると、興味のない相手には会話参加権が消えたように見えることも。入口の共有から始めると、推し活も人間関係も両立しやすいです。`,
+    ecology: ({ a }) => ({
+      trigger: `推し・趣味の話題 / 同好との遭遇 / 「${a}」が点火する瞬間`,
+      sideEffect: `会話速度と情熱が急上昇し、周囲が巻き込まれ始める`,
+      weakness: `ネタバレ / 推しの不調 / 興味ゼロの雑談だけが続く場`,
+    }),
+  },
+  "crimson-rebel": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、枠を壊す熱と反骨で場を塗るタイプ。周りからは『カッコいい』『危ないけど魅力的』と感じられやすいです。`,
+    shadow: () =>
+      `反骨が強すぎると、ただの衝突に見える瞬間もあります。壊す対象を選ぶセンスがあると、魅力が長く残ります。`,
+    ecology: ({ a }) => ({
+      trigger: `理不尽な空気 / ノリが乗った夜 / 「${a}」が出る反骨スイッチ`,
+      sideEffect: `周囲の常識ゲージが揺れ、誰かが止め役になる`,
+      weakness: `堅い公式の場 / 説明責任が重い場面`,
+    }),
+  },
+  "velvet-muse": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が効く人は、雰囲気そのものが作品になるミューズ型。周りからは『なんか綺麗』『余韻が残る』と思われやすく、言葉より空気で人を動かします。`,
+    shadow: () =>
+      `雰囲気任せになると、意図が伝わらず距離が空くことも。ときどき素の一言を足すと、ミューズ感が現実の関係にも着地します。`,
+    ecology: ({ a }) => ({
+      trigger: `良い光 / 静かな注目 / 「${a}」が映える空気`,
+      sideEffect: `周囲の視線と想像力が集まり、印象が長く残る`,
+      weakness: `雑な説明要求 / 雰囲気を壊す急ぎの用事`,
+    }),
+  },
+  "mythic-quill": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、語りと解釈で世界を編むタイプ。周りからは『話がうまい』『見方が面白い』と思われやすく、場の意味づけ役になりがちです。`,
+    shadow: () =>
+      `語りが上手いぶん、事実より物語が先行して誤解を生むことも。聞き役モードを意識できると、信頼がさらに厚くなります。`,
+    ecology: ({ a }) => ({
+      trigger: `物語の話 / 解釈が分かれる話題 / 「${a}」が点火する語り場`,
+      sideEffect: `周囲の想像力が走り出し、会話が長編化する`,
+      weakness: `結論だけ求められる場 / 語りの余白がない締切`,
+    }),
+  },
+  "legendary-prism": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が同時に強い人は、複数の光が重なるレア枠。周りからは『何者なんだろう』『総合力が高い』と見られやすく、印象が立体的です。`,
+    shadow: () =>
+      `多面性が魅力でも、全部を同時に出すと焦点がぼやけます。今日はどの面を表にするか選ぶと、伝説感がよりシャープになります。`,
+    ecology: ({ a, b }) => ({
+      trigger: `複数の要素が同時に求められた時 / 「${a}」と「${b}」が両方刺さる場`,
+      sideEffect: `周囲の評価軸が増え、印象が更新され続ける`,
+      weakness: `一つの役割に固定される日 / 説明しきれない多面性`,
+    }),
+  },
+  "golden-oracle": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が効いている人は、助言や判断で周囲を導くタイプ。『この人に聞くと安心』『視点が一段高い』と思われやすいです。`,
+    shadow: () =>
+      `賢者枠は頼られますが、常に正解を出す役は重いです。わからないを言える瞬間があると、オラクルとしての信頼はむしろ増えます。`,
+    ecology: ({ a }) => ({
+      trigger: `相談が来た時 / 判断に迷う空気 / 「${a}」が求められる瞬間`,
+      sideEffect: `周囲の不安が整理され、行動指針がクリアになる`,
+      weakness: `軽口だけの場 / 常時フル相談の連続`,
+    }),
+  },
+  "void-abyss": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、存在感と不在感が同時に立つヴォイド型。周りからは『いるのに読めない』『静かな重力がある』と感じられやすいです。`,
+    shadow: () =>
+      `沈黙は魅力ですが、放置されると忘れられた感覚にも繋がります。小さな合図を一つ残しておくと、関係が切れにくいです。`,
+    ecology: ({ a }) => ({
+      trigger: `大人数の端 / 名前を呼ばれた瞬間 / 「${a}」が滲む静けさ`,
+      sideEffect: `周囲が存在確認と考察を同時に始め、印象が濃くなる`,
+      weakness: `急な自己紹介 / 強制的なハイライト枠`,
+    }),
+  },
+  "phantom-mirror": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が同居する人は、相手や場面で別人に見えるミラー型。周りからは『状況で顔が変わる』『合わせ方が上手い』と思われやすいです。`,
+    shadow: () =>
+      `合わせ上手は強みですが、自分の輪郭が薄くなる危険もあります。誰の前でも消えない一点を決めておくと、別人スイッチが怖くなくなります。`,
+    ecology: ({ a, b }) => ({
+      trigger: `相手が変わった瞬間 / 「${a}」と「${b}」の切り替えが必要な場`,
+      sideEffect: `周囲が『さっきと別人？』と更新し、ギャップが話題になる`,
+      weakness: `素を出す必要のある深い関係 / 役割固定の長期戦`,
+    }),
+  },
+  "god-calamity": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}のような相反が上位に来る人は、規格外の天変地異タイプ。周りからは『予想不能』『いると何か起きる』と思われやすく、印象が強く残ります。`,
+    shadow: () =>
+      `破壊力は魅力ですが、日常の説明責任や落ち着きが弱点になりやすいです。発動条件を自分で把握できると、災害ではなく伝説になります。`,
+    ecology: ({ a, b }) => ({
+      trigger: `本番 / 「${a}」と「${b}」が同時発火する矛盾の瞬間`,
+      sideEffect: `周囲の常識が一時停止し、話のネタが量産される`,
+      weakness: `落ち着いた日常の継続 / 丁寧な説明が必要な場`,
+    }),
+  },
+  "absolute-crystal": {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}が上位の人は、触れにくさと美しさが同居する結晶タイプ。周りからは『近づきにくい』『でも目が離せない』と感じられやすいです。`,
+    shadow: () =>
+      `冷たい印象は防壁になりますが、好意も弾きやすいです。温度を少しだけ通す許可を出せると、結晶がただの氷で終わりません。`,
+    ecology: ({ a }) => ({
+      trigger: `距離が必要な場 / 静かな視線 / 「${a}」が映えるクリアな空気`,
+      sideEffect: `周囲が勝手に敬意と距離を取り始め、印象が研ぎ澄まされる`,
+      weakness: `ベタベタした親密さの強制 / 温度を出しすぎる必要のある場`,
+    }),
+  },
+};
+
+function fallbackDiagnosisKit(aura: AuraType): AuraDiagnosisKit {
+  return {
+    reading: ({ a, b }) =>
+      `${pairLabel(a, b)}の傾向から、${aura.archetypeName}としての輪郭がはっきりしています。友達目線では『${aura.catchCopy}』という印象に近く、日常のふるまいの積み重ねが診断結果に表れています。`,
+    shadow: () =>
+      `ただし『${aura.archetypeName}』らしさが強く出すぎると、周囲の反応が割れたり疲れが出たりします。強みを出しすぎない日を意図的に作ると、印象の寿命が伸びます。`,
+    ecology: ({ a, b }) => {
+      const base = ECOLOGY_BY_AURA[aura.id];
+      if (base) {
+        return {
+          trigger: `${base.trigger}。とくに「${a}」が出やすい空気`,
+          sideEffect: base.sideEffect,
+          weakness: `${base.weakness} / 「${b}」を連続で求められる日`,
+        };
+      }
+      return {
+        trigger: `「${a}」が出やすい場面 / 友達と長くいる時間`,
+        sideEffect: `周囲の印象が『${aura.archetypeName}』寄りのに更新される`,
+        weakness: `素の自分を出せない空気 / 期待値だけが先行する日`,
+      };
+    },
+  };
+}
+
+function getDiagnosisKit(aura: AuraType): AuraDiagnosisKit {
+  return DIAGNOSIS_BY_AURA[aura.id] ?? fallbackDiagnosisKit(aura);
+}
+
 function pickStable<T>(items: readonly T[], seed: string): T {
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) {
@@ -971,11 +1243,7 @@ function buildWitness(aura: AuraType, topWords: string[]): string {
   const primary = topWords[0] ?? aura.name;
   const nuance =
     getWordResultFlavor(primary)?.nuance ?? WORD_NUANCE[primary] ?? primary;
-  return `周囲からは『${nuance}な人』として認識されています`;
-}
-
-function wordNuance(word: string): string {
-  return getWordResultFlavor(word)?.nuance ?? WORD_NUANCE[word] ?? word;
+  return `友達からは、${aura.archetypeName}らしい『${nuance}』な人として認識されやすい状態です`;
 }
 
 function buildVoteEvidence(
@@ -995,63 +1263,24 @@ function buildVoteEvidence(
   });
 }
 
-function buildDominanceParagraph(
+function buildEvidenceLead(
   evidence: VoteEvidence[],
   totalVotes: number,
   uniqueCount: number,
 ): string {
-  const top = evidence[0];
-  if (!top) return "";
-
-  const nuance = wordNuance(top.word);
-  if (evidence.length === 1) {
-    return `現時点の投票${totalVotes}票はほぼ「${top.word}」に集中（${top.count}票・${top.percent}%）。友達目線の第一印象は『${nuance}』でほぼ固まっています。`;
-  }
-
-  if (top.percent >= 45) {
-    return `全${totalVotes}票・${uniqueCount}種類のうち、「${top.word}」が${top.count}票（${top.percent}%）で突出。『${nuance}』が診断の主軸になっています。`;
-  }
-
-  if (top.percent >= 30) {
-    return `全${totalVotes}票のなかで「${top.word}」が${top.count}票（${top.percent}%）と最多。『${nuance}』がはっきり見えています。`;
-  }
-
-  return `全${totalVotes}票・${uniqueCount}種類とバラけつつも、先頭は「${top.word}」（${top.count}票・${top.percent}%）。『${nuance}』がわずかにリードしています。`;
-}
-
-function buildComboParagraph(aura: AuraType, evidence: VoteEvidence[]): string {
-  const a = evidence[0];
-  const b = evidence[1];
-  const c = evidence[2];
-  if (!a) return "";
-
-  if (a && b && c) {
-    return `さらに「${b.word}」（${b.count}票）と「${c.word}」（${c.count}票）が同時に上位へ食い込んだ結果、単体の印象ではなく『${wordNuance(a.word)}×${wordNuance(b.word)}×${wordNuance(c.word)}』の混成として${aura.archetypeName}（${aura.name}）に着地しました。`;
-  }
-
-  if (a && b) {
-    return `決め手は「${a.word}」だけでなく「${b.word}」（${b.count}票）とのセット感。『${wordNuance(a.word)}』に『${wordNuance(b.word)}』が乗ったことで、${aura.archetypeName}タイプとして読み取れます。`;
-  }
-
-  return `この一票集中から、${aura.archetypeName}（${aura.name}）としての輪郭が立ち上がっています。`;
+  if (evidence.length === 0) return "";
+  const top = evidence
+    .slice(0, 3)
+    .map((item) => `「${item.word}」${item.count}票`)
+    .join("、");
+  return `今回の診断は全${totalVotes}票・${uniqueCount}種類から判定。軸になったのは${top}です。`;
 }
 
 function buildSupportParagraph(evidence: VoteEvidence[]): string | null {
   if (evidence.length < 4) return null;
   const extras = evidence.slice(3);
   const joined = extras.map((item) => `「${item.word}」${item.count}票`).join("、");
-  return `補助線として${joined}も入っており、メイン印象を裏打ちするサブ要素になっています。`;
-}
-
-function buildCautionParagraph(aura: AuraType, topWords: string[]): string {
-  const primary = topWords[0];
-  if (primary) {
-    const flavor = getWordResultFlavor(primary);
-    if (flavor?.punchline) return flavor.punchline;
-    const options = PUNCHLINE_BY_WORD[primary];
-    if (options) return pickStable(options, `punch:${primary}:${aura.id}`);
-  }
-  return buildPunchline(aura, topWords);
+  return `さらに${joined}も入っており、メイン印象を補強するサブ要素になっています。`;
 }
 
 function buildDiagnosisReport(
@@ -1064,16 +1293,29 @@ function buildDiagnosisReport(
   const totalVotes = votes.length;
   const uniqueCount = counts.size;
   const evidence = buildVoteEvidence(counts, totalVotes);
+  const a = topWords[0] ?? aura.archetypeName;
+  const b = topWords[1] ?? a;
+  const c = topWords[2] ?? b;
+  const ctx: DiagnosisCtx = {
+    aura,
+    a,
+    b,
+    c,
+    evidence,
+    totalVotes,
+    uniqueCount,
+  };
+  const kit = getDiagnosisKit(aura);
 
   const paragraphs = [
-    buildDominanceParagraph(evidence, totalVotes, uniqueCount),
-    buildComboParagraph(aura, evidence),
+    buildEvidenceLead(evidence, totalVotes, uniqueCount),
+    kit.reading(ctx),
     buildWitness(aura, topWords),
     buildSupportParagraph(evidence),
     contradiction
       ? `なお上位に「${contradiction.wordA}」と「${contradiction.wordB}」が同居しているため、${contradiction.text}`
       : null,
-    buildCautionParagraph(aura, topWords),
+    kit.shadow(ctx),
   ].filter((part): part is string => Boolean(part && part.trim().length > 0));
 
   return {
@@ -1082,50 +1324,20 @@ function buildDiagnosisReport(
   };
 }
 
-function buildPunchline(aura: AuraType, topWords: string[]): string {
-  for (const word of topWords) {
-    const flavor = getWordResultFlavor(word);
-    if (flavor?.punchline) {
-      return flavor.punchline;
-    }
-    const options = PUNCHLINE_BY_WORD[word];
-    if (options) {
-      return pickStable(options, `punch:${word}:${aura.id}`);
-    }
-  }
-
-  const auraOptions = PUNCHLINE_BY_AURA[aura.id];
-  if (auraOptions) {
-    return pickStable(auraOptions, `punch-aura:${aura.id}`);
-  }
-
-  return `ただし『${aura.archetypeName}』らしさが強く出すぎると、周囲の反応が割れがちです`;
-}
-
 function buildEcology(aura: AuraType, topWords: string[]): AuraEcology {
-  const flavors = topWords
-    .map((word) => getWordResultFlavor(word)?.ecology ?? ECOLOGY_BY_WORD[word])
-    .filter(Boolean) as AuraEcology[];
-
-  if (flavors.length >= 2) {
-    return {
-      trigger: `${flavors[0]!.trigger} ／ ${flavors[1]!.trigger}`,
-      sideEffect: flavors[0]!.sideEffect,
-      weakness: flavors[1]!.weakness,
-    };
-  }
-
-  if (flavors[0]) return flavors[0];
-
-  const auraEcology = ECOLOGY_BY_AURA[aura.id];
-  if (auraEcology) return auraEcology;
-
-  const primary = topWords[0] ?? "投票";
-  return {
-    trigger: `${primary}の話題 / 友達と会った時`,
-    sideEffect: "周囲の印象ワードが更新され続ける",
-    weakness: "投票が来ない / 話題が尽きる",
-  };
+  const a = topWords[0] ?? aura.archetypeName;
+  const b = topWords[1] ?? a;
+  const c = topWords[2] ?? b;
+  const kit = getDiagnosisKit(aura);
+  return kit.ecology({
+    aura,
+    a,
+    b,
+    c,
+    evidence: [],
+    totalVotes: 0,
+    uniqueCount: topWords.length,
+  });
 }
 
 const SPECIAL_MOVE_BY_WORD: Partial<Record<string, readonly string[]>> = {
@@ -1253,37 +1465,171 @@ function buildCompatibility(aura: AuraType): AuraCompatibility {
   };
 }
 
+/** 投票語 → 必殺技用の短いネタ部品 */
+const MOVE_SNIPPET: Partial<Record<string, string>> = {
+  リアクション過剰: "大音量リアクション",
+  飲み会の潤滑油: "滑り芸",
+  だるいのに有能: "だる顔覚醒",
+  天才的バカ: "天才バカ砲",
+  草不可避: "強制草植え",
+  突然ボケる: "不意打ちボケ",
+  限界オタク: "推し語り無双",
+  推ししか勝たん: "推し一択爆発",
+  既読スルー魔: "既読スルー封殺",
+  熱血: "熱血フルスロットル",
+  冷徹: "冷徹ジャッジ",
+  温厚: "温厚バリア",
+  変態: "好奇心解放",
+  天然: "天然誤爆",
+  負けず嫌い: "リベンジ点火",
+  面倒見いい: "世話焼き護衛",
+  腹黒: "腹黒スマイル",
+  カリスマ: "引力全開",
+  癒やし枠: "癒やしフィールド",
+  陽キャバイブス: "陽キャ台風",
+  治安悪め: "治安悪化ビーム",
+  狂気: "狂気スイッチ",
+  ギャップの鬼: "ギャップ炸裂",
+  ツンデレ: "ツンデレ逆走",
+  空気読みすぎ: "過剰空気読み",
+  笑いの引力: "笑いブラックホール",
+  頼れる相棒: "相棒召喚",
+  NPC: "背景融合",
+  ビジュ爆発: "ビジュ無双",
+  圧倒的主人公: "主人公補正",
+  飯テロ魔: "飯テロ連打",
+  理論武装: "論破ミサイル",
+  深夜テンション: "深夜覚醒",
+  ミステリアス: "謎の余韻",
+  マイナスイオン: "イオン浄化",
+  距離感バグ: "距離感クラッシュ",
+  実は寂しがり: "寂しがりビーム",
+  知性派: "知性切断",
+  ラスボス: "ラスボス降臨",
+  チート級: "チート解放",
+};
+
+function comboMoveKey(a: string, b: string) {
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+/** 上位2語の定番コンボ必殺技（順序非依存） */
+const COMBO_SPECIAL_MOVES: Record<string, readonly string[]> = (() => {
+  const entries: Array<[string, string, readonly string[]]> = [
+    [
+      "リアクション過剰",
+      "飲み会の潤滑油",
+      ["大音量の滑り芸", "宴会オイル爆笑砲", "潤滑リアクション滑走"],
+    ],
+    [
+      "リアクション過剰",
+      "だるいのに有能",
+      ["だる顔メガホン覚醒", "省エネ爆音リアクション", "締切前・過積載リアクション"],
+    ],
+    [
+      "飲み会の潤滑油",
+      "だるいのに有能",
+      ["だる顔で宴会潤滑", "省エネ滑り芸", "締切前オイル注入"],
+    ],
+    ["天才的バカ", "草不可避", ["天才バカで強制草植え", "神プレイ即草化", "脱線草砲"]],
+    ["突然ボケる", "草不可避", ["不意打ち草不可避", "白けてからの即草", "空気崩壊ボケ"]],
+    ["熱血", "負けず嫌い", ["熱血リベンジ全開", "負けず嫌いフルスロットル", "熱血逆転劇"]],
+    ["冷徹", "腹黒", ["冷徹腹黒ジャッジ", "笑顔で即決裁", "氷笑の裁定"]],
+    ["温厚", "面倒見いい", ["温厚世話焼き結界", "怒らなそう護衛", "安心感フルカバー"]],
+    ["天然", "変態", ["天然好奇心誤爆", "ほんわか変態解放", "計算なしの禁断質問"]],
+    ["推ししか勝たん", "限界オタク", ["推し命銀河爆発", "語録ラッシュ無双", "推し以外遮断"]],
+    [
+      "陽キャバイブス",
+      "飲み会の潤滑油",
+      ["陽キャ滑走パーティー", "バイブス給油祭", "陽気オイル台風"],
+    ],
+    ["治安悪め", "狂気", ["治安悪化・狂気スイッチ", "深夜危険度MAX", "止まれないノリ砲"]],
+    ["ギャップの鬼", "ツンデレ", ["ツンデレギャップ炸裂", "逆走して好意露出", "予想外の急接近"]],
+    ["カリスマ", "圧倒的主人公", ["主役補正カリスマ", "視線独占フィニッシュ", "主人公引力"]],
+    ["癒やし枠", "マイナスイオン", ["癒やしイオン浄化", "場温リセット結界", "深呼吸強制装置"]],
+    [
+      "空気読みすぎ",
+      "リアクション過剰",
+      ["過剰読み上げリアクション", "空気センサー爆音化", "察して大音量"],
+    ],
+    [
+      "既読スルー魔",
+      "実は寂しがり",
+      ["既読スルーの寂しがり", "既読だけ秒速・本体は待つ", "返信保留の小型化"],
+    ],
+  ];
+
+  const out: Record<string, readonly string[]> = {};
+  for (const [a, b, moves] of entries) {
+    out[comboMoveKey(a, b)] = moves;
+  }
+  return out;
+})();
+
+function moveSnippet(word: string): string {
+  const curated = MOVE_SNIPPET[word];
+  if (curated) return curated;
+  const fromList = SPECIAL_MOVE_BY_WORD[word]?.[0];
+  if (fromList) return fromList;
+  const flavorMove = getWordResultFlavor(word)?.specialMove;
+  if (flavorMove) return flavorMove.replace(/全開$/, "").replace(/解放$/, "");
+  return word;
+}
+
 function buildSpecialMove(aura: AuraType, topWords: string[]): string {
   const primary = topWords[0];
   const secondary = topWords[1];
+  const tertiary = topWords[2];
 
   if (primary && secondary) {
-    const moveA =
-      getWordResultFlavor(primary)?.specialMove ??
-      SPECIAL_MOVE_BY_WORD[primary]?.[0] ??
-      `${primary}全開`;
-    return `${moveA} × ${secondary}`;
+    const combo = COMBO_SPECIAL_MOVES[comboMoveKey(primary, secondary)];
+    if (combo) {
+      return pickStable(combo, `combo:${aura.id}:${primary}:${secondary}`);
+    }
+
+    const sa = moveSnippet(primary);
+    const sb = moveSnippet(secondary);
+    const mashups = [
+      `${sa}の${sb}`,
+      `${sb}式${sa}`,
+      `奥義・${sa}で${sb}`,
+      `最終技・${sa}${sb}`,
+    ];
+
+    if (tertiary) {
+      const sc = moveSnippet(tertiary);
+      mashups.push(`${sa}＋${sb}の${sc}`);
+    }
+
+    // 通り名ごとの味付け
+    if (aura.id === "chaos-neon") {
+      mashups.unshift(`大音量${sb}`, `${sa}滑走`, `宴会級${sa}`);
+    } else if (aura.id === "healing-mint") {
+      mashups.unshift(`${sa}浄化解禁`, `穏やかなる${sb}`);
+    } else if (aura.id === "imp-neon") {
+      mashups.unshift(`表${sa}・裏${sb}`, `ギャップ起爆・${sa}`);
+    } else if (aura.id === "otaku-galaxy") {
+      mashups.unshift(`${sa}銀河爆発`, `推し熱・${sb}`);
+    } else if (aura.id === "sunrise-hero") {
+      mashups.unshift(`主人公補正・${sa}`, `${sb}で逆転劇`);
+    }
+
+    return pickStable(mashups, `mash:${aura.id}:${primary}:${secondary}:${tertiary ?? ""}`);
   }
 
-  for (const word of topWords) {
-    const flavor = getWordResultFlavor(word);
-    if (flavor?.specialMove) {
-      return flavor.specialMove;
-    }
-    const moves = SPECIAL_MOVE_BY_WORD[word];
-    if (moves) {
-      return pickStable(moves, `move:${word}:${aura.id}`);
-    }
+  if (primary) {
+    const solo = [
+      moveSnippet(primary),
+      getWordResultFlavor(primary)?.specialMove,
+      ...(SPECIAL_MOVE_BY_WORD[primary] ?? []),
+      `秘技「${primary}」`,
+    ].filter((item): item is string => Boolean(item));
+    return pickStable(solo, `solo:${aura.id}:${primary}`);
   }
 
-  const fallback = topWords[0] ?? "オーラ";
   return pickStable(
-    [
-      `究極・${fallback}フィニッシュ`,
-      `秘技「${fallback}全開」`,
-      `${fallback}の領域展開`,
-    ],
-    `move-default:${aura.id}:${fallback}`,
+    [`究極・${aura.archetypeName}フィニッシュ`, `秘技「${aura.archetypeName}」`, `${aura.archetypeName}の領域展開`],
+    `move-aura:${aura.id}`,
   );
 }
 

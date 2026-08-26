@@ -475,12 +475,15 @@ export default function DashboardClient({
             </p>
             <ul className="mt-4 space-y-2">
               {ranking.slice(0, 10).map(([word, count], index) => (
-                <li key={word} className="flex items-center justify-between rounded-lg bg-white/10 px-3 py-2">
-                  <span>
+                <li
+                  key={word}
+                  className="flex min-w-0 items-center justify-between gap-3 rounded-lg bg-white/10 px-3 py-2"
+                >
+                  <span className="min-w-0 truncate">
                     {index + 1}. {word}
                   </span>
                   <span
-                    className={`font-semibold ${lastVotedWord === word ? "vote-pop text-cyan-200" : ""}`}
+                    className={`shrink-0 font-semibold tabular-nums ${lastVotedWord === word ? "vote-pop text-cyan-200" : ""}`}
                   >
                     {count}
                   </span>
@@ -489,16 +492,21 @@ export default function DashboardClient({
             </ul>
           </article>
 
-          <article className="rounded-2xl border border-white/20 bg-black/35 p-6 backdrop-blur">
+          <article className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur sm:p-6">
             <h2 className="text-xl font-bold">Word Cloud</h2>
-            <div className="mt-4 flex min-h-52 flex-wrap items-center gap-3">
+            <div className="mt-4 flex min-h-52 min-w-0 flex-wrap items-center justify-center gap-2 overflow-x-clip sm:gap-3">
               {ranking.map(([word, count]) => {
-                const size = 0.95 + (count / maxCount) * 1.4;
+                const ratio = count / maxCount;
+                const lengthPenalty = Math.min(0.4, Math.max(0, (word.length - 4) * 0.045));
+                const idealRem = Math.max(0.82, 0.9 + ratio * 1.05 - lengthPenalty);
+                const maxRem = word.length >= 7 ? 1.15 : word.length >= 5 ? 1.28 : 1.45;
                 return (
                   <span
                     key={word}
-                    style={{ fontSize: `${size}rem` }}
-                    className={`rounded-full bg-white/15 px-3 py-1 font-semibold ${
+                    style={{
+                      fontSize: `clamp(0.75rem, ${idealRem}rem, ${maxRem}rem)`,
+                    }}
+                    className={`inline-flex max-w-full items-center justify-center whitespace-nowrap rounded-full bg-white/15 px-2.5 py-1.5 text-center font-semibold leading-none tracking-tight sm:px-3 ${
                       lastVotedWord === word ? "vote-pop border border-cyan-200/70" : ""
                     }`}
                   >

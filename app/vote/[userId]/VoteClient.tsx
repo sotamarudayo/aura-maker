@@ -149,9 +149,8 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
             <OpenInBrowserCta
               href="/"
               className="block rounded-full bg-violet-300 px-4 py-3 text-center text-sm font-bold leading-snug text-black sm:px-5"
-            >
-              あなたも自分のオーラを診断してみる？（1タップで作成）
-            </OpenInBrowserCta>
+              label="あなたも自分のオーラを診断してみる？（1タップで作成）"
+            />
           </div>
         </section>
       </main>
