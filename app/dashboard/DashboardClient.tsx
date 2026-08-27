@@ -9,7 +9,7 @@ import AuraBackground from "@/components/AuraBackground";
 import AuraCard from "@/components/AuraCard";
 import LinkAccountModal from "@/components/LinkAccountModal";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
-import { calculateAuraType } from "@/lib/constants/auras";
+import { calculateAuraType, type AuraCalculationResult } from "@/lib/constants/auras";
 import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
 import type {
   DashboardFusionPartner,
@@ -22,6 +22,10 @@ const StoryExportModal = dynamic(() => import("@/components/StoryExportModal"), 
 });
 
 const ChemiExportModal = dynamic(() => import("@/components/ChemiExportModal"), {
+  ssr: false,
+});
+
+const AuraEvolutionOverlay = dynamic(() => import("@/components/AuraEvolutionOverlay"), {
   ssr: false,
 });
 
@@ -77,6 +81,9 @@ export default function DashboardClient({
   const [fusions, setFusions] = useState(initialFusions);
   const [creatingFusion, setCreatingFusion] = useState(false);
   const [fusionError, setFusionError] = useState<string | null>(null);
+  const [displayedAura, setDisplayedAura] = useState<AuraCalculationResult | null>(null);
+  const [pendingAura, setPendingAura] = useState<AuraCalculationResult | null>(null);
+  const pendingAuraRef = useRef<AuraCalculationResult | null>(null);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
@@ -155,14 +162,31 @@ export default function DashboardClient({
   const auraSourceLabel =
     friendWords.length > 0 ? "友達目線" : selfWords.length > 0 ? "自己診断（暫定）" : "観測待ち";
 
+  useEffect(() => {
+    if (!displayedAura) {
+      setDisplayedAura(auraResult);
+      return;
+    }
+    if (auraResult.aura.id === displayedAura.aura.id) {
+      // 同じオーラでも票数増で文言・覚醒状態は更新
+      if (!pendingAura) setDisplayedAura(auraResult);
+      return;
+    }
+    if (pendingAura?.aura.id === auraResult.aura.id) return;
+    setPendingAura(auraResult);
+    pendingAuraRef.current = auraResult;
+  }, [auraResult, displayedAura, pendingAura]);
+
+  const visibleAura = displayedAura ?? auraResult;
+  const isAwakened = visibleAura.dynamicProfile.awakening.unlocked;
+
   const ownerParty: ChemiParty = useMemo(() => {
-    const result = calculateAuraType(auraWords, { userId, displayName });
     return {
       displayName,
-      aura: result.aura,
-      topWords: result.topWords,
+      aura: visibleAura.aura,
+      topWords: visibleAura.topWords,
     };
-  }, [auraWords, userId, displayName]);
+  }, [visibleAura, displayName]);
 
   function openChemiWithPartner(partner: DashboardFusionPartner) {
     setChemiPartyB(partner.partnerParty);
@@ -210,7 +234,7 @@ export default function DashboardClient({
     router.refresh();
   }
 
-  const palette = auraResult.aura.palette;
+  const palette = visibleAura.aura.palette;
   const maxCount = ranking[0]?.[1] ?? 1;
 
   async function copyVoteUrlOnly() {
@@ -287,16 +311,38 @@ export default function DashboardClient({
         open={storyModalOpen}
         onClose={() => setStoryModalOpen(false)}
         displayName={displayName}
-        aura={auraResult.aura}
-        profile={auraResult.dynamicProfile}
-        catchCopy={auraResult.personalizedCatchCopy}
-        topWords={auraResult.topWords}
+        aura={visibleAura.aura}
+        profile={visibleAura.dynamicProfile}
+        catchCopy={visibleAura.personalizedCatchCopy}
+        topWords={visibleAura.topWords}
         onSaved={() => {
           setToastMessage("画像を保存しました！");
           if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
           toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
         }}
       />
+
+      {pendingAura && displayedAura ? (
+        <AuraEvolutionOverlay
+          fromAura={displayedAura.aura}
+          toAura={pendingAura.aura}
+          onComplete={() => {
+            const next = pendingAuraRef.current;
+            if (next) {
+              setDisplayedAura(next);
+              setToastMessage(
+                next.aura.rarity === "secret"
+                  ? "シークレットオーラが覚醒した！"
+                  : "オーラが進化した！",
+              );
+            }
+            pendingAuraRef.current = null;
+            setPendingAura(null);
+            if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+            toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 2200);
+          }}
+        />
+      ) : null}
 
       {chemiPartyB ? (
         <ChemiExportModal
@@ -359,13 +405,14 @@ export default function DashboardClient({
         </div>
 
         <AuraCard
-          aura={auraResult.aura}
-          catchCopy={auraResult.personalizedCatchCopy}
-          profile={auraResult.dynamicProfile}
-          topWords={auraResult.topWords}
+          aura={visibleAura.aura}
+          catchCopy={visibleAura.personalizedCatchCopy}
+          profile={visibleAura.dynamicProfile}
+          topWords={visibleAura.topWords}
           hasVotes={auraWords.length > 0}
           pulse={pulseActive}
           displayName={displayName}
+          awakened={isAwakened}
         />
 
         {selfWords.length > 0 && friendWords.length > 0 ? (

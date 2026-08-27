@@ -123,6 +123,7 @@ function ChemiCardCanvas({
 }) {
   const chemi = calculateChemi(partyA, partyB);
   const { blendedPalette } = chemi;
+  const chemNameSize = chemi.chemName.length >= 12 ? 20 : chemi.chemName.length >= 9 ? 24 : 28;
 
   return (
     <div
@@ -136,14 +137,15 @@ function ChemiCardCanvas({
       <div
         style={{
           display: "flex",
+          flex: 1,
           flexDirection: "column",
-          height: "85%",
-          padding: "20px 16px 8px",
+          justifyContent: "space-between",
+          padding: "16px 14px 8px",
           boxSizing: "border-box",
-          overflow: "hidden",
+          minHeight: 0,
         }}
       >
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", flexShrink: 0 }}>
           <p
             style={{
               margin: 0,
@@ -157,9 +159,9 @@ function ChemiCardCanvas({
           </p>
           <p
             style={{
-              marginTop: 8,
+              marginTop: 6,
               marginBottom: 0,
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: 800,
               color: "#fff",
             }}
@@ -174,23 +176,24 @@ function ChemiCardCanvas({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 14,
-            height: 120,
+            marginTop: 8,
+            height: 96,
+            flexShrink: 0,
           }}
         >
           <FusedChemiOrb
             paletteA={partyA.aura.palette}
             paletteB={partyB.aura.palette}
             blended={blendedPalette}
-            size={112}
+            size={96}
           />
         </div>
 
-        <div style={{ marginTop: 10, textAlign: "center" }}>
+        <div style={{ marginTop: 6, textAlign: "center", flexShrink: 0 }}>
           <p
             style={{
               margin: 0,
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: 700,
               letterSpacing: "0.18em",
               color: "rgba(255,255,255,0.45)",
@@ -200,11 +203,11 @@ function ChemiCardCanvas({
           </p>
           <h3
             style={{
-              marginTop: 4,
+              marginTop: 3,
               marginBottom: 0,
-              fontSize: 28,
+              fontSize: chemNameSize,
               fontWeight: 900,
-              lineHeight: 1.15,
+              lineHeight: 1.2,
               color: "#fff",
               textShadow: `0 0 24px ${blendedPalette.a}aa`,
             }}
@@ -213,9 +216,9 @@ function ChemiCardCanvas({
           </h3>
           <p
             style={{
-              marginTop: 10,
+              marginTop: 6,
               marginBottom: 0,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 900,
               color: "#fde68a",
             }}
@@ -224,9 +227,9 @@ function ChemiCardCanvas({
           </p>
           <p
             style={{
-              marginTop: 4,
+              marginTop: 2,
               marginBottom: 0,
-              fontSize: 11,
+              fontSize: 10,
               color: "rgba(255,255,255,0.55)",
             }}
           >
@@ -236,12 +239,14 @@ function ChemiCardCanvas({
 
         <div
           style={{
-            marginTop: 12,
+            marginTop: 8,
             borderRadius: 12,
             border: "1px solid rgba(255,255,255,0.16)",
             background: "rgba(255,255,255,0.06)",
-            padding: "10px 12px",
+            padding: "8px 10px",
             textAlign: "center",
+            flexShrink: 1,
+            minHeight: 0,
           }}
         >
           <p
@@ -257,11 +262,11 @@ function ChemiCardCanvas({
           </p>
           <p
             style={{
-              marginTop: 6,
+              marginTop: 4,
               marginBottom: 0,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 600,
-              lineHeight: 1.45,
+              lineHeight: 1.4,
               color: "rgba(255,255,255,0.88)",
             }}
           >
@@ -271,11 +276,12 @@ function ChemiCardCanvas({
 
         <div
           style={{
-            marginTop: 10,
+            marginTop: 8,
             display: "flex",
             flexWrap: "wrap",
             justifyContent: "center",
             gap: 5,
+            flexShrink: 0,
           }}
         >
           {[...partyA.topWords.slice(0, 2), ...partyB.topWords.slice(0, 2)].map((word) => (
@@ -296,9 +302,9 @@ function ChemiCardCanvas({
           ))}
         </div>
 
-        <div style={{ marginTop: "auto", paddingTop: 6 }}>
+        <div style={{ marginTop: 6, flexShrink: 0 }}>
           <ExportBrandFooter />
-          <p style={{ marginTop: 4, marginBottom: 0, fontSize: 8, color: "rgba(255,255,255,0.28)" }}>
+          <p style={{ marginTop: 2, marginBottom: 0, fontSize: 8, color: "rgba(255,255,255,0.28)" }}>
             {siteUrl.replace(/^https?:\/\//, "")}
           </p>
         </div>
@@ -306,7 +312,8 @@ function ChemiCardCanvas({
 
       <div
         style={{
-          height: "15%",
+          height: 52,
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

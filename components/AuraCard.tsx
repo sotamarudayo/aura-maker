@@ -12,6 +12,8 @@ type AuraCardProps = {
   hasVotes: boolean;
   pulse?: boolean;
   displayName?: string;
+  /** 10票以上で解放される覚醒ビジュアル */
+  awakened?: boolean;
 };
 
 const STAT_META = [
@@ -161,6 +163,7 @@ export default function AuraCard({
   hasVotes,
   pulse = false,
   displayName,
+  awakened = false,
 }: AuraCardProps) {
   const [compatPreview, setCompatPreview] = useState<CompatPreview | null>(null);
 
@@ -212,13 +215,32 @@ export default function AuraCard({
             <div className={`aura-card-halo ${pulse ? "aura-card-halo-pulse" : ""}`} />
             <div className="aura-card-ring aura-card-ring-a" />
             <div className="aura-card-ring aura-card-ring-b" />
-            <div className={`aura-card-core ${hasVotes ? "" : "aura-card-core-dormant"}`} />
+            <div
+              className={`aura-card-core ${hasVotes ? "" : "aura-card-core-dormant"} ${
+                awakened ? "aura-card-core-awakened" : ""
+              }`}
+            />
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            <span className="rounded-full border border-white/25 bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold">
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-black tracking-wide ${
+                aura.rarity === "secret"
+                  ? "border-violet-300/70 bg-violet-500/30 text-violet-100 shadow-[0_0_18px_rgba(124,58,237,0.45)]"
+                  : aura.rarity === "legendary"
+                    ? "border-amber-200/70 bg-amber-300/20 text-amber-100 shadow-[0_0_16px_rgba(251,191,36,0.35)]"
+                    : aura.rarity === "rare"
+                      ? "border-cyan-300/50 bg-cyan-400/15 text-cyan-100"
+                      : "border-white/25 bg-white/10 text-white/90"
+              }`}
+            >
               {RARITY_LABELS[aura.rarity]}
             </span>
+            {awakened ? (
+              <span className="rounded-full border border-amber-300/60 bg-amber-400/20 px-3 py-1 text-xs font-black text-amber-100">
+                覚醒
+              </span>
+            ) : null}
             <span
               className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${
                 profile.confidence === "provisional"

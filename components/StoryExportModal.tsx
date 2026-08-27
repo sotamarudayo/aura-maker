@@ -417,11 +417,28 @@ function StoryLayout({
             style={{
               display: "inline-block",
               borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.25)",
-              background: "rgba(255,255,255,0.08)",
-              padding: "2px 10px",
-              fontSize: 9,
-              fontWeight: 700,
+              border:
+                aura.rarity === "secret"
+                  ? "1px solid rgba(196,181,253,0.7)"
+                  : aura.rarity === "legendary"
+                    ? "1px solid rgba(253,230,138,0.7)"
+                    : "1px solid rgba(255,255,255,0.25)",
+              background:
+                aura.rarity === "secret"
+                  ? "rgba(124,58,237,0.35)"
+                  : aura.rarity === "legendary"
+                    ? "rgba(251,191,36,0.22)"
+                    : "rgba(255,255,255,0.08)",
+              padding: "3px 12px",
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: "0.06em",
+              color:
+                aura.rarity === "secret"
+                  ? "#ede9fe"
+                  : aura.rarity === "legendary"
+                    ? "#fef3c7"
+                    : "#fff",
             }}
           >
             {RARITY_LABELS[aura.rarity]}
@@ -574,11 +591,21 @@ function CardLayout({
             <span
               style={{
                 borderRadius: 999,
-                border: "1px solid rgba(255,255,255,0.25)",
-                background: "rgba(255,255,255,0.1)",
-                padding: "2px 7px",
-                fontSize: 8,
-                fontWeight: 700,
+                border:
+                  aura.rarity === "secret"
+                    ? "1px solid rgba(196,181,253,0.7)"
+                    : aura.rarity === "legendary"
+                      ? "1px solid rgba(253,230,138,0.7)"
+                      : "1px solid rgba(255,255,255,0.25)",
+                background:
+                  aura.rarity === "secret"
+                    ? "rgba(124,58,237,0.35)"
+                    : aura.rarity === "legendary"
+                      ? "rgba(251,191,36,0.22)"
+                      : "rgba(255,255,255,0.1)",
+                padding: "2px 8px",
+                fontSize: 9,
+                fontWeight: 800,
               }}
             >
               {RARITY_LABELS[aura.rarity]}

@@ -25,7 +25,8 @@ export default function AuraEncyclopediaSection({
           全{AURA_TYPES.length}種類のオーラを発見しよう
         </h2>
         <p className="mx-auto mt-3 max-w-2xl px-1 text-sm text-white/75 sm:text-base">
-          似た空気感どうしで系統分け。あなたの印象ワードの組み合わせで、どの系統に着地するかが決まる。
+          似た空気感どうしで系統分け。レア度はコモン〜シークレットの5段階。
+          シークレットは投票10票以上で判定が開く。
         </p>
       </div>
 

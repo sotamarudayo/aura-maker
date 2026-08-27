@@ -94,12 +94,15 @@ export default function AuraEncyclopediaCard({
               ) : null}
             </div>
             <span
-              className="w-fit shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide"
-              style={{
-                borderColor: `${accent}55`,
-                background: `${accent}22`,
-                color: isSecret ? `${accent}ee` : "rgba(255,255,255,0.92)",
-              }}
+              className={`w-fit shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-black tracking-wide ${
+                isSecret
+                  ? "border-violet-300/70 bg-violet-500/30 text-violet-100 shadow-[0_0_14px_rgba(124,58,237,0.4)]"
+                  : aura.rarity === "legendary"
+                    ? "border-amber-200/70 bg-amber-300/20 text-amber-100"
+                    : aura.rarity === "rare"
+                      ? "border-cyan-300/50 bg-cyan-400/15 text-cyan-100"
+                      : "border-white/20 bg-white/10 text-white/90"
+              }`}
             >
               {RARITY_LABELS[aura.rarity]}
             </span>
