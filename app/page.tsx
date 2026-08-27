@@ -7,6 +7,20 @@ import { AURA_TYPES } from "@/lib/constants/auras";
 import { SERVICE_SHARE_TEXT } from "@/lib/constants/share";
 import { createClient } from "@/utils/supabase/server";
 
+/** トップで見せる投票キーワード例（実際の投票ワードから抜粋） */
+const LANDING_EXAMPLE_WORDS = [
+  { label: "カリスマ", selected: true },
+  { label: "癒やし枠", selected: false },
+  { label: "透明感", selected: true },
+  { label: "陽キャバイブス", selected: false },
+  { label: "ミステリアス", selected: false },
+  { label: "天才的バカ", selected: true },
+  { label: "ギャップの鬼", selected: false },
+  { label: "天然毒舌", selected: false },
+  { label: "頼れる相棒", selected: false },
+  { label: "深夜テンション", selected: false },
+] as const;
+
 export const metadata: Metadata = {
   title: "AuraMaker | 友達から見た自分のオーラがわかる",
   description: SERVICE_SHARE_TEXT,
@@ -67,7 +81,7 @@ export default async function Home() {
             周りからどう思われてるか、知りたくない？
           </h1>
           <p className="mt-5 max-w-2xl text-white/80">
-            友達に匿名で印象を聞くと、あなたのオーラタイプがわかる。自分じゃ見えない「周りからの見え方」を診断しよう。
+            友達にURLを送り、キーワードを選んでもらうだけで自分のオーラがわかる。
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <AnonymousStartButton className="w-full rounded-full bg-violet-300 px-6 py-3 text-center font-semibold text-black disabled:opacity-60 sm:w-auto" />
@@ -78,10 +92,28 @@ export default async function Home() {
               ログイン / 新規登録
             </Link>
           </div>
-          <div className="mt-8 grid gap-3 text-sm text-white/70 md:grid-cols-3">
-            <div className="rounded-xl bg-white/10 p-3">匿名投票URLを発行</div>
-            <div className="rounded-xl bg-white/10 p-3">リアルタイム集計</div>
-            <div className="rounded-xl bg-white/10 p-3">X / LINE / Instagramで共有</div>
+
+          <div className="mt-8">
+            <p className="text-sm font-semibold text-white/75">
+              友達はこんなキーワードから最大3つ選ぶだけ
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2" aria-hidden>
+              {LANDING_EXAMPLE_WORDS.map((word) => (
+                <span
+                  key={word.label}
+                  className={
+                    word.selected
+                      ? "rounded-full bg-violet-300 px-3 py-2 text-sm font-semibold text-black"
+                      : "rounded-full border border-white/25 bg-white/10 px-3 py-2 text-sm font-semibold text-white/85"
+                  }
+                >
+                  {word.label}
+                </span>
+              ))}
+            </div>
+            <p className="mt-4 text-sm text-white/55">
+              URLを送る → キーワード選択 → オーラ完成
+            </p>
           </div>
         </section>
 

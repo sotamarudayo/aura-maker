@@ -1,6 +1,6 @@
 /** サービス紹介用シェア文面 */
 export const SERVICE_SHARE_TEXT =
-  "周りからどう思われてるか、知りたくない？友達の印象からオーラ診断✨ AuraMaker #AuraMaker";
+  "周りからどう思われてるか、知りたくない？友達にURLを送ってキーワードを選んでもらうだけでオーラ診断✨ AuraMaker #AuraMaker";
 
 export function buildServiceShareUrls(siteUrl: string) {
   const encodedText = encodeURIComponent(SERVICE_SHARE_TEXT);

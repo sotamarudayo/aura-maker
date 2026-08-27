@@ -22,7 +22,7 @@ export default async function LoginPage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-black sm:text-4xl">AuraMaker</h1>
           <p className="text-sm text-white/80 sm:text-base">
-            周りからどう思われてるか、知りたくない？友達の印象からオーラ診断。
+            周りからどう思われてるか、知りたくない？キーワードを選んでもらうだけでオーラ診断。
           </p>
         </div>
 

@@ -114,7 +114,7 @@ async function renderDefaultOg(fontData: ArrayBuffer) {
             color: "#ddd6fe",
           }}
         >
-          友達の印象から、あなたのオーラがわかる
+          友達にURLを送り、キーワードを選んでもらうだけ
         </div>
       </OgShell>
     ),
