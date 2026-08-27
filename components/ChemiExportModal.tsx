@@ -36,23 +36,24 @@ function ExportBrandFooter() {
   );
 }
 
-function ChemiOrb({
-  palette,
-  size = 88,
-  offsetX = 0,
+function FusedChemiOrb({
+  paletteA,
+  paletteB,
+  blended,
+  size = 112,
 }: {
-  palette: ChemiParty["aura"]["palette"];
+  paletteA: ChemiParty["aura"]["palette"];
+  paletteB: ChemiParty["aura"]["palette"];
+  blended: ChemiParty["aura"]["palette"];
   size?: number;
-  offsetX?: number;
 }) {
-  const glow = size + 36;
+  const glow = size + 44;
   return (
     <div
       style={{
         position: "relative",
         width: size,
         height: size,
-        marginLeft: offsetX,
         flexShrink: 0,
       }}
     >
@@ -66,8 +67,12 @@ function ChemiOrb({
           marginLeft: -glow / 2,
           marginTop: -glow / 2,
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${palette.a}aa 0%, ${palette.b}55 45%, transparent 72%)`,
-          filter: "blur(10px)",
+          background: `
+            radial-gradient(circle at 32% 48%, ${paletteA.a}99 0%, transparent 52%),
+            radial-gradient(circle at 68% 48%, ${paletteB.a}99 0%, transparent 52%),
+            radial-gradient(circle at 50% 50%, ${blended.b}66 0%, transparent 62%)
+          `,
+          filter: "blur(12px)",
         }}
       />
       <div
@@ -78,12 +83,29 @@ function ChemiOrb({
           borderRadius: "50%",
           overflow: "hidden",
           background: `
-            radial-gradient(circle at 32% 28%, ${palette.a} 0%, transparent 48%),
-            radial-gradient(circle at 74% 40%, ${palette.b} 0%, transparent 50%),
-            radial-gradient(circle at 50% 78%, ${palette.c} 0%, transparent 52%),
+            radial-gradient(circle at 28% 36%, ${paletteA.a} 0%, transparent 46%),
+            radial-gradient(circle at 72% 38%, ${paletteB.a} 0%, transparent 46%),
+            radial-gradient(circle at 50% 62%, ${blended.c} 0%, transparent 48%),
+            radial-gradient(circle at 40% 52%, ${paletteA.b}bb 0%, transparent 42%),
+            radial-gradient(circle at 60% 50%, ${paletteB.b}bb 0%, transparent 42%),
+            linear-gradient(135deg, ${paletteA.c}55 0%, ${paletteB.c}55 100%),
             linear-gradient(160deg, #16112a 0%, #0a0818 100%)
           `,
-          boxShadow: `inset 0 0 16px rgba(255,255,255,0.14), 0 0 28px ${palette.a}77`,
+          boxShadow: `
+            inset 0 0 20px rgba(255,255,255,0.16),
+            0 0 32px ${paletteA.a}66,
+            0 0 32px ${paletteB.a}55
+          `,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: "18%",
+          borderRadius: "50%",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: `inset 0 0 18px ${blended.a}44`,
+          pointerEvents: "none",
         }}
       />
     </div>
@@ -156,18 +178,12 @@ function ChemiCardCanvas({
             height: 120,
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              width: 180,
-              height: 80,
-              borderRadius: "50%",
-              background: `radial-gradient(ellipse, ${blendedPalette.a}66 0%, ${blendedPalette.b}44 50%, transparent 72%)`,
-              filter: "blur(14px)",
-            }}
+          <FusedChemiOrb
+            paletteA={partyA.aura.palette}
+            paletteB={partyB.aura.palette}
+            blended={blendedPalette}
+            size={112}
           />
-          <ChemiOrb palette={partyA.aura.palette} size={92} offsetX={-18} />
-          <ChemiOrb palette={partyB.aura.palette} size={92} offsetX={-36} />
         </div>
 
         <div style={{ marginTop: 10, textAlign: "center" }}>
