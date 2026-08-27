@@ -64,11 +64,10 @@ export default async function Home() {
         <section className="rounded-3xl border border-white/20 bg-black/35 p-5 backdrop-blur sm:p-8 md:p-10">
           <p className="text-xs font-semibold tracking-[0.2em] text-violet-200 sm:text-sm">AuraMaker</p>
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
-            匿名の印象を、動くオーラに。
+            周りからどう思われてるか、知りたくない？
           </h1>
           <p className="mt-5 max-w-2xl text-white/80">
-            友だちやフォロワーから「あなたらしさ」を匿名投票で集めて、ランキングと
-            Word Cloud、SNSシェア画像に変換するエンタメサービスです。
+            友達に匿名で印象を聞くと、あなたのオーラタイプがわかる。自分じゃ見えない「周りからの見え方」を診断しよう。
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <AnonymousStartButton className="w-full rounded-full bg-violet-300 px-6 py-3 text-center font-semibold text-black disabled:opacity-60 sm:w-auto" />

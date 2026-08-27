@@ -35,11 +35,11 @@ export const metadata: Metadata = {
     template: "%s | AuraMaker",
   },
   description:
-    "友達から見た自分の『オーラ』がわかる！ AuraMakerでみんなの印象を集めよう✨",
+    "周りからどう思われてるか、知りたくない？友達の印象からオーラ診断。AuraMaker",
   openGraph: {
     title: "AuraMaker | 友達から見た自分のオーラがわかる",
     description:
-      "友達から見た自分の『オーラ』がわかる！ AuraMakerでみんなの印象を集めよう✨",
+      "周りからどう思われてるか、知りたくない？友達の印象からオーラ診断。AuraMaker",
     siteName: "AuraMaker",
     type: "website",
     locale: "ja_JP",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AuraMaker | 友達から見た自分のオーラがわかる",
     description:
-      "友達から見た自分の『オーラ』がわかる！ AuraMakerでみんなの印象を集めよう✨",
+      "周りからどう思われてるか、知りたくない？友達の印象からオーラ診断。AuraMaker",
     images: [ogImage.url],
   },
   icons: {

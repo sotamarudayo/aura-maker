@@ -94,14 +94,15 @@ async function renderDefaultOg(fontData: ArrayBuffer) {
         <div
           style={{
             marginTop: 18,
-            fontSize: 58,
+            fontSize: 46,
             fontWeight: 700,
             textAlign: "center",
-            lineHeight: 1.25,
+            lineHeight: 1.3,
+            maxWidth: 1000,
             textShadow: "0 8px 40px rgba(168, 85, 247, 0.45)",
           }}
         >
-          友達から見た自分のオーラがわかる
+          周りからどう思われてるか、知りたくない？
         </div>
         <div
           style={{
@@ -113,7 +114,7 @@ async function renderDefaultOg(fontData: ArrayBuffer) {
             color: "#ddd6fe",
           }}
         >
-          匿名投票で印象を集めて、あなただけのオーラを覚醒させよう
+          友達の印象から、あなたのオーラがわかる
         </div>
       </OgShell>
     ),
