@@ -11,7 +11,10 @@ import LinkAccountModal from "@/components/LinkAccountModal";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import { calculateAuraType } from "@/lib/constants/auras";
 import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
-import { groupVoterSessions } from "@/lib/chemi/group-voters";
+import type {
+  DashboardFusionPartner,
+  DashboardFusions,
+} from "@/lib/fusion/load-dashboard-fusions";
 import { trackEvent } from "@/lib/analytics";
 
 const StoryExportModal = dynamic(() => import("@/components/StoryExportModal"), {
@@ -25,7 +28,6 @@ const ChemiExportModal = dynamic(() => import("@/components/ChemiExportModal"), 
 type VoteEntry = {
   word: string;
   isSelfVote: boolean;
-  voterFingerprint: string | null;
 };
 
 type DashboardClientProps = {
@@ -33,6 +35,8 @@ type DashboardClientProps = {
   initialDisplayName: string;
   initialVotes: VoteEntry[];
   initialIsAnonymous: boolean;
+  initialFusions: DashboardFusions;
+  fusionJustAccepted: boolean;
   siteUrl: string;
 };
 
@@ -49,6 +53,8 @@ export default function DashboardClient({
   initialDisplayName,
   initialVotes,
   initialIsAnonymous,
+  initialFusions,
+  fusionJustAccepted,
   siteUrl,
 }: DashboardClientProps) {
   const router = useRouter();
@@ -68,10 +74,24 @@ export default function DashboardClient({
   const [isSavingName, setIsSavingName] = useState(false);
   const [chemiOpen, setChemiOpen] = useState(false);
   const [chemiPartyB, setChemiPartyB] = useState<ChemiParty | null>(null);
+  const [fusions, setFusions] = useState(initialFusions);
+  const [creatingFusion, setCreatingFusion] = useState(false);
+  const [fusionError, setFusionError] = useState<string | null>(null);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
   const voteUrl = `${siteUrl}/vote/${userId}`;
+
+  useEffect(() => {
+    setFusions(initialFusions);
+  }, [initialFusions]);
+
+  useEffect(() => {
+    if (!fusionJustAccepted) return;
+    setToastMessage("オーラ融合が完了しました！");
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 2200);
+  }, [fusionJustAccepted]);
 
   useEffect(() => {
     const channel = supabase
@@ -87,12 +107,8 @@ export default function DashboardClient({
         (payload) => {
           const word = payload.new.word;
           const isSelfVote = payload.new.is_self_vote === true;
-          const voterFingerprint =
-            typeof payload.new.voter_fingerprint === "string"
-              ? payload.new.voter_fingerprint
-              : null;
           if (typeof word === "string") {
-            setVotes((prev) => [{ word, isSelfVote, voterFingerprint }, ...prev]);
+            setVotes((prev) => [{ word, isSelfVote }, ...prev]);
             if (!isSelfVote) {
               setPulseActive(true);
               setToastMessage(`新しい投票が届きました！ (+${word})`);
@@ -148,28 +164,52 @@ export default function DashboardClient({
     };
   }, [auraWords, userId, displayName]);
 
-  const voterSessions = useMemo(
-    () =>
-      groupVoterSessions(
-        votes.map((vote) => ({
-          word: vote.word,
-          isSelfVote: vote.isSelfVote,
-          voterFingerprint: vote.voterFingerprint,
-        })),
-      ),
-    [votes],
-  );
-
-  function openChemiWithSession(session: (typeof voterSessions)[number]) {
-    const friendResult = calculateAuraType(session.words, { displayName: session.label });
-    setChemiPartyB({
-      displayName: session.label,
-      aura: friendResult.aura,
-      topWords: friendResult.topWords,
-    });
+  function openChemiWithPartner(partner: DashboardFusionPartner) {
+    setChemiPartyB(partner.partnerParty);
     setChemiOpen(true);
-    trackEvent("open_chemi_export", { source: "dashboard_voter_list" });
+    trackEvent("open_chemi_export", { source: "dashboard_fusion" });
   }
+
+  function fusionInviteUrl(token: string) {
+    return `${siteUrl}/fusion/${token}`;
+  }
+
+  async function copyFusionLink(token: string) {
+    await navigator.clipboard.writeText(fusionInviteUrl(token));
+    trackEvent("copy_fusion_link");
+    setToastMessage("融合リンクをコピーしました");
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+  }
+
+  async function createFusionLink() {
+    setCreatingFusion(true);
+    setFusionError(null);
+
+    const response = await fetch("/api/fusion", {
+      method: "POST",
+      credentials: "include",
+    });
+    const payload = (await response.json().catch(() => null)) as
+      | { inviteToken?: string; fusionId?: string; error?: string }
+      | null;
+
+    if (!response.ok || !payload?.inviteToken) {
+      setFusionError(payload?.error ?? "融合リンクの作成に失敗しました。");
+      setCreatingFusion(false);
+      return;
+    }
+
+    await navigator.clipboard.writeText(fusionInviteUrl(payload.inviteToken));
+    setToastMessage("融合リンクをコピーしました");
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+
+    trackEvent("create_fusion_link");
+    setCreatingFusion(false);
+    router.refresh();
+  }
+
   const palette = auraResult.aura.palette;
   const maxCount = ranking[0]?.[1] ?? 1;
 
@@ -437,36 +477,77 @@ export default function DashboardClient({
           </Link>
         </div>
 
-        {voterSessions.length > 0 ? (
-          <section className="rounded-2xl border border-fuchsia-300/30 bg-black/35 p-4 backdrop-blur sm:p-6">
-            <h2 className="text-xl font-bold">投票してくれた友達</h2>
-            <p className="mt-1 text-sm text-white/65">
-              匿名の投票セッションごとにケミカードを作成できます。
-            </p>
-            <ul className="mt-4 space-y-3">
-              {voterSessions.map((session) => (
-                <li
-                  key={session.fingerprint}
-                  className="flex flex-col gap-3 rounded-xl border border-white/15 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-white">{session.label}</p>
-                    <p className="mt-1 text-sm text-white/60">
-                      {session.words.map((word) => `#${word}`).join(" ")}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => openChemiWithSession(session)}
-                    className="shrink-0 rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2.5 text-sm font-black text-black"
+        <section className="rounded-2xl border border-fuchsia-300/30 bg-black/35 p-4 backdrop-blur sm:p-6">
+          <p className="text-xs font-bold tracking-[0.22em] text-fuchsia-200">AURA FUSION</p>
+          <h2 className="mt-2 text-xl font-bold">友達とオーラ融合</h2>
+          <p className="mt-1 text-sm text-white/65">
+            お互いの本物のオーラ診断が揃うと、融合ケミカードが作れます。リンクを友達に送ってね。
+          </p>
+
+          <button
+            type="button"
+            onClick={createFusionLink}
+            disabled={creatingFusion}
+            className="mt-4 inline-flex min-h-[3rem] w-full items-center justify-center rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black disabled:opacity-70 sm:text-base"
+          >
+            {creatingFusion ? "リンク作成中..." : "✨ 融合リンクを作成してコピー"}
+          </button>
+          {fusionError ? <p className="mt-2 text-sm text-rose-300">{fusionError}</p> : null}
+
+          {fusions.partners.length > 0 ? (
+            <div className="mt-6">
+              <h3 className="text-sm font-bold text-white/85">融合済みの友達</h3>
+              <ul className="mt-3 space-y-3">
+                {fusions.partners.map((partner) => (
+                  <li
+                    key={partner.fusionId}
+                    className="flex flex-col gap-3 rounded-xl border border-white/15 bg-white/5 p-4 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    ✨ この人とケミカードを作る
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+                    <div className="min-w-0">
+                      <p className="font-semibold text-white">{partner.partnerDisplayName}</p>
+                      <p className="mt-1 text-sm text-white/60">{partner.partnerArchetypeName}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => openChemiWithPartner(partner)}
+                      className="shrink-0 rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2.5 text-sm font-black text-black"
+                    >
+                      ✨ ケミカードを作る
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {fusions.pendingInvites.length > 0 ? (
+            <div className="mt-6">
+              <h3 className="text-sm font-bold text-white/85">参加待ちのリンク</h3>
+              <ul className="mt-3 space-y-3">
+                {fusions.pendingInvites.map((invite) => (
+                  <li
+                    key={invite.fusionId}
+                    className="flex flex-col gap-3 rounded-xl border border-amber-300/25 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-amber-100">友達の参加を待っています</p>
+                      <p className="mt-1 truncate text-xs text-white/50">
+                        {fusionInviteUrl(invite.inviteToken)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyFusionLink(invite.inviteToken)}
+                      className="shrink-0 rounded-full border border-amber-200/60 bg-amber-200/90 px-4 py-2.5 text-sm font-bold text-black"
+                    >
+                      リンクをコピー
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
           <article className="rounded-2xl border border-white/20 bg-black/35 p-6 backdrop-blur">

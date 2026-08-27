@@ -429,7 +429,7 @@ export default function ChemiExportModal({
       <div className="max-h-[95vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/20 bg-zinc-950 p-5 text-white shadow-2xl md:p-6">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold">ケミカードをシェア</h2>
+            <h2 className="text-xl font-bold">融合ケミカードをシェア</h2>
             <p className="mt-1 text-sm text-white/70">
               {partyA.displayName} × {partyB.displayName} · 相性 {chemi.compatibilityPercent}%
             </p>

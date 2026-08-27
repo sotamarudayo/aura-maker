@@ -1,8 +1,13 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { loadDashboardFusions } from "@/lib/fusion/load-dashboard-fusions";
 import { resolveAnonymousDisplayName } from "@/lib/utils/nickname";
 import { resolveSiteUrl } from "@/lib/utils/site-url";
 import DashboardClient from "./DashboardClient";
+
+type DashboardPageProps = {
+  searchParams: Promise<{ fusion?: string }>;
+};
 
 function fallbackName(email?: string | null) {
   if (!email) return "Anonymous";
@@ -26,7 +31,8 @@ function resolveDisplayName(
   );
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const { fusion: fusionParam } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -64,12 +70,11 @@ export default async function DashboardPage() {
     redirect("/onboarding/self-vote");
   }
 
-  const { data: votes } = await supabase
-    .from("votes")
-    .select("word, is_self_vote, voter_fingerprint")
-    .eq("target_user_id", user.id);
-
-  const siteUrl = await resolveSiteUrl();
+  const [{ data: votes }, siteUrl, initialFusions] = await Promise.all([
+    supabase.from("votes").select("word, is_self_vote").eq("target_user_id", user.id),
+    resolveSiteUrl(),
+    loadDashboardFusions(user.id),
+  ]);
 
   return (
     <DashboardClient
@@ -78,9 +83,10 @@ export default async function DashboardPage() {
       initialVotes={(votes ?? []).map((vote) => ({
         word: vote.word,
         isSelfVote: vote.is_self_vote ?? false,
-        voterFingerprint: vote.voter_fingerprint ?? null,
       }))}
       initialIsAnonymous={user.is_anonymous ?? false}
+      initialFusions={initialFusions}
+      fusionJustAccepted={fusionParam === "1"}
       siteUrl={siteUrl}
     />
   );
