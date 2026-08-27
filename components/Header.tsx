@@ -70,27 +70,22 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-4">
         <Link
           href={logoHref}
-          className="flex shrink-0 items-center gap-2.5 text-lg font-black tracking-tight text-white"
+          className="flex shrink-0 items-center gap-2 text-base font-black tracking-tight text-white sm:gap-2.5 sm:text-lg"
         >
           <BrandLogo size={28} priority />
-          AuraMaker
+          <span className="hidden min-[380px]:inline">AuraMaker</span>
         </Link>
 
-        <nav className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+        <nav className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Link
             href="/auras"
-            className="rounded-full px-2.5 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 sm:px-3 sm:text-sm"
+            className="whitespace-nowrap rounded-full px-2 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 sm:px-3 sm:text-sm"
           >
-            📖 オーラ図鑑
-          </Link>
-          <Link
-            href={isLoggedIn ? "/dashboard" : "/login"}
-            className="rounded-full px-2.5 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 sm:px-3 sm:text-sm"
-          >
-            📊 マイオーラ
+            <span className="sm:hidden">📖 図鑑</span>
+            <span className="hidden sm:inline">📖 オーラ図鑑</span>
           </Link>
 
           {auth.status === "loading" ? (
@@ -99,7 +94,7 @@ export default function Header() {
             <>
               <Link
                 href="/dashboard"
-                className="shrink-0 rounded-full border border-amber-300/50 bg-amber-500/20 px-2.5 py-1 text-[10px] font-bold text-amber-100 transition hover:bg-amber-500/30 sm:text-xs"
+                className="shrink-0 whitespace-nowrap rounded-full border border-amber-300/50 bg-amber-500/20 px-2.5 py-1 text-[10px] font-bold text-amber-100 transition hover:bg-amber-500/30 sm:text-xs"
               >
                 ゲスト
               </Link>
@@ -107,7 +102,7 @@ export default function Header() {
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="shrink-0 rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold text-white/70 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
+                className="shrink-0 whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold text-white/70 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
               >
                 {loggingOut ? "..." : "ログアウト"}
               </button>
@@ -116,7 +111,7 @@ export default function Header() {
             <>
               <Link
                 href="/dashboard"
-                className="shrink-0 rounded-full border border-emerald-300/60 bg-emerald-400/90 px-2.5 py-1 text-[10px] font-bold text-black transition hover:bg-emerald-300 sm:text-xs"
+                className="shrink-0 whitespace-nowrap rounded-full border border-emerald-300/60 bg-emerald-400/90 px-2.5 py-1 text-[10px] font-bold text-black transition hover:bg-emerald-300 sm:text-xs"
               >
                 マイページ
               </Link>
@@ -124,7 +119,7 @@ export default function Header() {
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="shrink-0 rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold text-white/70 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
+                className="shrink-0 whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold text-white/70 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
               >
                 {loggingOut ? "..." : "ログアウト"}
               </button>
@@ -132,7 +127,7 @@ export default function Header() {
           ) : (
             <Link
               href="/login"
-              className="shrink-0 rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/80 transition hover:bg-white/15 sm:text-xs"
+              className="shrink-0 whitespace-nowrap rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/80 transition hover:bg-white/15 sm:text-xs"
             >
               ログイン
             </Link>
