@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { CSSProperties } from "react";
 import { toPng } from "html-to-image";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
@@ -15,18 +15,10 @@ type StoryExportModalProps = {
   displayName: string;
   aura: AuraType;
   profile: DynamicAuraProfile;
-  catchCopy: string;
-  topWords: string[];
+  catchCopy?: string;
+  topWords?: string[];
   onSaved?: () => void;
 };
-
-const STAT_META = [
-  { key: "social" as const, label: "社交", color: "#fbbf24" },
-  { key: "neta" as const, label: "ネタ", color: "#e879f9" },
-  { key: "mystic" as const, label: "神秘", color: "#818cf8" },
-  { key: "heal" as const, label: "癒し", color: "#6ee7b7" },
-  { key: "gap" as const, label: "ギャップ", color: "#22d3ee" },
-];
 
 function ExportBrandFooter({ compact = false }: { compact?: boolean }) {
   return (
@@ -142,49 +134,48 @@ function StoryOrb({
   );
 }
 
-function MiniStatBar({
-  label,
-  value,
-  color,
+function truncateText(text: string, maxLen: number) {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLen) return trimmed;
+  return `${trimmed.slice(0, maxLen - 1)}…`;
+}
+
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <p
+      style={{
+        margin: 0,
+        marginBottom: 4,
+        fontSize: 8,
+        fontWeight: 700,
+        letterSpacing: "0.14em",
+        color: "rgba(196,181,253,0.85)",
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function InfoBox({
+  children,
+  border = "rgba(255,255,255,0.14)",
+  background = "rgba(255,255,255,0.05)",
 }: {
-  label: string;
-  value: number;
-  color: string;
+  children: ReactNode;
+  border?: string;
+  background?: string;
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <span style={{ width: 42, fontSize: 9, color: "rgba(255,255,255,0.7)", flexShrink: 0 }}>
-        {label}
-      </span>
-      <div
-        style={{
-          flex: 1,
-          height: 5,
-          borderRadius: 999,
-          background: "rgba(255,255,255,0.12)",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            width: `${value}%`,
-            height: "100%",
-            borderRadius: 999,
-            background: color,
-          }}
-        />
-      </div>
-      <span
-        style={{
-          width: 22,
-          fontSize: 9,
-          fontWeight: 700,
-          color: "rgba(255,255,255,0.85)",
-          textAlign: "right",
-        }}
-      >
-        {value}
-      </span>
+    <div
+      style={{
+        borderRadius: 10,
+        border: `1px solid ${border}`,
+        background,
+        padding: "8px 10px",
+      }}
+    >
+      {children}
     </div>
   );
 }
@@ -195,8 +186,6 @@ export default function StoryExportModal({
   displayName,
   aura,
   profile,
-  catchCopy,
-  topWords,
   onSaved,
 }: StoryExportModalProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -205,8 +194,6 @@ export default function StoryExportModal({
   const [error, setError] = useState<string | null>(null);
 
   if (!open) return null;
-
-  const words = topWords.slice(0, 3);
 
   async function exportPng(): Promise<string | null> {
     if (!canvasRef.current) return null;
@@ -267,7 +254,7 @@ export default function StoryExportModal({
   const canvasSize =
     format === "story"
       ? { width: 300, height: 533 }
-      : { width: 360, height: 640 };
+      : { width: 360, height: 720 };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 py-6">
@@ -276,7 +263,7 @@ export default function StoryExportModal({
           <div>
             <h2 className="text-xl font-bold">結果を画像でシェア</h2>
             <p className="mt-1 text-sm text-white/70">
-              診断結果カードを画像でシェア。Instagram / X / LINE にそのまま投稿できます。
+              サクッと晒すはストーリー向け、じっくり解説は読み物カードです。
             </p>
           </div>
           <button
@@ -296,7 +283,7 @@ export default function StoryExportModal({
               format === "story" ? "bg-white text-black" : "bg-white/10 text-white/80"
             }`}
           >
-            ストーリー（9:16）
+            サクッと晒す
           </button>
           <button
             type="button"
@@ -305,7 +292,7 @@ export default function StoryExportModal({
               format === "card" ? "bg-white text-black" : "bg-white/10 text-white/80"
             }`}
           >
-            結果カード（詳細）
+            じっくり解説
           </button>
         </div>
 
@@ -336,17 +323,11 @@ export default function StoryExportModal({
                 displayName={displayName}
                 aura={aura}
                 specialMove={profile.specialMove}
-                stats={profile.stats}
+                shareLine={profile.shareLine}
                 palette={aura.palette}
               />
             ) : (
-              <CardLayout
-                displayName={displayName}
-                aura={aura}
-                profile={profile}
-                catchCopy={catchCopy}
-                words={words}
-              />
+              <CardLayout displayName={displayName} aura={aura} profile={profile} />
             )}
           </div>
 
@@ -386,15 +367,17 @@ function StoryLayout({
   displayName,
   aura,
   specialMove,
-  stats,
+  shareLine,
   palette,
 }: {
   displayName: string;
   aura: AuraType;
   specialMove: string;
-  stats: DynamicAuraProfile["stats"];
+  shareLine: string;
   palette: AuraType["palette"];
 }) {
+  const hookLine = `友達から見た${displayName}、${aura.archetypeName}やったわ 🔥`;
+
   return (
     <div
       style={{
@@ -404,45 +387,32 @@ function StoryLayout({
         boxSizing: "border-box",
       }}
     >
-      {/* コンテンツ領域（下部15%はリンクスタンプ用に空ける） */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           height: "85%",
-          padding: "18px 16px 6px",
+          padding: "20px 18px 8px",
           boxSizing: "border-box",
           overflow: "hidden",
         }}
       >
-        <div style={{ textAlign: "center", flexShrink: 0 }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 11,
-              letterSpacing: "0.22em",
-              color: "rgba(233,213,255,0.9)",
-              fontWeight: 700,
-            }}
-          >
-            My Aura is...
-          </p>
-          <p
-            style={{
-              marginTop: 4,
-              marginBottom: 0,
-              fontSize: 11,
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.7)",
-            }}
-          >
-            {displayName}
-          </p>
-        </div>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12,
+            fontWeight: 800,
+            lineHeight: 1.45,
+            textAlign: "center",
+            color: "rgba(255,255,255,0.92)",
+          }}
+        >
+          {hookLine}
+        </p>
 
-        <StoryOrb palette={palette} size={140} />
+        <StoryOrb palette={palette} size={132} />
 
-        <div style={{ marginTop: 6, textAlign: "center", flexShrink: 0 }}>
+        <div style={{ marginTop: 4, textAlign: "center", flexShrink: 0 }}>
           <span
             style={{
               display: "inline-block",
@@ -458,7 +428,7 @@ function StoryLayout({
           </span>
           <p
             style={{
-              marginTop: 8,
+              marginTop: 10,
               marginBottom: 0,
               fontSize: 8,
               fontWeight: 700,
@@ -472,45 +442,45 @@ function StoryLayout({
             style={{
               marginTop: 2,
               marginBottom: 0,
-              fontSize: 36,
+              fontSize: 40,
               fontWeight: 900,
-              lineHeight: 1.05,
+              lineHeight: 1.02,
               color: "#fff",
-              textShadow: `0 0 28px ${palette.a}cc, 0 0 48px ${palette.b}66`,
+              textShadow: `0 0 32px ${palette.a}cc, 0 0 56px ${palette.b}66`,
             }}
           >
             {aura.archetypeName}
           </h3>
           <p
             style={{
-              marginTop: 3,
+              marginTop: 6,
               marginBottom: 0,
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 600,
-              color: "rgba(255,255,255,0.5)",
+              color: "rgba(255,255,255,0.55)",
             }}
           >
             {aura.name}
           </p>
           <p
             style={{
-              marginTop: 8,
+              marginTop: 12,
               marginBottom: 0,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 700,
-              lineHeight: 1.35,
+              lineHeight: 1.4,
               color: "rgba(165,243,252,0.95)",
             }}
           >
-            {aura.catchCopy}
+            {truncateText(shareLine, 72)}
           </p>
           <p
             style={{
-              marginTop: 8,
+              marginTop: 14,
               marginBottom: 0,
-              fontSize: 13,
-              fontWeight: 800,
-              lineHeight: 1.3,
+              fontSize: 18,
+              fontWeight: 900,
+              lineHeight: 1.25,
               color: "rgba(244,114,182,0.98)",
             }}
           >
@@ -518,34 +488,11 @@ function StoryLayout({
           </p>
         </div>
 
-        <div
-          style={{
-            marginTop: 10,
-            borderRadius: 10,
-            border: "1px solid rgba(255,255,255,0.14)",
-            background: "rgba(255,255,255,0.06)",
-            padding: "8px 10px",
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {STAT_META.map((stat) => (
-              <MiniStatBar
-                key={stat.key}
-                label={stat.label}
-                value={stats[stat.key]}
-                color={stat.color}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div style={{ marginTop: "auto", paddingTop: 4 }}>
+        <div style={{ marginTop: "auto", paddingTop: 8 }}>
           <ExportBrandFooter compact />
         </div>
       </div>
 
-      {/* Instagramリンクスタンプ用の下部余白（約15%） */}
       <div
         style={{
           height: "15%",
@@ -577,221 +524,183 @@ function CardLayout({
   displayName,
   aura,
   profile,
-  catchCopy,
-  words,
 }: {
   displayName: string;
   aura: AuraType;
   profile: DynamicAuraProfile;
-  catchCopy: string;
-  words: string[];
 }) {
+  const evidence = profile.evidence.slice(0, 3);
+  const bodyStyle = {
+    margin: 0,
+    fontSize: 10,
+    lineHeight: 1.45,
+    color: "rgba(255,255,255,0.82)",
+  } as const;
+
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        padding: "22px 18px 16px",
+        padding: "18px 16px 14px",
         boxSizing: "border-box",
+        gap: 8,
       }}
     >
       <div style={{ textAlign: "center" }}>
         <p
           style={{
             margin: 0,
-            fontSize: 11,
-            letterSpacing: "0.2em",
+            fontSize: 10,
+            letterSpacing: "0.18em",
             fontWeight: 700,
             color: "rgba(196,181,253,0.95)",
           }}
         >
-          AURA RESULT
+          AURA REPORT
         </p>
-        <p style={{ marginTop: 4, marginBottom: 0, fontSize: 11, color: "rgba(255,255,255,0.65)" }}>
+        <p style={{ marginTop: 3, marginBottom: 0, fontSize: 10, color: "rgba(255,255,255,0.65)" }}>
           {displayName}
         </p>
       </div>
 
-      <StoryOrb palette={aura.palette} size={128} />
-
-      <div style={{ marginTop: 10, textAlign: "center" }}>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
-          <span
-            style={{
-              borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.25)",
-              background: "rgba(255,255,255,0.1)",
-              padding: "2px 8px",
-              fontSize: 9,
-              fontWeight: 700,
-            }}
-          >
-            {RARITY_LABELS[aura.rarity]}
-          </span>
-          {profile.confidence !== "stable" ? (
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ flexShrink: 0 }}>
+          <StoryOrb palette={aura.palette} size={78} />
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             <span
               style={{
                 borderRadius: 999,
-                border:
-                  profile.confidence === "provisional"
-                    ? "1px solid rgba(252,211,77,0.5)"
-                    : "1px solid rgba(103,232,249,0.4)",
-                background:
-                  profile.confidence === "provisional"
-                    ? "rgba(245,158,11,0.2)"
-                    : "rgba(6,182,212,0.15)",
-                padding: "2px 8px",
-                fontSize: 9,
+                border: "1px solid rgba(255,255,255,0.25)",
+                background: "rgba(255,255,255,0.1)",
+                padding: "2px 7px",
+                fontSize: 8,
                 fontWeight: 700,
-                color:
-                  profile.confidence === "provisional"
-                    ? "rgba(254,243,199,0.95)"
-                    : "rgba(207,250,254,0.95)",
               }}
             >
-              {profile.confidence === "provisional" ? "暫定" : "育ち中"}
+              {RARITY_LABELS[aura.rarity]}
             </span>
-          ) : null}
-        </div>
-
-        <p
-          style={{
-            marginTop: 10,
-            marginBottom: 0,
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: "0.2em",
-            color: "rgba(255,255,255,0.4)",
-          }}
-        >
-          通り名
-        </p>
-        <h3
-          style={{
-            marginTop: 4,
-            marginBottom: 0,
-            fontSize: 32,
-            fontWeight: 900,
-            lineHeight: 1.08,
-            color: "#fff",
-            textShadow: `0 0 24px ${aura.palette.a}aa`,
-          }}
-        >
-          {aura.archetypeName}
-        </h3>
-        <p
-          style={{
-            marginTop: 4,
-            marginBottom: 0,
-            fontSize: 10,
-            fontWeight: 600,
-            color: "rgba(255,255,255,0.5)",
-          }}
-        >
-          {aura.name}
-        </p>
-        <p
-          style={{
-            marginTop: 10,
-            marginBottom: 0,
-            fontSize: 13,
-            fontWeight: 700,
-            lineHeight: 1.4,
-            color: "rgba(165,243,252,0.95)",
-          }}
-        >
-          {catchCopy}
-        </p>
-      </div>
-
-      <div
-        style={{
-          marginTop: 12,
-          borderRadius: 10,
-          border: "1px solid rgba(244,114,182,0.35)",
-          background: "rgba(236,72,153,0.12)",
-          padding: "10px 12px",
-          textAlign: "center",
-        }}
-      >
-        <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: "rgba(251,207,232,0.9)" }}>
-          💥 必殺技
-        </p>
-        <p
-          style={{
-            marginTop: 4,
-            marginBottom: 0,
-            fontSize: 14,
-            fontWeight: 800,
-            color: "#fce7f3",
-          }}
-        >
-          「{profile.specialMove}」
-        </p>
-      </div>
-
-      <div
-        style={{
-          marginTop: 10,
-          borderRadius: 10,
-          border: "1px solid rgba(255,255,255,0.14)",
-          background: "rgba(255,255,255,0.05)",
-          padding: "10px 12px",
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            marginBottom: 8,
-            fontSize: 9,
-            fontWeight: 700,
-            color: "rgba(196,181,253,0.9)",
-          }}
-        >
-          ステータス
-        </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {STAT_META.map((stat) => (
-            <MiniStatBar
-              key={stat.key}
-              label={stat.label}
-              value={profile.stats[stat.key]}
-              color={stat.color}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 10,
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 5,
-        }}
-      >
-        {(words.length > 0 ? words : ["覚醒待ち"]).map((word) => (
-          <span
-            key={word}
+            {profile.confidence !== "stable" ? (
+              <span
+                style={{
+                  borderRadius: 999,
+                  border:
+                    profile.confidence === "provisional"
+                      ? "1px solid rgba(252,211,77,0.5)"
+                      : "1px solid rgba(103,232,249,0.4)",
+                  background:
+                    profile.confidence === "provisional"
+                      ? "rgba(245,158,11,0.2)"
+                      : "rgba(6,182,212,0.15)",
+                  padding: "2px 7px",
+                  fontSize: 8,
+                  fontWeight: 700,
+                  color:
+                    profile.confidence === "provisional"
+                      ? "rgba(254,243,199,0.95)"
+                      : "rgba(207,250,254,0.95)",
+                }}
+              >
+                {profile.confidenceLabel}
+              </span>
+            ) : null}
+          </div>
+          <p
             style={{
-              borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.2)",
-              background: "rgba(255,255,255,0.1)",
-              padding: "3px 8px",
-              fontSize: 10,
-              fontWeight: 700,
-              color: "#f5f3ff",
+              marginTop: 6,
+              marginBottom: 0,
+              fontSize: 22,
+              fontWeight: 900,
+              lineHeight: 1.08,
+              color: "#fff",
             }}
           >
-            #{word}
-          </span>
-        ))}
+            {aura.archetypeName}
+          </p>
+          <p style={{ marginTop: 2, marginBottom: 0, fontSize: 9, color: "rgba(255,255,255,0.5)" }}>
+            {aura.name}
+          </p>
+        </div>
       </div>
 
-      <div style={{ marginTop: "auto", paddingTop: 12 }}>
-        <ExportBrandFooter />
+      <InfoBox border="rgba(196,181,253,0.28)" background="rgba(139,92,246,0.1)">
+        <SectionLabel>周囲からの見え方</SectionLabel>
+        <p style={bodyStyle}>{truncateText(profile.witnessText, 88)}</p>
+      </InfoBox>
+
+      <InfoBox>
+        <SectionLabel>なぜこのオーラ？</SectionLabel>
+        <p style={bodyStyle}>{truncateText(profile.readingText, 110)}</p>
+      </InfoBox>
+
+      <InfoBox>
+        <SectionLabel>生態</SectionLabel>
+        <p style={{ ...bodyStyle, marginBottom: 4 }}>
+          <span style={{ color: "rgba(251,207,232,0.95)", fontWeight: 700 }}>発動：</span>
+          {truncateText(profile.ecology.trigger, 42)}
+        </p>
+        <p style={{ ...bodyStyle, marginBottom: 4 }}>
+          <span style={{ color: "rgba(165,243,252,0.95)", fontWeight: 700 }}>副作用：</span>
+          {truncateText(profile.ecology.sideEffect, 42)}
+        </p>
+        <p style={bodyStyle}>
+          <span style={{ color: "rgba(254,202,202,0.95)", fontWeight: 700 }}>弱点：</span>
+          {truncateText(profile.ecology.weakness, 42)}
+        </p>
+      </InfoBox>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+        <InfoBox border="rgba(110,231,183,0.35)" background="rgba(16,185,129,0.12)">
+          <SectionLabel>相性 ◎</SectionLabel>
+          <p style={{ ...bodyStyle, fontWeight: 700, color: "rgba(209,250,229,0.95)" }}>
+            {truncateText(profile.compatibility.good.name, 16)}
+          </p>
+        </InfoBox>
+        <InfoBox border="rgba(252,165,165,0.35)" background="rgba(239,68,68,0.12)">
+          <SectionLabel>相性 ×</SectionLabel>
+          <p style={{ ...bodyStyle, fontWeight: 700, color: "rgba(254,226,226,0.95)" }}>
+            {truncateText(profile.compatibility.bad.name, 16)}
+          </p>
+        </InfoBox>
+      </div>
+
+      <InfoBox border="rgba(250,204,21,0.35)" background="rgba(245,158,11,0.1)">
+        <SectionLabel>今日の運勢</SectionLabel>
+        <p style={{ ...bodyStyle, fontWeight: 700, color: "rgba(254,243,199,0.95)" }}>
+          {truncateText(profile.dailyFortune, 48)}
+        </p>
+      </InfoBox>
+
+      {evidence.length > 0 ? (
+        <div>
+          <SectionLabel>投票根拠</SectionLabel>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {evidence.map((item) => (
+              <span
+                key={item.word}
+                style={{
+                  borderRadius: 999,
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  background: "rgba(255,255,255,0.1)",
+                  padding: "3px 8px",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: "#f5f3ff",
+                }}
+              >
+                #{item.word} {item.count}票
+                {item.badge ? ` · ${item.badge}` : ""}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div style={{ marginTop: "auto", paddingTop: 4 }}>
+        <ExportBrandFooter compact />
       </div>
     </div>
   );
