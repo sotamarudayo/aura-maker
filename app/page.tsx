@@ -76,7 +76,7 @@ export default async function Home() {
         </div>
 
         <section className="rounded-3xl border border-white/20 bg-black/35 p-5 backdrop-blur sm:p-8 md:p-10">
-          <p className="text-xs font-semibold tracking-[0.2em] text-violet-200 sm:text-sm">AuraMaker</p>
+          <p className="font-display text-2xl text-violet-200 sm:text-3xl">AuraMaker</p>
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
             周りからどう思われてるか、知りたくない？
           </h1>
@@ -118,7 +118,7 @@ export default async function Home() {
         </section>
 
         <section className="rounded-3xl border border-white/15 bg-black/30 p-6 text-center backdrop-blur sm:p-8">
-          <p className="text-sm font-semibold tracking-[0.25em] text-violet-200">AURA ENCYCLOPEDIA</p>
+          <p className="font-display text-2xl text-violet-200 sm:text-3xl">Aura Encyclopedia</p>
           <h2 className="mt-2 text-2xl font-black sm:text-3xl">
             全{AURA_TYPES.length}種類のオーラ図鑑
           </h2>

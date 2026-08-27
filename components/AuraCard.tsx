@@ -3,6 +3,8 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
 import { getAuraById, getAuraLineage, RARITY_LABELS, SECRET_FLAVOR } from "@/lib/constants/auras";
+import { AuraEvolutionPrompt } from "@/components/AuraEvolutionOverlay";
+import MorphingText from "@/components/MorphingText";
 
 type AuraCardProps = {
   aura: AuraType;
@@ -14,6 +16,14 @@ type AuraCardProps = {
   displayName?: string;
   /** 10票以上で解放される覚醒ビジュアル */
   awakened?: boolean;
+  /** 進化待ち：オーブ上に Tap、名前欄に Change Your Aura */
+  evolutionPending?: boolean;
+  /** じわっと変化中（色クロスフェード＋文字フェード） */
+  evolutionMorphing?: boolean;
+  /** モーフィング元のオーラ（オーブ色・文言のクロスフェード用） */
+  morphFromAura?: AuraType | null;
+  /** モーフィング元のキャッチコピー */
+  morphFromCatchCopy?: string | null;
 };
 
 const STAT_META = [
@@ -164,6 +174,10 @@ export default function AuraCard({
   pulse = false,
   displayName,
   awakened = false,
+  evolutionPending = false,
+  evolutionMorphing = false,
+  morphFromAura = null,
+  morphFromCatchCopy = null,
 }: AuraCardProps) {
   const [compatPreview, setCompatPreview] = useState<CompatPreview | null>(null);
 
@@ -196,6 +210,7 @@ export default function AuraCard({
   return (
     <div className="min-w-0 space-y-0">
       {/* ========== First View: スクショ映え ========== */}
+      {/* 進化演出の対象はここまで。取扱説明書（AURA MANUAL）以降は通常差し替えのみ */}
       <section
         className="min-w-0 rounded-3xl border border-white/20 bg-black/35 p-5 backdrop-blur sm:p-8"
         style={
@@ -207,7 +222,11 @@ export default function AuraCard({
         }
       >
         <div className="flex flex-col items-center text-center">
-          {displayName ? (
+          {evolutionPending && !evolutionMorphing ? (
+            <p className="aura-evolve-title font-display text-xl text-white/90 sm:text-2xl">
+              Change Your Aura
+            </p>
+          ) : displayName ? (
             <p className="text-sm font-semibold text-white/70 sm:text-base">{displayName}</p>
           ) : null}
 
@@ -215,11 +234,30 @@ export default function AuraCard({
             <div className={`aura-card-halo ${pulse ? "aura-card-halo-pulse" : ""}`} />
             <div className="aura-card-ring aura-card-ring-a" />
             <div className="aura-card-ring aura-card-ring-b" />
-            <div
-              className={`aura-card-core ${hasVotes ? "" : "aura-card-core-dormant"} ${
-                awakened ? "aura-card-core-awakened" : ""
-              }`}
-            />
+            {evolutionMorphing && morphFromAura ? (
+              <>
+                <div
+                  className="aura-card-core aura-evolve-orb-from"
+                  style={
+                    {
+                      "--card-a": morphFromAura.palette.a,
+                      "--card-b": morphFromAura.palette.b,
+                      "--card-c": morphFromAura.palette.c,
+                    } as CSSProperties
+                  }
+                />
+                <div
+                  className={`aura-card-core aura-evolve-orb-to ${awakened ? "aura-card-core-awakened" : ""}`}
+                />
+              </>
+            ) : (
+              <div
+                className={`aura-card-core ${hasVotes ? "" : "aura-card-core-dormant"} ${
+                  awakened ? "aura-card-core-awakened" : ""
+                }`}
+              />
+            )}
+            <AuraEvolutionPrompt active={evolutionPending && !evolutionMorphing} />
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -269,12 +307,36 @@ export default function AuraCard({
               filter: `drop-shadow(0 0 32px ${aura.palette.a}77)`,
             }}
           >
-            {aura.archetypeName}
+            {evolutionMorphing && morphFromAura ? (
+              <MorphingText
+                from={morphFromAura.archetypeName}
+                to={aura.archetypeName}
+                active
+                className="inline"
+              />
+            ) : (
+              aura.archetypeName
+            )}
           </h2>
-          <p className="mt-1 break-words text-xs font-medium text-white/50 sm:text-sm">{aura.name}</p>
+          <p className="mt-1 break-words text-xs font-medium text-white/50 sm:text-sm">
+            {evolutionMorphing && morphFromAura ? (
+              <MorphingText from={morphFromAura.name} to={aura.name} active className="inline" />
+            ) : (
+              aura.name
+            )}
+          </p>
 
           <p className="mt-4 max-w-xl break-words text-base font-semibold leading-snug text-cyan-100 sm:text-lg">
-            {oneLineCatch}
+            {evolutionMorphing && morphFromAura ? (
+              <MorphingText
+                from={morphFromCatchCopy ?? morphFromAura.catchCopy}
+                to={oneLineCatch}
+                active
+                className="inline"
+              />
+            ) : (
+              oneLineCatch
+            )}
           </p>
 
           <div className="mt-4 flex max-w-full flex-wrap justify-center gap-2">
@@ -326,8 +388,8 @@ export default function AuraCard({
             background: `linear-gradient(180deg, ${aura.palette.a}aa, transparent)`,
           }}
         />
-        <p className="text-center text-[11px] font-bold tracking-[0.28em] text-white/50">
-          AURA MANUAL
+        <p className="font-display text-center text-2xl text-white/70 sm:text-3xl">
+          Aura Manual
         </p>
         <h3 className="mt-2 text-center text-lg font-black text-white sm:text-xl">
           あなたのオーラ取扱説明書

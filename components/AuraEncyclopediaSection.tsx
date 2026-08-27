@@ -20,7 +20,7 @@ export default function AuraEncyclopediaSection({
   return (
     <section id="auras" className="space-y-10">
       <div className="text-center">
-        <p className="text-sm font-semibold tracking-[0.25em] text-violet-200">AURA ENCYCLOPEDIA</p>
+        <p className="font-display text-2xl text-violet-200 sm:text-3xl">Aura Encyclopedia</p>
         <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl md:text-4xl">
           全{AURA_TYPES.length}種類のオーラを発見しよう
         </h2>

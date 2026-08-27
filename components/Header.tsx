@@ -73,7 +73,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-3 sm:px-4">
         <Link
           href={logoHref}
-          className="flex shrink-0 items-center gap-2 text-base font-black tracking-tight text-white sm:gap-2.5 sm:text-lg"
+          className="font-display flex shrink-0 items-center gap-2 text-xl text-white sm:gap-2.5 sm:text-2xl"
         >
           <BrandLogo size={28} priority />
           <span className="hidden min-[380px]:inline">AuraMaker</span>

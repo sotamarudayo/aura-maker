@@ -8,7 +8,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* 日本語・本文: 従来どおり Geist（JPはシステムゴシックへフォールバック） */
+  --font-sans: var(--font-geist-sans), "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    Meiryo, sans-serif;
+  /* 英語ディスプレイ専用（Pacifico）。日本語には使わない */
+  --font-display: var(--font-pacifico), cursive;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
@@ -26,7 +30,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
   overflow-x: clip;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -286,54 +290,36 @@ body {
   animation: story-export-spin 0.8s linear infinite;
 }
 
-@keyframes aura-evolve-flash {
+@keyframes aura-evolve-orb-from {
   0% {
-    opacity: 0;
-    background: #ffffff;
-  }
-  12% {
     opacity: 1;
-    background: #ffffff;
-  }
-  48% {
-    opacity: 1;
-    background: #ffffff;
-  }
-  78% {
-    opacity: 0.85;
-    background: #f8fafc;
+    transform: scale(1);
   }
   100% {
     opacity: 0;
-    background: #ffffff;
+    transform: scale(0.92);
   }
 }
 
-.aura-evolve-flash {
-  animation: aura-evolve-flash 1100ms ease-in-out forwards;
-  background: #ffffff;
-}
-
-@keyframes aura-evolve-reveal {
+@keyframes aura-evolve-orb-to {
   0% {
     opacity: 0;
-    transform: scale(0.82);
-    filter: brightness(2.4);
-  }
-  55% {
-    opacity: 1;
-    transform: scale(1.05);
-    filter: brightness(1.15);
+    transform: scale(1.08);
+    filter: brightness(1.4) saturate(1.25);
   }
   100% {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1);
+    filter: brightness(1) saturate(1);
   }
 }
 
-.aura-evolve-reveal {
-  animation: aura-evolve-reveal 900ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+.aura-evolve-orb-from {
+  animation: aura-evolve-orb-from 2.2s ease-in-out forwards;
+}
+
+.aura-evolve-orb-to {
+  animation: aura-evolve-orb-to 2.2s ease-in-out forwards;
 }
 
 @keyframes aura-evolve-orb-breathe {
@@ -376,12 +362,12 @@ body {
 @keyframes aura-evolve-tap {
   0%,
   100% {
-    opacity: 0.55;
-    transform: scale(0.96);
+    opacity: 0.45;
+    transform: scale(0.98);
   }
   50% {
-    opacity: 1;
-    transform: scale(1.06);
+    opacity: 0.85;
+    transform: scale(1.02);
   }
 }
 
@@ -392,12 +378,10 @@ body {
 @keyframes aura-evolve-title {
   0%,
   100% {
-    opacity: 0.75;
-    letter-spacing: 0.32em;
+    opacity: 0.8;
   }
   50% {
     opacity: 1;
-    letter-spacing: 0.38em;
   }
 }
 
@@ -426,13 +410,13 @@ body {
   .aura-secret-orb,
   .vote-chip-selected,
   .story-export-spinner,
-  .aura-evolve-flash,
-  .aura-evolve-reveal,
   .aura-evolve-orb,
   .aura-evolve-orb-ring,
   .aura-evolve-orb-ring-slow,
   .aura-evolve-tap,
-  .aura-evolve-title {
+  .aura-evolve-title,
+  .aura-evolve-orb-from,
+  .aura-evolve-orb-to {
     animation: none;
   }
 }

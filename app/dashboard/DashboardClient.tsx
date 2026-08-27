@@ -9,7 +9,7 @@ import AuraBackground from "@/components/AuraBackground";
 import AuraCard from "@/components/AuraCard";
 import LinkAccountModal from "@/components/LinkAccountModal";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
-import { calculateAuraType, type AuraCalculationResult } from "@/lib/constants/auras";
+import { calculateAuraType, type AuraCalculationResult, type AuraType } from "@/lib/constants/auras";
 import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
 import type {
   DashboardFusionPartner,
@@ -84,6 +84,9 @@ export default function DashboardClient({
   const [displayedAura, setDisplayedAura] = useState<AuraCalculationResult | null>(null);
   const [pendingAura, setPendingAura] = useState<AuraCalculationResult | null>(null);
   const pendingAuraRef = useRef<AuraCalculationResult | null>(null);
+  const [evolutionMorphing, setEvolutionMorphing] = useState(false);
+  const [morphFromAura, setMorphFromAura] = useState<AuraType | null>(null);
+  const [morphFromCatchCopy, setMorphFromCatchCopy] = useState<string | null>(null);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
@@ -316,20 +319,28 @@ export default function DashboardClient({
 
       {pendingAura && displayedAura ? (
         <AuraEvolutionOverlay
-          fromAura={displayedAura.aura}
+          fromAura={morphFromAura ?? displayedAura.aura}
           toAura={pendingAura.aura}
+          onReveal={() => {
+            const next = pendingAuraRef.current;
+            if (!next) return;
+            setMorphFromAura(displayedAura.aura);
+            setMorphFromCatchCopy(displayedAura.personalizedCatchCopy);
+            setEvolutionMorphing(true);
+            setDisplayedAura(next);
+          }}
           onComplete={() => {
             const next = pendingAuraRef.current;
-            if (next) {
-              setDisplayedAura(next);
-              setToastMessage(
-                next.aura.rarity === "secret"
-                  ? "シークレットオーラが覚醒した！"
-                  : "オーラが進化した！",
-              );
-            }
+            setToastMessage(
+              next?.aura.rarity === "secret"
+                ? "シークレットオーラが覚醒した！"
+                : "オーラが進化した！",
+            );
             pendingAuraRef.current = null;
             setPendingAura(null);
+            setEvolutionMorphing(false);
+            setMorphFromAura(null);
+            setMorphFromCatchCopy(null);
             if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
             toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 2200);
           }}
@@ -405,6 +416,10 @@ export default function DashboardClient({
           pulse={pulseActive}
           displayName={displayName}
           awakened={isAwakened}
+          evolutionPending={Boolean(pendingAura)}
+          evolutionMorphing={evolutionMorphing}
+          morphFromAura={morphFromAura}
+          morphFromCatchCopy={morphFromCatchCopy}
         />
 
         {selfWords.length > 0 && friendWords.length > 0 ? (
@@ -517,7 +532,7 @@ export default function DashboardClient({
         </div>
 
         <section className="rounded-2xl border border-fuchsia-300/30 bg-black/35 p-4 backdrop-blur sm:p-6">
-          <p className="text-xs font-bold tracking-[0.22em] text-fuchsia-200">AURA FUSION</p>
+          <p className="font-display text-2xl text-fuchsia-200 sm:text-3xl">Aura Fusion</p>
           <h2 className="mt-2 text-xl font-bold">友達とオーラ融合</h2>
           <p className="mt-1 text-sm text-white/65">
             お互いの本物のオーラ診断が揃うと、融合ケミカードが作れます。リンクを友達に送ってね。

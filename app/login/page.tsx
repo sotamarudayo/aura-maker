@@ -20,7 +20,7 @@ export default async function LoginPage() {
       <AuraBackground />
       <div className="relative z-10 flex w-full max-w-md flex-col items-center gap-6 text-center">
         <div className="space-y-2">
-          <h1 className="text-3xl font-black sm:text-4xl">AuraMaker</h1>
+          <h1 className="font-display text-4xl text-white sm:text-5xl">AuraMaker</h1>
           <p className="text-sm text-white/80 sm:text-base">
             周りからどう思われてるか、知りたくない？キーワードを選んでもらうだけでオーラ診断。
           </p>
