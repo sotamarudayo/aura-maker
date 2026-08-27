@@ -14,6 +14,10 @@ import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
 import { groupVoterSessions } from "@/lib/chemi/group-voters";
 import { trackEvent } from "@/lib/analytics";
 
+const StoryExportModal = dynamic(() => import("@/components/StoryExportModal"), {
+  ssr: false,
+});
+
 const ChemiExportModal = dynamic(() => import("@/components/ChemiExportModal"), {
   ssr: false,
 });
@@ -52,6 +56,7 @@ export default function DashboardClient({
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [isAnonymous, setIsAnonymous] = useState(initialIsAnonymous);
   const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [storyModalOpen, setStoryModalOpen] = useState(false);
   const [votes, setVotes] = useState<VoteEntry[]>(initialVotes);
   const [pulseActive, setPulseActive] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -67,7 +72,6 @@ export default function DashboardClient({
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
   const voteUrl = `${siteUrl}/vote/${userId}`;
-  const resultUrl = `${siteUrl}/dashboard`;
 
   useEffect(() => {
     const channel = supabase
@@ -168,28 +172,11 @@ export default function DashboardClient({
   }
   const palette = auraResult.aura.palette;
   const maxCount = ranking[0]?.[1] ?? 1;
-  const resultShareText = auraResult.dynamicProfile.shareLine;
 
   async function copyVoteUrlOnly() {
     await navigator.clipboard.writeText(voteUrl);
     trackEvent("copy_vote_url", { with_message: false });
     setToastMessage("投票URLだけコピーしました");
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
-  }
-
-  async function copyResultUrl() {
-    await navigator.clipboard.writeText(resultUrl);
-    trackEvent("copy_result_url", { source: "dashboard" });
-    setToastMessage("結果URLをコピーしました");
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
-  }
-
-  async function copyResultShareUrl() {
-    await navigator.clipboard.writeText(`${resultShareText}\n${voteUrl}`);
-    trackEvent("copy_share_line");
-    setToastMessage("結果共有文をコピーしました");
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
@@ -254,6 +241,21 @@ export default function DashboardClient({
         open={linkModalOpen}
         onClose={() => setLinkModalOpen(false)}
         onLinked={handleAccountLinked}
+      />
+
+      <StoryExportModal
+        open={storyModalOpen}
+        onClose={() => setStoryModalOpen(false)}
+        displayName={displayName}
+        aura={auraResult.aura}
+        profile={auraResult.dynamicProfile}
+        catchCopy={auraResult.personalizedCatchCopy}
+        topWords={auraResult.topWords}
+        onSaved={() => {
+          setToastMessage("画像を保存しました！");
+          if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+          toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+        }}
       />
 
       {chemiPartyB ? (
@@ -337,9 +339,9 @@ export default function DashboardClient({
 
         <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
           <h2 className="text-xl font-bold">シェアして投票を集めよう</h2>
-          <p className="mt-1 text-sm text-white/70">必要な共有はこの4つでOK。</p>
+          <p className="mt-1 text-sm text-white/70">投票募集・結果画像・サイト紹介の3つでOK。</p>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid gap-3">
             <button
               type="button"
               onClick={copyVoteUrlOnly}
@@ -349,17 +351,13 @@ export default function DashboardClient({
             </button>
             <button
               type="button"
-              onClick={copyResultUrl}
-              className="min-h-[3.5rem] rounded-2xl border-2 border-cyan-200/80 bg-cyan-400 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
+              onClick={() => {
+                trackEvent("open_story_export", { source: "dashboard_main" });
+                setStoryModalOpen(true);
+              }}
+              className="min-h-[3.5rem] rounded-2xl border-2 border-fuchsia-200/80 bg-fuchsia-300 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
             >
-              結果URLをコピー
-            </button>
-            <button
-              type="button"
-              onClick={copyResultShareUrl}
-              className="min-h-[3.5rem] rounded-2xl border border-white/30 bg-white/10 px-5 py-5 text-lg font-black leading-snug text-white shadow-lg sm:min-h-[4rem] sm:text-xl"
-            >
-              結果共有文をコピー
+              📸 画像でシェア
             </button>
             <button
               type="button"
