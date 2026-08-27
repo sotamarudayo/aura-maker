@@ -339,25 +339,27 @@ export default function DashboardClient({
 
         <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
           <h2 className="text-xl font-bold">シェアして投票を集めよう</h2>
-          <p className="mt-1 text-sm text-white/70">投票募集・結果画像・サイト紹介の3つでOK。</p>
+          <p className="mt-1 text-sm text-white/70">
+            結果は画像、投票募集はURL。友達に見せるなら画像シェアが確実です。
+          </p>
 
           <div className="mt-5 grid gap-3">
-            <button
-              type="button"
-              onClick={copyVoteUrlOnly}
-              className="min-h-[3.5rem] rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
-            >
-              投票URLをコピー
-            </button>
             <button
               type="button"
               onClick={() => {
                 trackEvent("open_story_export", { source: "dashboard_main" });
                 setStoryModalOpen(true);
               }}
-              className="min-h-[3.5rem] rounded-2xl border-2 border-fuchsia-200/80 bg-fuchsia-300 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
+              className="min-h-[3.5rem] rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
             >
-              📸 画像でシェア
+              📸 結果を画像でシェア
+            </button>
+            <button
+              type="button"
+              onClick={copyVoteUrlOnly}
+              className="min-h-[3.5rem] rounded-2xl border-2 border-cyan-200/80 bg-cyan-400 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
+            >
+              投票URLをコピー
             </button>
             <button
               type="button"
