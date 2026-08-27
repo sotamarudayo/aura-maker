@@ -25,7 +25,7 @@ export default function AuraEvolutionOverlay({
 
   useEffect(() => {
     if (phase !== "flash") return;
-    const timer = window.setTimeout(() => setPhase("reveal"), 900);
+    const timer = window.setTimeout(() => setPhase("reveal"), 1100);
     return () => window.clearTimeout(timer);
   }, [phase]);
 
@@ -38,7 +38,7 @@ export default function AuraEvolutionOverlay({
         secret: isSecret,
       });
       onCompleteRef.current();
-    }, 2200);
+    }, 2600);
     return () => window.clearTimeout(timer);
   }, [phase, fromAura.id, toAura.id, isSecret]);
 
@@ -54,85 +54,102 @@ export default function AuraEvolutionOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 px-4"
+      className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-black"
       role="dialog"
       aria-modal="true"
       aria-label="オーラ進化"
     >
+      {/* soft backdrop glow from current / next aura */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-50"
+        style={{
+          background:
+            phase === "reveal"
+              ? `radial-gradient(circle at 50% 42%, ${toAura.palette.a}55 0%, transparent 55%)`
+              : `radial-gradient(circle at 50% 42%, ${fromAura.palette.a}44 0%, transparent 55%)`,
+        }}
+      />
+
       {phase === "flash" ? (
-        <div className="aura-evolve-flash pointer-events-none absolute inset-0" />
+        <div className="aura-evolve-flash pointer-events-none absolute inset-0 z-30" />
       ) : null}
 
-      <div className="relative z-10 w-full max-w-sm text-center text-white">
-        {phase === "ready" ? (
-          <button
-            type="button"
-            onClick={startEvolution}
-            className="w-full rounded-3xl border border-white/25 bg-zinc-950/90 p-6 shadow-2xl backdrop-blur transition hover:border-white/40"
-          >
-            <p className="text-xs font-bold tracking-[0.28em] text-violet-200">AURA EVOLUTION</p>
-            <p className="mt-3 text-sm text-white/70">オーラに変化の兆しがある…</p>
+      {phase === "ready" ? (
+        <button
+          type="button"
+          onClick={startEvolution}
+          className="relative z-10 flex w-full max-w-md flex-col items-center px-6 py-10 text-center text-white outline-none"
+        >
+          <p className="aura-evolve-title text-sm font-black tracking-[0.35em] text-white/90 sm:text-base">
+            CHANGE YOUR AURA
+          </p>
+          <p className="mt-3 text-sm text-white/55">オーラが変わろうとしている</p>
 
-            <div className="relative mx-auto mt-6 h-28 w-28">
-              <div
-                className="h-full w-full rounded-full border border-white/20 shadow-lg"
-                style={{
-                  background: fromAura.gradient,
-                  boxShadow: `0 0 28px ${fromAura.palette.a}66`,
-                }}
-              />
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-4xl font-black text-white/25">
-                ?
-              </div>
-            </div>
-
-            <p className="mt-4 text-lg font-black">{fromAura.archetypeName}</p>
-            <p className="mt-6 rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black">
-              タップして進化させる
-            </p>
-            <p className="mt-3 text-xs text-white/45">ポケモンの進化みたいな瞬間、撮ってね</p>
-          </button>
-        ) : null}
-
-        {phase === "reveal" ? (
-          <div className="aura-evolve-reveal rounded-3xl border border-white/25 bg-zinc-950/95 p-6 shadow-2xl backdrop-blur">
-            <p
-              className={`text-xs font-bold tracking-[0.28em] ${
-                isSecret ? "text-violet-200" : "text-amber-200"
-              }`}
-            >
-              {isSecret ? "SECRET AWAKENED" : "AURA EVOLVED"}
-            </p>
+          <div className="relative mx-auto mt-10 h-44 w-44 sm:h-52 sm:w-52">
             <div
-              className="relative mx-auto mt-6 h-32 w-32 rounded-full border border-white/25"
+              className="aura-evolve-orb absolute inset-0 rounded-full"
+              style={{
+                background: fromAura.gradient,
+                boxShadow: `0 0 48px ${fromAura.palette.a}88, 0 0 96px ${fromAura.palette.b}44`,
+              }}
+            />
+            <div className="aura-evolve-orb-ring pointer-events-none absolute -inset-3 rounded-full border border-white/20" />
+            <div className="aura-evolve-orb-ring-slow pointer-events-none absolute -inset-6 rounded-full border border-white/10" />
+            <span className="aura-evolve-tap absolute inset-0 flex items-center justify-center text-3xl font-black tracking-[0.2em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-4xl">
+              TAP
+            </span>
+          </div>
+
+          <p className="mt-8 text-lg font-bold text-white/80">{fromAura.archetypeName}</p>
+          <p className="mt-6 text-xs tracking-[0.18em] text-white/40">画面をタップして変身</p>
+        </button>
+      ) : null}
+
+      {phase === "flash" ? (
+        <div className="relative z-10 flex flex-col items-center opacity-0" aria-hidden>
+          <div
+            className="h-44 w-44 rounded-full sm:h-52 sm:w-52"
+            style={{ background: toAura.gradient }}
+          />
+        </div>
+      ) : null}
+
+      {phase === "reveal" ? (
+        <div className="aura-evolve-reveal relative z-10 flex w-full max-w-md flex-col items-center px-6 py-10 text-center text-white">
+          <p
+            className={`text-sm font-black tracking-[0.32em] sm:text-base ${
+              isSecret ? "text-violet-200" : "text-amber-100"
+            }`}
+          >
+            {isSecret ? "SECRET AWAKENED" : "AURA CHANGED"}
+          </p>
+
+          <div className="relative mx-auto mt-10 h-44 w-44 sm:h-52 sm:w-52">
+            <div
+              className="h-full w-full rounded-full border border-white/30"
               style={{
                 background: isSecret
-                  ? "radial-gradient(circle at 30% 30%, #7c3aed, #1e1b4b 55%, #05030b 100%)"
+                  ? "radial-gradient(circle at 30% 30%, #a78bfa, #4c1d95 50%, #0b0618 100%)"
                   : toAura.gradient,
-                boxShadow: `0 0 40px ${toAura.palette.a}88`,
+                boxShadow: `0 0 56px ${toAura.palette.a}aa, 0 0 110px ${toAura.palette.b}55`,
               }}
-            >
-              {isSecret ? (
-                <div className="absolute inset-0 flex items-center justify-center text-4xl font-black text-violet-100/90">
-                  !
-                </div>
-              ) : null}
-            </div>
-            <span
-              className={`mt-4 inline-block rounded-full border px-3 py-1 text-xs font-bold ${
-                isSecret
-                  ? "border-violet-300/60 bg-violet-500/25 text-violet-100"
-                  : "border-amber-300/50 bg-amber-400/20 text-amber-100"
-              }`}
-            >
-              {RARITY_LABELS[toAura.rarity]}
-              {!isSecret ? " · 覚醒" : ""}
-            </span>
-            <h2 className="mt-3 text-3xl font-black leading-tight">{toAura.archetypeName}</h2>
-            <p className="mt-2 text-sm text-white/65">{toAura.name}</p>
+            />
           </div>
-        ) : null}
-      </div>
+
+          <span
+            className={`mt-6 inline-block rounded-full border px-3 py-1 text-xs font-bold ${
+              isSecret
+                ? "border-violet-300/60 bg-violet-500/25 text-violet-100"
+                : "border-amber-300/50 bg-amber-400/20 text-amber-100"
+            }`}
+          >
+            {RARITY_LABELS[toAura.rarity]}
+            {!isSecret ? " · 覚醒" : ""}
+          </span>
+          <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">{toAura.archetypeName}</h2>
+          <p className="mt-2 text-sm text-white/65">{toAura.name}</p>
+        </div>
+      ) : null}
     </div>
   );
 }

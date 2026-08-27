@@ -291,12 +291,16 @@ body {
     opacity: 0;
     background: #ffffff;
   }
-  18% {
+  12% {
     opacity: 1;
     background: #ffffff;
   }
-  55% {
+  48% {
     opacity: 1;
+    background: #ffffff;
+  }
+  78% {
+    opacity: 0.85;
     background: #f8fafc;
   }
   100% {
@@ -306,27 +310,99 @@ body {
 }
 
 .aura-evolve-flash {
-  animation: aura-evolve-flash 900ms ease-in-out forwards;
+  animation: aura-evolve-flash 1100ms ease-in-out forwards;
   background: #ffffff;
 }
 
 @keyframes aura-evolve-reveal {
   0% {
     opacity: 0;
-    transform: scale(0.86);
+    transform: scale(0.82);
+    filter: brightness(2.4);
   }
-  60% {
+  55% {
     opacity: 1;
-    transform: scale(1.04);
+    transform: scale(1.05);
+    filter: brightness(1.15);
   }
   100% {
     opacity: 1;
     transform: scale(1);
+    filter: brightness(1);
   }
 }
 
 .aura-evolve-reveal {
-  animation: aura-evolve-reveal 700ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+  animation: aura-evolve-reveal 900ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes aura-evolve-orb-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.06);
+    filter: brightness(1.18);
+  }
+}
+
+.aura-evolve-orb {
+  animation: aura-evolve-orb-breathe 2.2s ease-in-out infinite;
+}
+
+@keyframes aura-evolve-ring {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.2;
+  }
+}
+
+.aura-evolve-orb-ring {
+  animation: aura-evolve-ring 2s ease-in-out infinite;
+}
+
+.aura-evolve-orb-ring-slow {
+  animation: aura-evolve-ring 2.8s ease-in-out infinite;
+  animation-delay: 0.35s;
+}
+
+@keyframes aura-evolve-tap {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.aura-evolve-tap {
+  animation: aura-evolve-tap 1.35s ease-in-out infinite;
+}
+
+@keyframes aura-evolve-title {
+  0%,
+  100% {
+    opacity: 0.75;
+    letter-spacing: 0.32em;
+  }
+  50% {
+    opacity: 1;
+    letter-spacing: 0.38em;
+  }
+}
+
+.aura-evolve-title {
+  animation: aura-evolve-title 2.4s ease-in-out infinite;
 }
 
 .aura-card-core-awakened {
@@ -351,7 +427,12 @@ body {
   .vote-chip-selected,
   .story-export-spinner,
   .aura-evolve-flash,
-  .aura-evolve-reveal {
+  .aura-evolve-reveal,
+  .aura-evolve-orb,
+  .aura-evolve-orb-ring,
+  .aura-evolve-orb-ring-slow,
+  .aura-evolve-tap,
+  .aura-evolve-title {
     animation: none;
   }
 }
