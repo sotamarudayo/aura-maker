@@ -16,8 +16,10 @@ export default function AuraEncyclopediaCard({
   lineageAccentSoft,
 }: AuraEncyclopediaCardProps) {
   const isSecret = aura.rarity === "secret";
-  const accent = lineageAccent ?? aura.palette.a;
+  const lineageColor = lineageAccent ?? aura.palette.a;
+  const accent = aura.palette.a;
   const accentSoft = lineageAccentSoft ?? "rgba(255,255,255,0.06)";
+  const cardSoft = `color-mix(in srgb, ${accent} 14%, transparent)`;
 
   return (
     <article
@@ -28,8 +30,8 @@ export default function AuraEncyclopediaCard({
           "--ency-a": aura.palette.a,
           "--ency-b": aura.palette.b,
           "--ency-c": aura.palette.c,
-          borderColor: `${accent}44`,
-          background: `linear-gradient(165deg, ${accentSoft} 0%, rgba(0,0,0,0.44) 38%)`,
+          borderColor: `${accent}55`,
+          background: `linear-gradient(165deg, ${cardSoft} 0%, rgba(0,0,0,0.44) 38%)`,
         } as CSSProperties
       }
     >
@@ -37,12 +39,12 @@ export default function AuraEncyclopediaCard({
         className="relative flex items-center justify-center px-3 py-2"
         style={{
           background: accentSoft,
-          borderBottom: `1px solid ${accent}55`,
+          borderBottom: `1px solid ${lineageColor}55`,
         }}
       >
         <span
           className="text-xs font-black tracking-[0.22em]"
-          style={{ color: accent }}
+          style={{ color: lineageColor }}
         >
           {lineageCode ?? "??"}
         </span>

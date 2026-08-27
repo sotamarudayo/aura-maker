@@ -168,8 +168,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、安心と包容力の塊。そばにいるだけで呼吸が深くなります。",
     gradient:
-      "radial-gradient(circle at 30% 25%, #fcd34d, transparent 45%), radial-gradient(circle at 75% 70%, #fbbf24, transparent 50%), linear-gradient(135deg, #2a1a00 0%, #1a0f00 100%)",
-    palette: { a: "#fcd34d", b: "#fbbf24", c: "#f59e0b" },
+      "radial-gradient(circle at 30% 25%, #fef08a, transparent 42%), radial-gradient(circle at 75% 70%, #fde047, transparent 48%), linear-gradient(135deg, #2a1a00 0%, #1a0f00 100%)",
+    palette: { a: "#fef08a", b: "#fde047", c: "#facc15" },
     keywords: ["癒やし枠", "マイナスイオン", "空気清浄機", "頼れる相棒", "実は寂しがり", "温厚", "面倒見いい"],
     attributes: ["heal", "warm"],
     rarity: "common",
@@ -233,8 +233,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、落ち着きの中に惹力を秘めたムードメーカー。じわっと心に残ります。",
     gradient:
-      "radial-gradient(circle at 20% 30%, #34d399, transparent 45%), radial-gradient(circle at 80% 60%, #6ee7b7, transparent 50%), linear-gradient(135deg, #022c22 0%, #0f172a 100%)",
-    palette: { a: "#34d399", b: "#6ee7b7", c: "#10b981" },
+      "radial-gradient(circle at 35% 32%, #a7f3d0, transparent 38%), radial-gradient(circle at 72% 68%, #6ee7b7, transparent 42%), linear-gradient(135deg, #022c22 0%, #0f172a 100%)",
+    palette: { a: "#a7f3d0", b: "#6ee7b7", c: "#34d399" },
     keywords: ["ミステリアス", "儚げ", "沼", "概念", "実は寂しがり"],
     attributes: ["mystic", "cool"],
     rarity: "common",
@@ -285,8 +285,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、未来志向の推進力。目標に向かう姿が周囲を鼓舞します。",
     gradient:
-      "radial-gradient(circle at 25% 30%, #e2e8f0, transparent 45%), radial-gradient(circle at 80% 40%, #94a3b8, transparent 50%), linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-    palette: { a: "#e2e8f0", b: "#94a3b8", c: "#cbd5e1" },
+      "radial-gradient(circle at 30% 28%, #f8fafc, transparent 38%), radial-gradient(circle at 78% 42%, #93c5fd, transparent 44%), linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)",
+    palette: { a: "#f8fafc", b: "#93c5fd", c: "#cbd5e1" },
     keywords: ["圧倒的主人公", "カリスマ", "異世界転生", "チート級", "知性派"],
     attributes: ["hero", "legend"],
     rarity: "uncommon",
@@ -299,8 +299,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、頭の回転が速いスパーク。会話にキレとテンポを与えます。",
     gradient:
-      "radial-gradient(circle at 25% 30%, #2dd4bf, transparent 45%), radial-gradient(circle at 75% 60%, #5eead4, transparent 50%), linear-gradient(135deg, #042f2e 0%, #064e3b 100%)",
-    palette: { a: "#2dd4bf", b: "#5eead4", c: "#14b8a6" },
+      "radial-gradient(circle at 22% 28%, #22d3ee, transparent 32%), radial-gradient(circle at 78% 38%, #06b6d4, transparent 36%), radial-gradient(circle at 50% 88%, #0891b2, transparent 40%), linear-gradient(135deg, #042f2e 0%, #0c4a6e 100%)",
+    palette: { a: "#22d3ee", b: "#06b6d4", c: "#0891b2" },
     keywords: ["知性派", "天才的バカ", "バグ技", "空気清浄機", "カリスマ"],
     attributes: ["intellect", "cool"],
     rarity: "uncommon",
@@ -323,12 +323,12 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     id: "midnight-moon",
     name: "ミッドナイトムーンオーラ",
     archetypeName: "夜更かし詩人",
-    catchCopy: "夜の静寂に溶ける、眠気と余白の翡翠光。",
+    catchCopy: "夜の静寂に溶ける、眠気と余白の月光。",
     description:
       "あなたの纏う空気感は、落ち着いた夜の詩人。マイペースで独自の世界観を持っています。",
     gradient:
-      "radial-gradient(circle at 30% 25%, #6ee7b7, transparent 45%), radial-gradient(circle at 70% 75%, #94a3b8, transparent 50%), linear-gradient(135deg, #022c22 0%, #0f172a 100%)",
-    palette: { a: "#6ee7b7", b: "#94a3b8", c: "#34d399" },
+      "radial-gradient(circle at 50% 38%, #e2e8f0, transparent 22%), radial-gradient(circle at 50% 38%, #94a3b8, transparent 38%), radial-gradient(circle at 28% 72%, #14532d, transparent 42%), radial-gradient(circle at 78% 78%, #1e293b, transparent 45%), linear-gradient(135deg, #020617 0%, #0f172a 100%)",
+    palette: { a: "#e2e8f0", b: "#64748b", c: "#14532d" },
     keywords: ["深夜テンション", "儚げ", "マイナスイオン", "透明感", "ミステリアス", "冷徹"],
     attributes: ["cool", "mystic"],
     rarity: "rare",
@@ -369,8 +369,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、感性の余白が美しいアーティスト気質。言葉にならない魅力があります。",
     gradient:
-      "radial-gradient(circle at 25% 30%, #059669, transparent 45%), radial-gradient(circle at 70% 70%, #34d399, transparent 50%), linear-gradient(135deg, #022c22 0%, #064e3b 100%)",
-    palette: { a: "#059669", b: "#34d399", c: "#047857" },
+      "radial-gradient(circle at 30% 30%, #166534, transparent 35%), radial-gradient(circle at 70% 65%, #052e16, transparent 42%), radial-gradient(circle at 50% 50%, #14532d, transparent 55%), linear-gradient(135deg, #020617 0%, #052e16 100%)",
+    palette: { a: "#166534", b: "#14532d", c: "#052e16" },
     keywords: ["概念", "儚げ", "平成レトロ", "ミステリアス", "沼"],
     attributes: ["mystic", "intellect"],
     rarity: "rare",
@@ -383,8 +383,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、人の人生を一章にしてしまう語り部。言葉の余韻が長く残ります。",
     gradient:
-      "radial-gradient(circle at 25% 25%, #cbd5e1, transparent 42%), radial-gradient(circle at 75% 55%, #64748b, transparent 48%), linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-    palette: { a: "#cbd5e1", b: "#94a3b8", c: "#64748b" },
+      "radial-gradient(circle at 28% 30%, #475569, transparent 38%), radial-gradient(circle at 72% 62%, #1e293b, transparent 44%), radial-gradient(circle at 50% 50%, #334155, transparent 52%), linear-gradient(135deg, #020617 0%, #0f172a 100%)",
+    palette: { a: "#64748b", b: "#334155", c: "#1e293b" },
     keywords: ["知性派", "概念", "カリスマ", "黒幕", "平成レトロ", "ミステリアス"],
     attributes: ["legend", "mystic", "intellect"],
     rarity: "rare",
@@ -397,8 +397,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、ジャンルを超えたレジェンド。どんな属性とも共鳴する稀な存在です。",
     gradient:
-      "radial-gradient(circle at 20% 20%, #e2e8f0, transparent 40%), radial-gradient(circle at 80% 25%, #a5b4fc, transparent 40%), radial-gradient(circle at 50% 80%, #67e8f9, transparent 45%), linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
-    palette: { a: "#e2e8f0", b: "#a5b4fc", c: "#94a3b8" },
+      "radial-gradient(circle at 18% 22%, #f472b6, transparent 34%), radial-gradient(circle at 82% 28%, #67e8f9, transparent 34%), radial-gradient(circle at 50% 78%, #fde047, transparent 38%), radial-gradient(circle at 50% 50%, #e2e8f0, transparent 48%), linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+    palette: { a: "#f472b6", b: "#67e8f9", c: "#fde047" },
     keywords: ["ビジュ爆発", "圧倒的主人公", "カリスマ", "チート級", "異次元", "知性派"],
     attributes: ["legend", "hero"],
     rarity: "legendary",
@@ -411,8 +411,8 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、言葉に重みがあるオラクル。周囲が自然と耳を傾けてしまいます。",
     gradient:
-      "radial-gradient(circle at 30% 25%, #e2e8f0, transparent 45%), radial-gradient(circle at 70% 70%, #cbd5e1, transparent 50%), linear-gradient(135deg, #0f172a 0%, #334155 100%)",
-    palette: { a: "#e2e8f0", b: "#cbd5e1", c: "#94a3b8" },
+      "radial-gradient(circle at 35% 30%, #ffffff, transparent 28%), radial-gradient(circle at 70% 68%, #e2e8f0, transparent 42%), radial-gradient(circle at 50% 50%, #94a3b8, transparent 50%), linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+    palette: { a: "#ffffff", b: "#e2e8f0", c: "#94a3b8" },
     keywords: ["カリスマ", "知性派", "黒幕", "頼れる相棒", "圧倒的主人公"],
     attributes: ["legend", "intellect"],
     rarity: "legendary",
@@ -429,8 +429,8 @@ export const SECRET_AURA_TYPES: AuraType[] = [
     description:
       "あなたの纏う空気感は、存在感と不在感が同時に立つ深淵。言葉にできない引力があります。",
     gradient:
-      "radial-gradient(circle at 30% 30%, #4c1d95, transparent 40%), radial-gradient(circle at 70% 70%, #1e1b4b, transparent 45%), linear-gradient(135deg, #020617 0%, #0f0720 100%)",
-    palette: { a: "#7c3aed", b: "#4c1d95", c: "#1e1b4b" },
+      "radial-gradient(circle at 30% 30%, #312e81, transparent 28%), radial-gradient(circle at 70% 70%, #020617, transparent 40%), linear-gradient(135deg, #000000 0%, #0f0720 100%)",
+    palette: { a: "#312e81", b: "#1e1b4b", c: "#020617" },
     keywords: ["NPC", "概念", "黒幕", "異次元", "距離感バグ"],
     attributes: ["void"],
     rarity: "secret",
