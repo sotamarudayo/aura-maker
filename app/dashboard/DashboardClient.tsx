@@ -198,14 +198,6 @@ export default function DashboardClient({
     return `${siteUrl}/fusion/${token}`;
   }
 
-  async function copyFusionLink(token: string) {
-    await navigator.clipboard.writeText(fusionInviteUrl(token));
-    trackEvent("copy_fusion_link");
-    setToastMessage("融合リンクをコピーしました");
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
-  }
-
   async function createFusionLink() {
     setCreatingFusion(true);
     setFusionError(null);
@@ -560,34 +552,6 @@ export default function DashboardClient({
                       className="shrink-0 rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2.5 text-sm font-black text-black"
                     >
                       ✨ ケミカードを作る
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {fusions.pendingInvites.length > 0 ? (
-            <div className="mt-6">
-              <h3 className="text-sm font-bold text-white/85">参加待ちのリンク</h3>
-              <ul className="mt-3 space-y-3">
-                {fusions.pendingInvites.map((invite) => (
-                  <li
-                    key={invite.fusionId}
-                    className="flex flex-col gap-3 rounded-xl border border-amber-300/25 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-amber-100">友達の参加を待っています</p>
-                      <p className="mt-1 truncate text-xs text-white/50">
-                        {fusionInviteUrl(invite.inviteToken)}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => copyFusionLink(invite.inviteToken)}
-                      className="shrink-0 rounded-full border border-amber-200/60 bg-amber-200/90 px-4 py-2.5 text-sm font-bold text-black"
-                    >
-                      リンクをコピー
                     </button>
                   </li>
                 ))}
