@@ -24,6 +24,14 @@ export const enMessages: Messages = {
       "A personality read from how others see you — browse every aura type by lineage.",
     openEncyclopedia: "Open the Dex",
   },
+  encyclopedia: {
+    title: "Discover all {count} aura types",
+    sub: "Grouped by vibe families. Rarity runs Common → Secret. Secret types unlock after 10+ votes.",
+    typeCount: "types",
+    backDashboard: "← Back to dashboard",
+    ctaLoggedIn: "See your aura result",
+    ctaGuest: "What color is your aura? Ask your friends",
+  },
   aura: {
     alias: "Street name",
     specialMove: "Signature move",

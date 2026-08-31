@@ -1,8 +1,10 @@
 import type { AuraType, AuraCalculationResult, AuraRarity, DynamicAuraProfile } from "@/lib/constants/auras";
+import type { AuraLineage } from "@/lib/constants/auras";
 import { RARITY_LABELS } from "@/lib/constants/auras";
 import { getVoteWordDef } from "@/lib/constants/words";
 import type { Locale } from "./types";
 import { AURA_EN } from "./en/auras";
+import { LINEAGE_EN } from "./en/lineages";
 
 /** 投票ワード id → 英語ラベル（ネットスラング寄り） */
 export const WORD_EN: Record<string, string> = {
@@ -129,6 +131,13 @@ export function localizeAuraType(aura: AuraType, locale: Locale): AuraType {
     catchCopy: en.catchCopy,
     description: en.description,
   };
+}
+
+export function localizeLineage(lineage: AuraLineage, locale: Locale): AuraLineage {
+  if (locale === "ja") return lineage;
+  const en = LINEAGE_EN[lineage.id];
+  if (!en) return lineage;
+  return { ...lineage, name: en.name, tagline: en.tagline };
 }
 
 function personalizeCatchCopyEn(catchCopy: string, topWords: string[]): string {

@@ -22,6 +22,14 @@ export const jaMessages = {
       "MBTIみたいな他人から見たタイプ診断。系統ごとに分かれたオーラを図鑑でチェック。",
     openEncyclopedia: "図鑑を開く",
   },
+  encyclopedia: {
+    title: "全{count}種類のオーラを発見しよう",
+    sub: "似た空気感どうしで系統分け。レア度はコモン〜シークレットの5段階。シークレットは投票10票以上で判定が開く。",
+    typeCount: "タイプ",
+    backDashboard: "← ダッシュボードへ戻る",
+    ctaLoggedIn: "あなたのオーラ結果を見る",
+    ctaGuest: "あなたのオーラは何色？ 友達に聞いてみる",
+  },
   aura: {
     alias: "通り名",
     specialMove: "必殺技",

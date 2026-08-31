@@ -1,6 +1,10 @@
+"use client";
+
 import type { CSSProperties } from "react";
+import { useLocale } from "@/components/LocaleProvider";
 import type { AuraType } from "@/lib/constants/auras";
-import { RARITY_LABELS, SECRET_FLAVOR } from "@/lib/constants/auras";
+import { SECRET_FLAVOR } from "@/lib/constants/auras";
+import { getRarityLabel } from "@/lib/i18n/localize";
 
 type AuraEncyclopediaCardProps = {
   aura: AuraType;
@@ -15,11 +19,13 @@ export default function AuraEncyclopediaCard({
   lineageAccent,
   lineageAccentSoft,
 }: AuraEncyclopediaCardProps) {
+  const { locale, t } = useLocale();
   const isSecret = aura.rarity === "secret";
   const lineageColor = lineageAccent ?? aura.palette.a;
   const accent = aura.palette.a;
   const accentSoft = lineageAccentSoft ?? "rgba(255,255,255,0.06)";
   const cardSoft = `color-mix(in srgb, ${accent} 14%, transparent)`;
+  const secretFlavor = locale === "en" ? t.aura.secretFlavor : SECRET_FLAVOR;
 
   return (
     <article
@@ -85,7 +91,7 @@ export default function AuraEncyclopediaCard({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <h3 className="min-w-0 break-words text-lg font-black leading-snug sm:text-xl">
-                {isSecret ? "？？？（シークレット）" : aura.archetypeName}
+                {isSecret ? t.aura.secretName : aura.archetypeName}
               </h3>
               {!isSecret ? (
                 <p className="mt-1 break-words text-xs font-medium" style={{ color: `${accent}aa` }}>
@@ -104,14 +110,14 @@ export default function AuraEncyclopediaCard({
                       : "border-white/20 bg-white/10 text-white/90"
               }`}
             >
-              {RARITY_LABELS[aura.rarity]}
+              {getRarityLabel(aura.rarity, locale)}
             </span>
           </div>
           <p className="break-words text-sm font-medium" style={{ color: `${accent}ee` }}>
-            {isSecret ? "条件は明かされない、幻の光。" : aura.catchCopy}
+            {isSecret ? t.aura.secretFlavor : aura.catchCopy}
           </p>
           <p className="break-words text-xs leading-relaxed text-white/70">
-            {isSecret ? SECRET_FLAVOR : aura.description}
+            {isSecret ? secretFlavor : aura.description}
           </p>
         </div>
       </div>
