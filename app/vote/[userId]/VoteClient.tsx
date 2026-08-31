@@ -29,7 +29,7 @@ type VoteClientProps = {
 
 export default function VoteClient({ userId, displayName }: VoteClientProps) {
   const router = useRouter();
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const supabase = useMemo(() => createClient(), []);
   const [currentDisplayName, setCurrentDisplayName] = useState(() => displayName);
   const [selected, setSelected] = useState<VoteWord[]>([]);
@@ -95,14 +95,14 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
 
   async function submitVote() {
     if (selected.length === 0) {
-      setError("1つ以上選んでください。");
+      setError(t.common.pickAtLeastOne);
       return;
     }
 
     setSending(true);
     setError(null);
 
-    const result = await submitVotesViaApi(userId, selected);
+    const result = await submitVotesViaApi(userId, selected, { locale });
     if (!result.ok) {
       if (result.code === "duplicate_vote") {
         setServerSent(true);
@@ -122,7 +122,7 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
       <main className="relative flex min-h-screen items-center justify-center overflow-x-clip px-4 py-8 text-white sm:py-10">
         <AuraBackground />
         <section className="relative z-10 w-full min-w-0 max-w-xl rounded-2xl border border-white/20 bg-black/40 p-5 text-center backdrop-blur sm:p-8">
-          <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票済みです</h1>
+          <h1 className="text-2xl font-black leading-tight sm:text-3xl">{t.voteFlow.alreadyVoted}</h1>
           <p className="mt-3 text-white/80">
             {buildVoteThanksMessage(currentDisplayName, locale)}
           </p>
@@ -131,13 +131,12 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
               href="/"
               className="block rounded-full bg-violet-300 px-4 py-3 text-center text-sm font-bold leading-snug text-black sm:px-5"
             >
-              このままオーラ診断を始める
+              {t.voteFlow.startOwnDiagnosis}
             </Link>
             <OpenInBrowserCta
               href="/"
               inAppOnly
               className="block rounded-full border border-white/30 bg-white/10 px-4 py-3 text-center text-sm font-semibold leading-snug text-white sm:px-5"
-              label="Safari / Chromeで開いて診断する"
             />
           </div>
         </section>
@@ -150,7 +149,7 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
       <AuraBackground />
       <section className="relative z-10 mx-auto w-full min-w-0 max-w-4xl rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur sm:p-6 md:p-8">
         <div className="rounded-xl border border-cyan-300/25 bg-cyan-500/10 p-4">
-          <p className="text-xs font-semibold tracking-wide text-cyan-100">これなに？</p>
+          <p className="text-xs font-semibold tracking-wide text-cyan-100">{t.voteFlow.whatIsThis}</p>
           <p className="mt-2 text-sm leading-relaxed text-white/85 sm:text-base">
             {getVotePageWhatIsThis(locale)}
           </p>
@@ -162,7 +161,7 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
         <p className="mt-2 text-white/80">{buildVotePageSubcopy(currentDisplayName, locale)}</p>
 
         <div className="mt-4 rounded-xl border border-violet-300/25 bg-violet-500/10 p-4">
-          <p className="text-xs font-semibold tracking-wide text-violet-100">投票するとどうなる？</p>
+          <p className="text-xs font-semibold tracking-wide text-violet-100">{t.voteFlow.whatHappens}</p>
           <ol className="mt-2 space-y-1.5 text-sm text-white/75">
             {getVotePageFlow(locale).map((step, index) => (
               <li key={step} className="flex gap-2">
@@ -186,12 +185,11 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
             onClick={submitVote}
             className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-black disabled:opacity-60 sm:px-6 sm:text-base"
           >
-            {sending ? (locale === "en" ? "Sending..." : "送信中...") : buildVoteSubmitLabel(selected.length, locale)}
+            {sending ? t.common.sending : buildVoteSubmitLabel(selected.length, locale)}
           </button>
           <p className="min-w-0 flex-1 break-words text-sm text-white/80">
-            {locale === "en" ? "Selected: " : "選択中: "}
-            {selected.map((word) => getLocalizedWordLabel(word, locale)).join(" / ") ||
-              (locale === "en" ? "none" : "なし")}
+            {t.common.selected}
+            {selected.map((word) => getLocalizedWordLabel(word, locale)).join(" / ") || t.common.none}
           </p>
         </div>
       </div>

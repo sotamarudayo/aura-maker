@@ -108,7 +108,7 @@ function CompatibilityAuraModal({
               kind === "good" ? "text-emerald-200" : "text-rose-200"
             }`}
           >
-            {kind === "good" ? "🔗 相性の良いオーラ" : "⚔️ 危険なオーラ"}
+            {kind === "good" ? `🔗 ${t.aura.goodAura}` : `⚔️ ${t.aura.badAura}`}
           </p>
           <button
             type="button"

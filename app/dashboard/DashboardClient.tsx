@@ -11,7 +11,7 @@ import LinkAccountModal from "@/components/LinkAccountModal";
 import { useLocale } from "@/components/LocaleProvider";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import { calculateAuraType, type AuraCalculationResult, type AuraType } from "@/lib/constants/auras";
-import { localizeAuraResult, localizeAuraType } from "@/lib/i18n/localize";
+import { localizeAuraResult, localizeAuraType, getLocalizedWordLabel } from "@/lib/i18n/localize";
 import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
 import type {
   DashboardFusionPartner,
@@ -101,10 +101,10 @@ export default function DashboardClient({
 
   useEffect(() => {
     if (!fusionJustAccepted) return;
-    setToastMessage("オーラ融合が完了しました！");
+    setToastMessage(t.dashboard.fusionComplete);
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 2200);
-  }, [fusionJustAccepted]);
+  }, [fusionJustAccepted, t]);
 
   useEffect(() => {
     const channel = supabase
@@ -124,7 +124,9 @@ export default function DashboardClient({
             setVotes((prev) => [{ word, isSelfVote }, ...prev]);
             if (!isSelfVote) {
               setPulseActive(true);
-              setToastMessage(`新しい投票が届きました！ (+${word})`);
+              setToastMessage(
+                t.dashboard.newVote.replace("{word}", getLocalizedWordLabel(word, locale)),
+              );
               setTotalPopTick((prev) => prev + 1);
               setLastVotedWord(word);
 
@@ -229,13 +231,13 @@ export default function DashboardClient({
       | null;
 
     if (!response.ok || !payload?.inviteToken) {
-      setFusionError(payload?.error ?? "融合リンクの作成に失敗しました。");
+      setFusionError(payload?.error ?? t.fusion.createLinkFailed);
       setCreatingFusion(false);
       return;
     }
 
     await navigator.clipboard.writeText(fusionInviteUrl(payload.inviteToken));
-    setToastMessage("融合リンクをコピーしました");
+    setToastMessage(t.dashboard.fusionLinkCopied);
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
 
@@ -250,7 +252,7 @@ export default function DashboardClient({
   async function copyVoteUrlOnly() {
     await navigator.clipboard.writeText(voteUrl);
     trackEvent("copy_vote_url", { with_message: false });
-    setToastMessage("投票URLだけコピーしました");
+    setToastMessage(t.dashboard.voteUrlCopied);
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
@@ -258,7 +260,7 @@ export default function DashboardClient({
   async function copyServiceUrl() {
     await navigator.clipboard.writeText(siteUrl);
     trackEvent("copy_service_url", { source: "dashboard" });
-    setToastMessage("サイト紹介URLをコピーしました");
+    setToastMessage(t.dashboard.serviceUrlCopied);
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
@@ -267,7 +269,7 @@ export default function DashboardClient({
     const trimmed = nameInput.trim();
 
     if (trimmed.length < 1 || trimmed.length > 20) {
-      setNameError("表示名は1〜20文字で入力してください。");
+      setNameError(t.dashboard.nameLengthError);
       return;
     }
 
@@ -289,7 +291,7 @@ export default function DashboardClient({
     setNameInput(trimmed);
     setIsEditingName(false);
     setIsSavingName(false);
-    setToastMessage("名前を変更しました");
+    setToastMessage(t.dashboard.nameChanged);
 
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
@@ -301,7 +303,7 @@ export default function DashboardClient({
     } = await supabase.auth.getUser();
     setIsAnonymous(user?.is_anonymous ?? false);
     setLinkModalOpen(false);
-    setToastMessage("アカウントを連携しました");
+    setToastMessage(t.dashboard.accountLinked);
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
     router.refresh();
@@ -326,7 +328,7 @@ export default function DashboardClient({
         catchCopy={visibleAura.personalizedCatchCopy}
         topWords={visibleAura.topWords}
         onSaved={() => {
-          setToastMessage("画像を保存しました！");
+          setToastMessage(t.dashboard.imageSaved);
           if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
           toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
         }}
@@ -348,8 +350,8 @@ export default function DashboardClient({
             const next = pendingAuraRef.current;
             setToastMessage(
               next?.aura.rarity === "secret"
-                ? "シークレットオーラが覚醒した！"
-                : "オーラが進化した！",
+                ? t.dashboard.secretAwakened
+                : t.dashboard.auraEvolved,
             );
             pendingAuraRef.current = null;
             setPendingAura(null);
@@ -373,7 +375,7 @@ export default function DashboardClient({
           partyB={chemiPartyB}
           siteUrl={siteUrl}
           onSaved={() => {
-            setToastMessage("ケミカードを保存しました！");
+            setToastMessage(t.dashboard.chemiSaved);
             if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
             toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
           }}
@@ -390,9 +392,7 @@ export default function DashboardClient({
         {isAnonymous ? (
           <section className="rounded-2xl border border-amber-300/40 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-rose-500/10 p-3 backdrop-blur sm:p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm font-semibold text-amber-100">
-                ゲスト利用中：結果を残すならアカウント連携を
-              </p>
+              <p className="text-sm font-semibold text-amber-100">{t.dashboard.guestBanner}</p>
               <button
                 type="button"
                 onClick={() => {
@@ -401,7 +401,7 @@ export default function DashboardClient({
                 }}
                 className="shrink-0 rounded-full bg-amber-200 px-4 py-2 text-sm font-bold text-black"
               >
-                アカウントを連携
+                {t.dashboard.linkAccount}
               </button>
             </div>
           </section>
@@ -409,16 +409,16 @@ export default function DashboardClient({
           <section className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 backdrop-blur">
             <p className="text-xs text-emerald-100 sm:text-sm">
               <span className="mr-2 rounded-full bg-emerald-300 px-2 py-0.5 text-[10px] font-bold text-black">
-                保護済み
+                {t.dashboard.protected}
               </span>
-              アカウント連携済み。投票データは保存されています。
+              {t.dashboard.protectedSub}
             </p>
           </section>
         )}
 
         <div className="flex justify-center">
           <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white/75">
-            表示中: {auraSourceLabel}
+            {t.common.displaying}{auraSourceLabel}
           </span>
         </div>
 
@@ -447,10 +447,8 @@ export default function DashboardClient({
         ) : null}
 
         <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
-          <h2 className="text-xl font-bold">シェアして投票を集めよう</h2>
-          <p className="mt-1 text-sm text-white/70">
-            結果は画像、投票募集はURL。友達に見せるなら画像シェアが確実です。
-          </p>
+          <h2 className="text-xl font-bold">{t.dashboard.shareTitle}</h2>
+          <p className="mt-1 text-sm text-white/70">{t.dashboard.shareSub}</p>
 
           <div className="mt-5 grid gap-3">
             <button
@@ -461,28 +459,28 @@ export default function DashboardClient({
               }}
               className="min-h-[3.5rem] rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
             >
-              📸 結果を画像でシェア
+              {t.dashboard.shareImage}
             </button>
             <button
               type="button"
               onClick={copyVoteUrlOnly}
               className="min-h-[3.5rem] rounded-2xl border-2 border-cyan-200/80 bg-cyan-400 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
             >
-              投票URLをコピー
+              {t.dashboard.copyVoteUrl}
             </button>
             <button
               type="button"
               onClick={copyServiceUrl}
               className="min-h-[3.5rem] rounded-2xl border border-emerald-200/70 bg-emerald-300 px-5 py-5 text-lg font-black leading-snug text-black shadow-lg sm:min-h-[4rem] sm:text-xl"
             >
-              サイト紹介URLをコピー
+              {t.dashboard.copyServiceUrl}
             </button>
           </div>
         </section>
 
         <header className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="min-w-0 break-words text-lg font-black sm:text-xl">表示名の編集</h1>
+            <h1 className="min-w-0 break-words text-lg font-black sm:text-xl">{t.dashboard.editNameTitle}</h1>
             {!isEditingName ? (
               <button
                 type="button"
@@ -493,14 +491,14 @@ export default function DashboardClient({
                 }}
                 className="rounded-full border border-white/35 bg-white/10 px-3 py-1 text-sm"
               >
-                ✏️ 編集
+                {t.common.edit}
               </button>
             ) : null}
           </div>
 
           {isEditingName ? (
             <div className="mt-3 rounded-xl border border-white/20 bg-white/10 p-3">
-              <label className="mb-2 block text-sm text-white/80">表示名（1〜20文字）</label>
+              <label className="mb-2 block text-sm text-white/80">{t.dashboard.nameLabel}</label>
               <div className="flex flex-col gap-2 md:flex-row">
                 <input
                   value={nameInput}
@@ -515,7 +513,7 @@ export default function DashboardClient({
                     disabled={isSavingName}
                     className="rounded-lg bg-violet-300 px-4 py-2 text-sm font-semibold text-black disabled:opacity-70"
                   >
-                    {isSavingName ? "保存中..." : "保存"}
+                    {isSavingName ? t.common.saving : t.common.save}
                   </button>
                   <button
                     type="button"
@@ -526,7 +524,7 @@ export default function DashboardClient({
                     }}
                     className="rounded-lg border border-white/35 px-4 py-2 text-sm"
                   >
-                    キャンセル
+                    {t.common.cancel}
                   </button>
                 </div>
               </div>
@@ -542,16 +540,14 @@ export default function DashboardClient({
             href="/auras"
             className="rounded-full border border-violet-300/40 bg-violet-500/15 px-6 py-3 text-sm font-semibold text-violet-100 transition hover:bg-violet-500/25"
           >
-            ✨ 全オーラ一覧（図鑑）を見る
+            {t.dashboard.viewAllAuras}
           </Link>
         </div>
 
         <section className="rounded-2xl border border-fuchsia-300/30 bg-black/35 p-4 backdrop-blur sm:p-6">
           <p className="font-display text-2xl text-fuchsia-200 sm:text-3xl">Aura Fusion</p>
-          <h2 className="mt-2 text-xl font-bold">友達とオーラ融合</h2>
-          <p className="mt-1 text-sm text-white/65">
-            お互いの本物のオーラ診断が揃うと、融合ケミカードが作れます。リンクを友達に送ってね。
-          </p>
+          <h2 className="mt-2 text-xl font-bold">{t.dashboard.fusionWithFriends}</h2>
+          <p className="mt-1 text-sm text-white/65">{t.dashboard.fusionSub}</p>
 
           <button
             type="button"
@@ -559,13 +555,13 @@ export default function DashboardClient({
             disabled={creatingFusion}
             className="mt-4 inline-flex min-h-[3rem] w-full items-center justify-center rounded-2xl bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black disabled:opacity-70 sm:text-base"
           >
-            {creatingFusion ? "リンク作成中..." : "✨ 融合リンクを作成してコピー"}
+            {creatingFusion ? t.dashboard.creatingLink : t.dashboard.createFusionLink}
           </button>
           {fusionError ? <p className="mt-2 text-sm text-rose-300">{fusionError}</p> : null}
 
           {fusions.partners.length > 0 ? (
             <div className="mt-6">
-              <h3 className="text-sm font-bold text-white/85">融合済みの友達</h3>
+              <h3 className="text-sm font-bold text-white/85">{t.dashboard.fusedFriends}</h3>
               <ul className="mt-3 space-y-3">
                 {fusions.partners.map((partner) => (
                   <li
@@ -581,7 +577,7 @@ export default function DashboardClient({
                       onClick={() => openChemiWithPartner(partner)}
                       className="shrink-0 rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-2.5 text-sm font-black text-black"
                     >
-                      ✨ ケミカードを作る
+                      {t.dashboard.makeChemiCard}
                     </button>
                   </li>
                 ))}
@@ -592,14 +588,19 @@ export default function DashboardClient({
 
         <section className="grid gap-6 lg:grid-cols-2">
           <article className="rounded-2xl border border-white/20 bg-black/35 p-6 backdrop-blur">
-            <h2 className="text-xl font-bold">ランキング</h2>
+            <h2 className="text-xl font-bold">{t.dashboard.ranking}</h2>
             <p className="mt-1 text-sm text-white/70">
-              {friendWords.length > 0 ? "友達からの投票" : "自己診断"}の集計 · 総投票数:{" "}
+              {friendWords.length > 0 ? t.dashboard.friendVotes : t.dashboard.selfVotes}
+              {t.dashboard.totalVotes}
               <span key={totalPopTick} className="vote-pop font-semibold text-violet-200">
                 {rankingWords.length}
               </span>
               {friendWords.length > 0 && selfWords.length > 0 ? (
-                <span className="text-white/50">（うち友達 {friendWords.length} / 自己 {selfWords.length}）</span>
+                <span className="text-white/50">
+                  {t.dashboard.voteBreakdown
+                    .replace("{friend}", String(friendWords.length))
+                    .replace("{self}", String(selfWords.length))}
+                </span>
               ) : null}
             </p>
             <ul className="mt-4 space-y-2">
@@ -609,7 +610,7 @@ export default function DashboardClient({
                   className="flex min-w-0 items-center justify-between gap-3 rounded-lg bg-white/10 px-3 py-2"
                 >
                   <span className="min-w-0 truncate">
-                    {index + 1}. {word}
+                    {index + 1}. {getLocalizedWordLabel(word, locale)}
                   </span>
                   <span
                     className={`shrink-0 font-semibold tabular-nums ${lastVotedWord === word ? "vote-pop text-cyan-200" : ""}`}
@@ -622,7 +623,7 @@ export default function DashboardClient({
           </article>
 
           <article className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur sm:p-6">
-            <h2 className="text-xl font-bold">Word Cloud</h2>
+            <h2 className="text-xl font-bold">{t.dashboard.wordCloud}</h2>
             <div className="mt-4 flex min-h-52 min-w-0 flex-wrap items-center justify-center gap-2 overflow-x-clip sm:gap-3">
               {ranking.map(([word, count]) => {
                 const ratio = count / maxCount;
@@ -639,12 +640,12 @@ export default function DashboardClient({
                       lastVotedWord === word ? "vote-pop border border-cyan-200/70" : ""
                     }`}
                   >
-                    {word}
+                    {getLocalizedWordLabel(word, locale)}
                   </span>
                 );
               })}
               {ranking.length === 0 ? (
-                <p className="text-white/70">まだ集計できる投票がありません。</p>
+                <p className="text-white/70">{t.dashboard.noVotesYet}</p>
               ) : null}
             </div>
           </article>

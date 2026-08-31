@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuraBackground from "@/components/AuraBackground";
+import AnonymousStartButton from "@/components/AnonymousStartButton";
+import { useLocale } from "@/components/LocaleProvider";
 import { trackEvent } from "@/lib/analytics";
 
 type FusionAcceptClientProps = {
@@ -28,6 +30,7 @@ export default function FusionAcceptClient({
   alreadyPartner,
 }: FusionAcceptClientProps) {
   const router = useRouter();
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +48,7 @@ export default function FusionAcceptClient({
       | null;
 
     if (!response.ok) {
-      setError(payload?.error ?? "融合に失敗しました。");
+      setError(payload?.error ?? t.fusion.acceptFailed);
       setLoading(false);
       return;
     }
@@ -60,32 +63,32 @@ export default function FusionAcceptClient({
       <AuraBackground />
       <section className="relative z-10 w-full max-w-lg rounded-2xl border border-white/20 bg-black/45 p-6 text-center backdrop-blur sm:p-8">
         <p className="text-xs font-bold tracking-[0.22em] text-fuchsia-200">AURA FUSION</p>
-        <h1 className="mt-3 text-2xl font-black leading-tight sm:text-3xl">友達とオーラ融合</h1>
+        <h1 className="mt-3 text-2xl font-black leading-tight sm:text-3xl">{t.fusion.title}</h1>
 
         {status === "missing" ? (
-          <p className="mt-4 text-sm text-white/75">この融合リンクは無効か、期限切れです。</p>
+          <p className="mt-4 text-sm text-white/75">{t.fusion.invalidLink}</p>
         ) : (
           <>
             <p className="mt-4 text-sm leading-relaxed text-white/80">
-              <span className="font-bold text-white">{inviterName}</span>
-              （{inviterAuraName}）からオーラ融合のお願いが届いています。
-              お互いの本物のオーラが揃うと、融合カードが作れます。
+              {t.fusion.inviteBody
+                .replace("{name}", inviterName)
+                .replace("{aura}", inviterAuraName)}
             </p>
 
             {isOwnLink ? (
               <p className="mt-6 rounded-xl border border-amber-300/40 bg-amber-500/10 p-3 text-sm text-amber-100">
-                これはあなたの融合リンクです。友達に送ってね。
+                {t.fusion.ownLink}
               </p>
             ) : null}
 
             {alreadyPartner || status === "accepted" ? (
               <div className="mt-6 space-y-3">
-                <p className="text-sm text-emerald-200">融合済みです。ダッシュボードでカードを確認できます。</p>
+                <p className="text-sm text-emerald-200">{t.fusion.alreadyFused}</p>
                 <Link
                   href="/dashboard"
                   className="inline-flex rounded-full bg-violet-300 px-5 py-3 text-sm font-bold text-black"
                 >
-                  ダッシュボードへ
+                  {t.fusion.toDashboard}
                 </Link>
               </div>
             ) : null}
@@ -94,28 +97,25 @@ export default function FusionAcceptClient({
               <div className="mt-6 space-y-3">
                 {!isLoggedIn ? (
                   <>
-                    <p className="text-sm text-white/70">融合するにはアカウント作成（またはログイン）が必要です。</p>
+                    <p className="text-sm text-white/70">{t.fusion.needAccount}</p>
                     <Link
                       href={`/login?next=${encodeURIComponent(`/fusion/${token}`)}`}
                       className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black"
                     >
-                      ログイン / はじめる
+                      {t.fusion.loginStart}
                     </Link>
-                    <Link
-                      href={`/?fusion=${encodeURIComponent(token)}`}
+                    <AnonymousStartButton
                       className="inline-flex w-full items-center justify-center rounded-full border border-white/30 px-5 py-3 text-sm font-semibold text-white"
-                    >
-                      登録なしですぐ始める
-                    </Link>
+                    />
                   </>
                 ) : needsSelfVote ? (
                   <>
-                    <p className="text-sm text-white/70">先に自己診断（3語）を完了してください。</p>
+                    <p className="text-sm text-white/70">{t.fusion.needSelfVote}</p>
                     <Link
                       href="/onboarding/self-vote"
                       className="inline-flex w-full items-center justify-center rounded-full bg-violet-300 px-5 py-3 text-sm font-bold text-black"
                     >
-                      自己診断へ
+                      {t.fusion.toSelfVote}
                     </Link>
                   </>
                 ) : (
@@ -125,7 +125,7 @@ export default function FusionAcceptClient({
                     onClick={acceptFusion}
                     className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black disabled:opacity-60"
                   >
-                    {loading ? "融合中..." : "✨ オーラを融合する"}
+                    {loading ? t.fusion.accepting : t.fusion.accept}
                   </button>
                 )}
               </div>

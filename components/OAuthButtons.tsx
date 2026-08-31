@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useLocale } from "@/components/LocaleProvider";
 import { createClient } from "@/utils/supabase/client";
 import {
   buildAuthCallbackUrl,
@@ -23,6 +24,7 @@ export default function OAuthButtons({
   onLoadingChange,
   onError,
 }: OAuthButtonsProps) {
+  const { t } = useLocale();
   const supabase = useMemo(() => createClient(), []);
   const [activeProvider, setActiveProvider] = useState<OAuthProvider | null>(null);
 
@@ -66,10 +68,11 @@ export default function OAuthButtons({
     <div className="space-y-2">
       {providers.map((provider) => {
         const isBusy = loading && activeProvider === provider;
+        const providerLabel = OAUTH_PROVIDER_LABELS[provider];
         const label =
           mode === "link"
-            ? `${OAUTH_PROVIDER_LABELS[provider]}で連携`
-            : `${OAUTH_PROVIDER_LABELS[provider]}で続ける`;
+            ? t.oauth.linkWith.replace("{provider}", providerLabel)
+            : t.oauth.continueWith.replace("{provider}", providerLabel);
 
         return (
           <button
@@ -81,7 +84,7 @@ export default function OAuthButtons({
             }}
             className="w-full rounded-lg border border-white/30 bg-white/5 px-4 py-2 text-white disabled:opacity-60"
           >
-            {isBusy ? "接続中..." : label}
+            {isBusy ? t.common.connecting : label}
           </button>
         );
       })}

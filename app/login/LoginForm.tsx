@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import OAuthButtons from "@/components/OAuthButtons";
+import { useLocale } from "@/components/LocaleProvider";
 import { createClient } from "@/utils/supabase/client";
 
 type AuthMode = "login" | "signup";
@@ -11,6 +12,7 @@ type AuthMode = "login" | "signup";
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLocale();
   const supabase = useMemo(() => createClient(), []);
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
@@ -44,7 +46,7 @@ export default function LoginForm() {
       if (signupError) {
         setError(signupError.message);
       } else {
-        setMessage("登録しました。確認メールが届いた場合はリンクを開いてください。");
+        setMessage(t.login.signupSuccess);
       }
       setLoading(false);
       return;
@@ -74,7 +76,7 @@ export default function LoginForm() {
             mode === "login" ? "bg-white text-black" : "bg-white/10 text-white"
           }`}
         >
-          ログイン
+          {t.login.loginTab}
         </button>
         <button
           type="button"
@@ -83,7 +85,7 @@ export default function LoginForm() {
             mode === "signup" ? "bg-white text-black" : "bg-white/10 text-white"
           }`}
         >
-          新規登録
+          {t.login.signupTab}
         </button>
       </div>
 
@@ -119,7 +121,11 @@ export default function LoginForm() {
           disabled={loading}
           className="w-full rounded-lg bg-violet-400 px-4 py-2 font-semibold text-black disabled:opacity-60"
         >
-          {loading ? "処理中..." : mode === "login" ? "メールでログイン" : "メールで登録"}
+          {loading
+            ? t.common.processing
+            : mode === "login"
+              ? t.login.emailLogin
+              : t.login.emailSignup}
         </button>
       </form>
 

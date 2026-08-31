@@ -3,8 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuraBackground from "@/components/AuraBackground";
+import { useLocale } from "@/components/LocaleProvider";
 import VoteWordPicker, { VOTE_PICKER_MAX } from "@/components/VoteWordPicker";
 import { trackEvent } from "@/lib/analytics";
+import { getLocalizedWordLabel } from "@/lib/i18n/localize";
 import { submitVotesViaApi } from "@/lib/votes/client";
 import type { VoteWord } from "@/lib/constants/words";
 
@@ -15,6 +17,7 @@ type SelfVoteClientProps = {
 
 export default function SelfVoteClient({ userId, displayName }: SelfVoteClientProps) {
   const router = useRouter();
+  const { locale, t } = useLocale();
   const [selected, setSelected] = useState<VoteWord[]>([]);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,14 +37,14 @@ export default function SelfVoteClient({ userId, displayName }: SelfVoteClientPr
 
   async function submitSelfVote() {
     if (selected.length === 0) {
-      setError("1つ以上選んでください。");
+      setError(t.common.pickAtLeastOne);
       return;
     }
 
     setSending(true);
     setError(null);
 
-    const result = await submitVotesViaApi(userId, selected, { isSelfVote: true });
+    const result = await submitVotesViaApi(userId, selected, { isSelfVote: true, locale });
     if (!result.ok) {
       setError(result.error);
       setSending(false);
@@ -58,25 +61,22 @@ export default function SelfVoteClient({ userId, displayName }: SelfVoteClientPr
       <AuraBackground />
       <section className="relative z-10 mx-auto w-full min-w-0 max-w-4xl rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur sm:p-6 md:p-8">
         <div className="rounded-xl border border-fuchsia-300/25 bg-fuchsia-500/10 p-4">
-          <p className="text-xs font-semibold tracking-wide text-fuchsia-100">STEP 1 / 自己診断</p>
+          <p className="text-xs font-semibold tracking-wide text-fuchsia-100">{t.onboarding.step}</p>
           <p className="mt-2 text-sm leading-relaxed text-white/85 sm:text-base">
-            まずは{displayName}さん自身が「自分を3語」で表しましょう。
-            これで暫定オーラが完成し、友達にシェアできるカードが用意できます。
+            {t.onboarding.intro.replace("{name}", displayName)}
           </p>
         </div>
 
         <h1 className="mt-5 break-words text-2xl font-black leading-tight sm:text-3xl">
-          自分を3語で表すなら？
+          {t.onboarding.heading}
         </h1>
-        <p className="mt-2 text-sm text-white/75 sm:text-base">
-          友達の投票が増えるほど、「自分で思ってる自分」と「周りから見られてる自分」のズレが見えてきます。
-        </p>
+        <p className="mt-2 text-sm text-white/75 sm:text-base">{t.onboarding.sub}</p>
 
         <VoteWordPicker
           selected={selected}
           onToggle={toggleWord}
           disabled={sending}
-          hint="自己診断用：最大3つ。あとから友達の票で上書き・更新されていきます。"
+          hint={t.onboarding.hint}
         />
 
         {error ? <p className="mt-4 text-sm text-rose-300">{error}</p> : null}
@@ -90,10 +90,13 @@ export default function SelfVoteClient({ userId, displayName }: SelfVoteClientPr
             onClick={submitSelfVote}
             className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black disabled:opacity-60 sm:px-6 sm:text-base"
           >
-            {sending ? "保存中..." : `この3語で暫定オーラを完成 (${selected.length}/${VOTE_PICKER_MAX})`}
+            {sending
+              ? t.common.saving
+              : t.onboarding.submit.replace("{count}", String(selected.length))}
           </button>
           <p className="min-w-0 flex-1 break-words text-sm text-white/80">
-            選択中: {selected.join(" / ") || "なし"}
+            {t.common.selected}
+            {selected.map((word) => getLocalizedWordLabel(word, locale)).join(" / ") || t.common.none}
           </p>
         </div>
       </div>

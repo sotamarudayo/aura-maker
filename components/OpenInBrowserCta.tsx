@@ -1,39 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "@/components/LocaleProvider";
 import { buildExternalBrowserHref, isInAppBrowser } from "@/lib/utils/external-browser";
 
 type OpenInBrowserCtaProps = {
   href: string;
   className?: string;
-  /** 外部ブラウザ誘導ボタンの文言 */
   label?: string;
   persistenceNote?: string;
-  /** true のとき Instagram 等のアプリ内ブラウザだけで表示 */
   inAppOnly?: boolean;
 };
 
-const DEFAULT_NOTE =
-  "Xやメール登録なしでも診断データは端末に残せます。Instagram内だと消えやすいので、Safari / Chrome で開くのがおすすめです。";
-
-const FALLBACK_HINT =
-  "うまく開かないときは、画面右上の「⋯」→「外部ブラウザで開く」を押してください。";
-
-/**
- * アプリ内ブラウザから外部ブラウザ起動を試みる CTA。
- * 匿名セッションを端末ブラウザ側に残すのが主目的。
- */
 export default function OpenInBrowserCta({
   href,
   className,
-  label = "Safari / Chromeで開いて診断する",
-  persistenceNote = DEFAULT_NOTE,
+  label,
+  persistenceNote,
   inAppOnly = true,
 }: OpenInBrowserCtaProps) {
+  const { t } = useLocale();
   const [ready, setReady] = useState(false);
   const [inApp, setInApp] = useState(false);
   const [externalHref, setExternalHref] = useState<string | null>(null);
   const [showFallback, setShowFallback] = useState(false);
+
+  const buttonLabel = label ?? t.browser.openInSafari;
+  const note = persistenceNote ?? t.browser.persistenceNote;
 
   useEffect(() => {
     const detected = isInAppBrowser();
@@ -52,7 +45,7 @@ export default function OpenInBrowserCta({
   return (
     <div>
       {inApp ? (
-        <p className="mb-3 text-left text-xs leading-relaxed text-amber-100/85">{persistenceNote}</p>
+        <p className="mb-3 text-left text-xs leading-relaxed text-amber-100/85">{note}</p>
       ) : null}
       <a
         href={externalHref ?? href}
@@ -60,10 +53,10 @@ export default function OpenInBrowserCta({
         onClick={handleClick}
         rel="noopener noreferrer"
       >
-        {label}
+        {buttonLabel}
       </a>
       {showFallback ? (
-        <p className="mt-3 text-left text-xs leading-relaxed text-white/65">{FALLBACK_HINT}</p>
+        <p className="mt-3 text-left text-xs leading-relaxed text-white/65">{t.browser.fallbackHint}</p>
       ) : null}
     </div>
   );

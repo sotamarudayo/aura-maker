@@ -1,5 +1,7 @@
 "use client";
 
+import { getMessages } from "@/lib/i18n/messages";
+import type { Locale } from "@/lib/i18n/types";
 import { markVoteSent } from "@/lib/utils/vote-sent";
 
 export type SubmitVotesResult =
@@ -9,7 +11,7 @@ export type SubmitVotesResult =
 export async function submitVotesViaApi(
   targetUserId: string,
   words: string[],
-  options?: { isSelfVote?: boolean },
+  options?: { isSelfVote?: boolean; locale?: Locale },
 ): Promise<SubmitVotesResult> {
   const response = await fetch("/api/votes", {
     method: "POST",
@@ -27,9 +29,11 @@ export async function submitVotesViaApi(
     | null;
 
   if (!response.ok) {
+    const locale = options?.locale ?? "ja";
+    const t = getMessages(locale);
     return {
       ok: false,
-      error: payload?.error ?? "投票の送信に失敗しました。",
+      error: payload?.error ?? t.common.voteSubmitFailed,
       code: payload?.code,
     };
   }

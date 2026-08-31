@@ -6,6 +6,7 @@ import { toPng } from "html-to-image";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
 import { RARITY_LABELS } from "@/lib/constants/auras";
 import { trackEvent } from "@/lib/analytics";
+import { useLocale } from "@/components/LocaleProvider";
 
 type ExportFormat = "story" | "card";
 
@@ -188,6 +189,7 @@ export default function StoryExportModal({
   profile,
   onSaved,
 }: StoryExportModalProps) {
+  const { t } = useLocale();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [format, setFormat] = useState<ExportFormat>("story");
   const [exporting, setExporting] = useState(false);
@@ -207,7 +209,7 @@ export default function StoryExportModal({
 
   async function handleDownload(dataUrl?: string) {
     const url = dataUrl ?? (await exportPng());
-    if (!url) throw new Error("画像の生成に失敗しました");
+    if (!url) throw new Error(t.share.imageFailed);
 
     const link = document.createElement("a");
     link.download =
@@ -225,7 +227,7 @@ export default function StoryExportModal({
 
     try {
       const dataUrl = await exportPng();
-      if (!dataUrl) throw new Error("画像の生成に失敗しました");
+      if (!dataUrl) throw new Error(t.share.imageFailed);
 
       const res = await fetch(dataUrl);
       const blob = await res.blob();
@@ -234,7 +236,7 @@ export default function StoryExportModal({
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: `${displayName}のオーラ診断`,
+          title: t.share.shareTitle.replace("{name}", displayName),
           text: profile.shareLine,
         });
         trackEvent("export_result_image", { format, method: "native_share" });
@@ -244,7 +246,7 @@ export default function StoryExportModal({
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      const message = err instanceof Error ? err.message : "シェアに失敗しました";
+      const message = err instanceof Error ? err.message : t.share.shareFailed;
       setError(message);
     } finally {
       setExporting(false);
@@ -261,10 +263,8 @@ export default function StoryExportModal({
       <div className="max-h-[95vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/20 bg-zinc-950 p-5 text-white shadow-2xl md:p-6">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold">結果を画像でシェア</h2>
-            <p className="mt-1 text-sm text-white/70">
-              サクッと晒すはストーリー向け、じっくり解説は読み物カードです。
-            </p>
+            <h2 className="text-xl font-bold">{t.share.title}</h2>
+            <p className="mt-1 text-sm text-white/70">{t.share.sub}</p>
           </div>
           <button
             type="button"
@@ -283,7 +283,7 @@ export default function StoryExportModal({
               format === "story" ? "bg-white text-black" : "bg-white/10 text-white/80"
             }`}
           >
-            サクッと晒す
+            {t.share.storyFormat}
           </button>
           <button
             type="button"
@@ -292,7 +292,7 @@ export default function StoryExportModal({
               format === "card" ? "bg-white text-black" : "bg-white/10 text-white/80"
             }`}
           >
-            じっくり解説
+            {t.share.cardFormat}
           </button>
         </div>
 
@@ -341,10 +341,10 @@ export default function StoryExportModal({
               {exporting ? (
                 <>
                   <span className="story-export-spinner inline-block h-4 w-4 rounded-full border-2 border-black/30 border-t-black" />
-                  生成中...
+                  {t.share.generating}
                 </>
               ) : (
-                "📤 端末でシェア"
+                t.share.nativeShare
               )}
             </button>
             <button
@@ -352,7 +352,7 @@ export default function StoryExportModal({
               onClick={onClose}
               className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white/80"
             >
-              閉じる
+              {t.common.close}
             </button>
           </div>
 
