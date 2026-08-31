@@ -5,6 +5,8 @@ import {
   buildVoteInviteDescription,
   buildVoteInviteTitle,
 } from "@/lib/constants/share";
+import { buildLanguageAlternates } from "@/lib/i18n/metadata";
+import { getServerLocale } from "@/lib/i18n/server";
 import { resolveSiteUrl } from "@/lib/utils/site-url";
 import { createClient } from "@/utils/supabase/server";
 import VoteClient from "./VoteClient";
@@ -26,28 +28,37 @@ async function getProfile(userId: string) {
 
 export async function generateMetadata({ params }: VotePageProps): Promise<Metadata> {
   const { userId } = await params;
+  const locale = await getServerLocale();
   const profile = await getProfile(userId);
-  const displayName = profile?.display_name ?? "名無しのオーラ使い";
+  const displayName =
+    profile?.display_name ??
+    (locale === "en" ? "Anonymous aura user" : "名無しのオーラ使い");
   const siteUrl = await resolveSiteUrl();
   const ogImage = `${siteUrl}/api/og?userId=${encodeURIComponent(userId)}`;
-  const title = buildVoteInviteTitle(displayName);
-  const description = buildVoteInviteDescription(displayName);
-  const pageUrl = `${siteUrl}/vote/${encodeURIComponent(userId)}`;
+  const title = buildVoteInviteTitle(displayName, locale);
+  const description = buildVoteInviteDescription(displayName, locale);
+  const pagePath = `/vote/${encodeURIComponent(userId)}`;
+  const pageUrl = `${siteUrl}${pagePath}`;
 
   return {
     title,
     description,
+    alternates: buildLanguageAlternates(pagePath),
     openGraph: {
       title,
       description,
       url: pageUrl,
       type: "website",
+      locale: locale === "ja" ? "ja_JP" : "en_US",
       images: [
         {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: `${displayName}さんのAuraMaker OGP画像`,
+          alt:
+            locale === "en"
+              ? `${displayName}'s AuraMaker vote page`
+              : `${displayName}さんのAuraMaker OGP画像`,
         },
       ],
     },

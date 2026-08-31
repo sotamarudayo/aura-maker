@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { LOCALE_COOKIE } from "@/lib/i18n/types";
 
 /** セッション更新が必要なルートだけ middleware で getUser する（公開ページのTTFB改善） */
 function needsSessionRefresh(pathname: string) {
@@ -15,6 +16,19 @@ function needsSessionRefresh(pathname: string) {
 
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  const langParam = searchParams.get("lang");
+  if (langParam === "ja" || langParam === "en") {
+    const cleanUrl = request.nextUrl.clone();
+    cleanUrl.searchParams.delete("lang");
+    const response = NextResponse.redirect(cleanUrl);
+    response.cookies.set(LOCALE_COOKIE, langParam, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+    return response;
+  }
 
   // OAuth code がトップ等に落ちた場合は callback へ寄せる
   const code = searchParams.get("code");
