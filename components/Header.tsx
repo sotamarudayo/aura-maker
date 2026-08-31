@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useLocale } from "@/components/LocaleProvider";
 import { trackEvent } from "@/lib/analytics";
 import { createClient } from "@/utils/supabase/client";
 
@@ -15,6 +17,7 @@ type AuthState =
 
 export default function Header() {
   const router = useRouter();
+  const { t } = useLocale();
   const supabase = useMemo(() => createClient(), []);
   const [auth, setAuth] = useState<AuthState>({ status: "loading" });
   const [loggingOut, setLoggingOut] = useState(false);
@@ -80,12 +83,13 @@ export default function Header() {
         </Link>
 
         <nav className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <LanguageToggle />
           <Link
             href="/auras"
             className="whitespace-nowrap rounded-full px-2 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 sm:px-3 sm:text-sm"
           >
-            <span className="sm:hidden">📖 図鑑</span>
-            <span className="hidden sm:inline">📖 オーラ図鑑</span>
+            <span className="sm:hidden">📖 {t.header.encyclopedia}</span>
+            <span className="hidden sm:inline">📖 {t.header.encyclopediaFull}</span>
           </Link>
 
           {auth.status === "loading" ? (
@@ -96,7 +100,7 @@ export default function Header() {
                 href="/dashboard"
                 className="shrink-0 whitespace-nowrap rounded-full border border-amber-300/50 bg-amber-500/20 px-2.5 py-1 text-[10px] font-bold text-amber-100 transition hover:bg-amber-500/30 sm:text-xs"
               >
-                ゲスト
+                {t.header.guest}
               </Link>
               <button
                 type="button"
@@ -104,7 +108,7 @@ export default function Header() {
                 disabled={loggingOut}
                 className="shrink-0 whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold text-white/70 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
               >
-                {loggingOut ? "..." : "ログアウト"}
+                {loggingOut ? "..." : t.header.logout}
               </button>
             </>
           ) : auth.status === "linked" ? (
@@ -113,7 +117,7 @@ export default function Header() {
                 href="/dashboard"
                 className="shrink-0 whitespace-nowrap rounded-full border border-emerald-300/60 bg-emerald-400/90 px-2.5 py-1 text-[10px] font-bold text-black transition hover:bg-emerald-300 sm:text-xs"
               >
-                マイページ
+                {t.header.myPage}
               </Link>
               <button
                 type="button"
@@ -121,7 +125,7 @@ export default function Header() {
                 disabled={loggingOut}
                 className="shrink-0 whitespace-nowrap rounded-full border border-white/20 px-2.5 py-1 text-[10px] font-semibold text-white/70 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
               >
-                {loggingOut ? "..." : "ログアウト"}
+                {loggingOut ? "..." : t.header.logout}
               </button>
             </>
           ) : (
@@ -129,7 +133,7 @@ export default function Header() {
               href="/login"
               className="shrink-0 whitespace-nowrap rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/80 transition hover:bg-white/15 sm:text-xs"
             >
-              ログイン
+              {t.header.login}
             </Link>
           )}
         </nav>

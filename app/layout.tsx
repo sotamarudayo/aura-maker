@@ -1,5 +1,7 @@
 import AppHeader from "@/components/AppHeader";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { LocaleProvider } from "@/components/LocaleProvider";
+import { getServerLocale } from "@/lib/i18n/server";
 import type { Metadata, Viewport } from "next";
 import { Geist, Pacifico } from "next/font/google";
 import "./globals.css";
@@ -77,16 +79,20 @@ export const metadata: Metadata = {
     : {}),
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getServerLocale();
+
   return (
     <html
-      lang="ja"
+      lang={locale}
       className={`${geistSans.variable} ${pacifico.variable} h-full overflow-x-clip antialiased`}
     >
       <body className="flex min-h-full flex-col overflow-x-clip font-sans">
-        <GoogleAnalytics />
-        <AppHeader />
-        {children}
+        <LocaleProvider initialLocale={locale}>
+          <GoogleAnalytics />
+          <AppHeader />
+          {children}
+        </LocaleProvider>
       </body>
     </html>
   );

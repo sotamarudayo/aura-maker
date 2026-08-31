@@ -5,15 +5,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import AuraBackground from "@/components/AuraBackground";
 import OpenInBrowserCta from "@/components/OpenInBrowserCta";
+import { useLocale } from "@/components/LocaleProvider";
 import VoteWordPicker, { VOTE_PICKER_MAX } from "@/components/VoteWordPicker";
 import {
   buildVotePageHeading,
   buildVotePageSubcopy,
   buildVoteSubmitLabel,
   buildVoteThanksMessage,
-  VOTE_PAGE_FLOW,
-  VOTE_PAGE_WHAT_IS_THIS,
+  getVotePageFlow,
+  getVotePageWhatIsThis,
 } from "@/lib/constants/share";
+import { getLocalizedWordLabel } from "@/lib/i18n/localize";
 import { trackEvent } from "@/lib/analytics";
 import { checkVoteStatus, submitVotesViaApi } from "@/lib/votes/client";
 import { readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
@@ -27,6 +29,7 @@ type VoteClientProps = {
 
 export default function VoteClient({ userId, displayName }: VoteClientProps) {
   const router = useRouter();
+  const { locale } = useLocale();
   const supabase = useMemo(() => createClient(), []);
   const [currentDisplayName, setCurrentDisplayName] = useState(() => displayName);
   const [selected, setSelected] = useState<VoteWord[]>([]);
@@ -120,7 +123,9 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
         <AuraBackground />
         <section className="relative z-10 w-full min-w-0 max-w-xl rounded-2xl border border-white/20 bg-black/40 p-5 text-center backdrop-blur sm:p-8">
           <h1 className="text-2xl font-black leading-tight sm:text-3xl">投票済みです</h1>
-          <p className="mt-3 text-white/80">{buildVoteThanksMessage(currentDisplayName)}</p>
+          <p className="mt-3 text-white/80">
+            {buildVoteThanksMessage(currentDisplayName, locale)}
+          </p>
           <div className="mt-8 space-y-3">
             <Link
               href="/"
@@ -147,19 +152,19 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
         <div className="rounded-xl border border-cyan-300/25 bg-cyan-500/10 p-4">
           <p className="text-xs font-semibold tracking-wide text-cyan-100">これなに？</p>
           <p className="mt-2 text-sm leading-relaxed text-white/85 sm:text-base">
-            {VOTE_PAGE_WHAT_IS_THIS}
+            {getVotePageWhatIsThis(locale)}
           </p>
         </div>
 
         <h1 className="mt-5 break-words text-2xl font-black leading-tight sm:text-3xl">
-          {buildVotePageHeading(currentDisplayName)}
+          {buildVotePageHeading(currentDisplayName, locale)}
         </h1>
-        <p className="mt-2 text-white/80">{buildVotePageSubcopy(currentDisplayName)}</p>
+        <p className="mt-2 text-white/80">{buildVotePageSubcopy(currentDisplayName, locale)}</p>
 
         <div className="mt-4 rounded-xl border border-violet-300/25 bg-violet-500/10 p-4">
           <p className="text-xs font-semibold tracking-wide text-violet-100">投票するとどうなる？</p>
           <ol className="mt-2 space-y-1.5 text-sm text-white/75">
-            {VOTE_PAGE_FLOW.map((step, index) => (
+            {getVotePageFlow(locale).map((step, index) => (
               <li key={step} className="flex gap-2">
                 <span className="font-bold text-violet-200">{index + 1}.</span>
                 <span>{step}</span>
@@ -181,10 +186,12 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
             onClick={submitVote}
             className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-black disabled:opacity-60 sm:px-6 sm:text-base"
           >
-            {sending ? "送信中..." : buildVoteSubmitLabel(selected.length)}
+            {sending ? (locale === "en" ? "Sending..." : "送信中...") : buildVoteSubmitLabel(selected.length, locale)}
           </button>
           <p className="min-w-0 flex-1 break-words text-sm text-white/80">
-            選択中: {selected.join(" / ") || "なし"}
+            {locale === "en" ? "Selected: " : "選択中: "}
+            {selected.map((word) => getLocalizedWordLabel(word, locale)).join(" / ") ||
+              (locale === "en" ? "none" : "なし")}
           </p>
         </div>
       </div>

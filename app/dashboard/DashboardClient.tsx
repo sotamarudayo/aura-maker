@@ -8,8 +8,10 @@ import { createClient } from "@/utils/supabase/client";
 import AuraBackground from "@/components/AuraBackground";
 import AuraCard from "@/components/AuraCard";
 import LinkAccountModal from "@/components/LinkAccountModal";
+import { useLocale } from "@/components/LocaleProvider";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import { calculateAuraType, type AuraCalculationResult, type AuraType } from "@/lib/constants/auras";
+import { localizeAuraResult, localizeAuraType } from "@/lib/i18n/localize";
 import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
 import type {
   DashboardFusionPartner,
@@ -62,6 +64,7 @@ export default function DashboardClient({
   siteUrl,
 }: DashboardClientProps) {
   const router = useRouter();
+  const { locale, t } = useLocale();
   const supabase = useMemo(() => createClient(), []);
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [isAnonymous, setIsAnonymous] = useState(initialIsAnonymous);
@@ -163,7 +166,11 @@ export default function DashboardClient({
     [auraWords, userId, displayName],
   );
   const auraSourceLabel =
-    friendWords.length > 0 ? "友達目線" : selfWords.length > 0 ? "自己診断（暫定）" : "観測待ち";
+    friendWords.length > 0
+      ? t.aura.friendView
+      : selfWords.length > 0
+        ? t.aura.selfView
+        : t.aura.waiting;
 
   useEffect(() => {
     if (!displayedAura) {
@@ -180,7 +187,15 @@ export default function DashboardClient({
     pendingAuraRef.current = auraResult;
   }, [auraResult, displayedAura, pendingAura]);
 
-  const visibleAura = displayedAura ?? auraResult;
+  const baseAura = displayedAura ?? auraResult;
+  const visibleAura = useMemo(
+    () => localizeAuraResult(baseAura, locale),
+    [baseAura, locale],
+  );
+  const localizedMorphFromAura = useMemo(
+    () => (morphFromAura ? localizeAuraType(morphFromAura, locale) : null),
+    [morphFromAura, locale],
+  );
   const isAwakened = visibleAura.dynamicProfile.awakening.unlocked;
 
   const ownerParty: ChemiParty = useMemo(() => {
@@ -418,7 +433,7 @@ export default function DashboardClient({
           awakened={isAwakened}
           evolutionPending={Boolean(pendingAura)}
           evolutionMorphing={evolutionMorphing}
-          morphFromAura={morphFromAura}
+          morphFromAura={localizedMorphFromAura}
           morphFromCatchCopy={morphFromCatchCopy}
         />
 

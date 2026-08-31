@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
-import { getAuraById, getAuraLineage, RARITY_LABELS, SECRET_FLAVOR } from "@/lib/constants/auras";
 import { AuraEvolutionPrompt } from "@/components/AuraEvolutionOverlay";
+import { useLocale } from "@/components/LocaleProvider";
 import MorphingText from "@/components/MorphingText";
+import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
+import { getAuraById, getAuraLineage, SECRET_FLAVOR } from "@/lib/constants/auras";
+import { getRarityLabel, localizeAuraType } from "@/lib/i18n/localize";
+import type { Messages } from "@/lib/i18n/messages";
+import type { Locale } from "@/lib/i18n/types";
 
 type AuraCardProps = {
   aura: AuraType;
@@ -26,13 +30,19 @@ type AuraCardProps = {
   morphFromCatchCopy?: string | null;
 };
 
-const STAT_META = [
-  { key: "social" as const, label: "社交力", short: "社交", color: "#fbbf24" },
-  { key: "neta" as const, label: "ネタ力", short: "ネタ", color: "#e879f9" },
-  { key: "mystic" as const, label: "神秘度", short: "神秘", color: "#818cf8" },
-  { key: "heal" as const, label: "癒し力", short: "癒し", color: "#6ee7b7" },
-  { key: "gap" as const, label: "ギャップ", short: "ギャップ", color: "#22d3ee" },
-];
+function statMeta(t: Messages["aura"]) {
+  return [
+    { key: "social" as const, label: t.statSocial, short: t.statSocialShort, color: "#fbbf24" },
+    { key: "neta" as const, label: t.statNeta, short: t.statNetaShort, color: "#e879f9" },
+    { key: "mystic" as const, label: t.statMystic, short: t.statMysticShort, color: "#818cf8" },
+    { key: "heal" as const, label: t.statHeal, short: t.statHealShort, color: "#6ee7b7" },
+    { key: "gap" as const, label: t.statGap, short: t.statGapShort, color: "#22d3ee" },
+  ];
+}
+
+function quoteWrap(text: string, locale: Locale) {
+  return locale === "en" ? `"${text}"` : `「${text}」`;
+}
 
 function StatBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
@@ -59,13 +69,18 @@ type CompatPreview = {
 function CompatibilityAuraModal({
   preview,
   onClose,
+  locale,
+  t,
 }: {
   preview: CompatPreview;
   onClose: () => void;
+  locale: Locale;
+  t: Messages;
 }) {
   const { aura, kind } = preview;
   const isSecret = aura.rarity === "secret";
   const lineage = getAuraLineage(aura.id);
+  const secretFlavor = locale === "en" ? t.aura.secretFlavor : SECRET_FLAVOR;
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -100,7 +115,7 @@ function CompatibilityAuraModal({
             onClick={onClose}
             className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/70"
           >
-            閉じる
+            {t.aura.close}
           </button>
         </div>
 
@@ -122,7 +137,7 @@ function CompatibilityAuraModal({
           )}
 
           <span className="mt-4 rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold">
-            {RARITY_LABELS[aura.rarity]}
+            {getRarityLabel(aura.rarity, locale)}
           </span>
           {lineage ? (
             <p className="mt-2 text-[11px] font-semibold tracking-[0.18em]" style={{ color: lineage.accent }}>
@@ -130,16 +145,16 @@ function CompatibilityAuraModal({
             </p>
           ) : null}
           <h3 className="mt-2 break-words text-2xl font-black leading-tight">
-            {isSecret ? "？？？（シークレット）" : aura.archetypeName}
+            {isSecret ? t.aura.secretName : aura.archetypeName}
           </h3>
           {!isSecret ? (
             <p className="mt-1 break-words text-sm text-white/55">{aura.name}</p>
           ) : null}
           <p className="mt-3 break-words text-sm text-cyan-100/90">
-            {isSecret ? "条件は明かされない、幻の光。" : aura.catchCopy}
+            {isSecret ? t.aura.secretFlavor : aura.catchCopy}
           </p>
           <p className="mt-3 break-words text-sm leading-relaxed text-white/75">
-            {isSecret ? SECRET_FLAVOR : aura.description}
+            {isSecret ? secretFlavor : aura.description}
           </p>
           {!isSecret && aura.keywords.length > 0 ? (
             <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -179,13 +194,15 @@ export default function AuraCard({
   morphFromAura = null,
   morphFromCatchCopy = null,
 }: AuraCardProps) {
+  const { locale, t } = useLocale();
+  const stats = statMeta(t.aura);
   const [compatPreview, setCompatPreview] = useState<CompatPreview | null>(null);
 
   function openCompat(kind: "good" | "bad") {
     const targetId = kind === "good" ? profile.compatibility.good.id : profile.compatibility.bad.id;
     const target = getAuraById(targetId);
     if (!target) return;
-    setCompatPreview({ kind, aura: target });
+    setCompatPreview({ kind, aura: localizeAuraType(target, locale) });
   }
 
   const heroTags =
@@ -195,16 +212,16 @@ export default function AuraCard({
 
   const oneLineCatch = aura.catchCopy || catchCopy;
 
-  const topStatBadges = [...STAT_META]
+  const topStatBadges = [...stats]
     .map((stat) => ({ ...stat, value: profile.stats[stat.key] }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 3);
 
   const ecologyRows = [
-    { label: "生息地", value: profile.ecology.habitat, tone: "violet" as const },
-    { label: "発動条件", value: profile.ecology.trigger, tone: "cyan" as const },
-    { label: "弱点", value: profile.ecology.weakness, tone: "amber" as const },
-    { label: "周囲への副作用", value: profile.ecology.sideEffect, tone: "fuchsia" as const },
+    { label: t.aura.habitat, value: profile.ecology.habitat, tone: "violet" as const },
+    { label: t.aura.trigger, value: profile.ecology.trigger, tone: "cyan" as const },
+    { label: t.aura.weakness, value: profile.ecology.weakness, tone: "amber" as const },
+    { label: t.aura.sideEffect, value: profile.ecology.sideEffect, tone: "fuchsia" as const },
   ];
 
   return (
@@ -224,7 +241,7 @@ export default function AuraCard({
         <div className="flex flex-col items-center text-center">
           {evolutionPending && !evolutionMorphing ? (
             <p className="aura-evolve-title font-display text-xl text-white/90 sm:text-2xl">
-              Change Your Aura
+              {t.aura.changeYourAura}
             </p>
           ) : displayName ? (
             <p className="text-sm font-semibold text-white/70 sm:text-base">{displayName}</p>
@@ -272,11 +289,11 @@ export default function AuraCard({
                       : "border-white/25 bg-white/10 text-white/90"
               }`}
             >
-              {RARITY_LABELS[aura.rarity]}
+              {getRarityLabel(aura.rarity, locale)}
             </span>
             {awakened ? (
               <span className="rounded-full border border-amber-300/60 bg-amber-400/20 px-3 py-1 text-xs font-black text-amber-100">
-                覚醒
+                {t.aura.awakened}
               </span>
             ) : null}
             <span
@@ -289,14 +306,14 @@ export default function AuraCard({
               }`}
             >
               {profile.confidence === "provisional"
-                ? "暫定"
+                ? t.aura.provisional
                 : profile.confidence === "growing"
-                  ? "育ち中"
-                  : "安定"}
+                  ? t.aura.growing
+                  : t.aura.stable}
             </span>
           </div>
 
-          <p className="mt-4 text-[11px] font-bold tracking-[0.28em] text-white/45">通り名</p>
+          <p className="mt-4 text-[11px] font-bold tracking-[0.28em] text-white/45">{t.aura.alias}</p>
           <h2
             className="mt-1 max-w-full break-words text-[clamp(2.25rem,10vw,4rem)] font-black leading-[1.02] tracking-tight"
             style={{
@@ -340,7 +357,7 @@ export default function AuraCard({
           </p>
 
           <div className="mt-4 flex max-w-full flex-wrap justify-center gap-2">
-            {(heroTags.length > 0 ? heroTags : ["覚醒待ち"]).map((word) => (
+            {(heroTags.length > 0 ? heroTags : [t.aura.awaitingVotes]).map((word) => (
               <span
                 key={word}
                 className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-sm font-bold"
@@ -352,10 +369,10 @@ export default function AuraCard({
 
           <div className="mt-5 w-full max-w-md rounded-2xl border border-fuchsia-300/45 bg-gradient-to-br from-fuchsia-500/25 via-rose-500/15 to-violet-500/20 px-4 py-3.5 text-center shadow-[0_0_28px_rgba(232,121,249,0.22)]">
             <p className="text-[11px] font-black tracking-[0.28em] text-fuchsia-100/90">
-              💥 必殺技
+              💥 {t.aura.specialMove}
             </p>
             <p className="mt-1.5 break-words text-lg font-black leading-snug text-white sm:text-xl">
-              「{profile.specialMove}」
+              {quoteWrap(profile.specialMove, locale)}
             </p>
           </div>
 
@@ -389,13 +406,13 @@ export default function AuraCard({
           }}
         />
         <p className="font-display text-center text-2xl text-white/70 sm:text-3xl">
-          Aura Manual
+          {t.aura.auraManual}
         </p>
         <h3 className="mt-2 text-center text-lg font-black text-white sm:text-xl">
-          あなたのオーラ取扱説明書
+          {t.aura.manualTitle}
         </h3>
         <p className="mt-1 max-w-sm text-center text-xs text-white/55 sm:text-sm">
-          当たりすぎ注意。スクロールして熟読してください。
+          {t.aura.manualSub}
         </p>
       </div>
 
@@ -416,7 +433,7 @@ export default function AuraCard({
 
         {/* 生態データ */}
         <div>
-          <SectionLabel>生態データ</SectionLabel>
+          <SectionLabel>{t.aura.ecology}</SectionLabel>
           <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
             {ecologyRows.map((row) => (
               <div
@@ -454,11 +471,11 @@ export default function AuraCard({
 
         {/* 周囲からの見え方 */}
         <div className="rounded-2xl border border-white/15 bg-white/5 p-4 sm:p-5">
-          <SectionLabel>周囲からのリアルな見え方</SectionLabel>
-          <p className="mt-1 text-[11px] text-white/45">友達目線・証言風</p>
+          <SectionLabel>{t.aura.witness}</SectionLabel>
+          <p className="mt-1 text-[11px] text-white/45">{t.aura.witnessSub}</p>
           <blockquote className="mt-3 border-l-2 border-cyan-300/50 pl-4">
             <p className="break-words text-sm leading-relaxed text-cyan-50/95 sm:text-base">
-              「{profile.witnessText}」
+              {quoteWrap(profile.witnessText, locale)}
             </p>
           </blockquote>
         </div>
@@ -466,13 +483,13 @@ export default function AuraCard({
         {/* 二面性＆詳細解説 */}
         <div className="space-y-4">
           <div>
-            <SectionLabel>二面性分析＆詳細解説</SectionLabel>
-            <p className="mt-1 text-[11px] text-white/45">なぜこのオーラになったのか</p>
+            <SectionLabel>{t.aura.duality}</SectionLabel>
+            <p className="mt-1 text-[11px] text-white/45">{t.aura.dualityWhy}</p>
           </div>
 
           {profile.evidence.length > 0 ? (
             <div>
-              <p className="text-xs font-semibold text-white/60">診断の決め手（票の根拠）</p>
+              <p className="text-xs font-semibold text-white/60">{t.aura.evidence}</p>
               <ul className="mt-2 space-y-2">
                 {profile.evidence.slice(0, 5).map((item) => (
                   <li
@@ -481,7 +498,8 @@ export default function AuraCard({
                   >
                     <span className="text-sm font-semibold">#{item.word}</span>
                     <span className="text-xs tabular-nums text-white/70">
-                      {item.count}票・{item.percent}%
+                      {item.count}
+                      {t.aura.voteUnit}・{item.percent}%
                     </span>
                     {item.badge ? (
                       <span className="rounded-full border border-violet-300/40 bg-violet-500/20 px-2 py-0.5 text-[10px] font-bold text-violet-100">
@@ -496,9 +514,12 @@ export default function AuraCard({
 
           {profile.contradiction ? (
             <div className="rounded-2xl border border-amber-400/40 bg-amber-500/10 p-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-amber-200">⚠️ 票の割れ・矛盾検出</p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-amber-200">
+                ⚠️ {t.aura.contradiction}
+              </p>
               <p className="mt-2 text-sm font-semibold text-amber-100">
-                「{profile.contradiction.wordA}」×「{profile.contradiction.wordB}」
+                {quoteWrap(profile.contradiction.wordA, locale)} ×{" "}
+                {quoteWrap(profile.contradiction.wordB, locale)}
               </p>
               <p className="mt-1.5 text-sm leading-relaxed text-amber-100/90">
                 {profile.contradiction.text}
@@ -520,22 +541,22 @@ export default function AuraCard({
 
         {/* 相性 */}
         <div>
-          <SectionLabel>相性診断</SectionLabel>
-          <p className="mt-1 text-[11px] text-white/45">友達同士で結果を見せ合うフック</p>
+          <SectionLabel>{t.aura.compat}</SectionLabel>
+          <p className="mt-1 text-[11px] text-white/45">{t.aura.compatSub}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <button
               type="button"
               onClick={() => openCompat("good")}
               className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-left transition hover:border-emerald-300/50 hover:bg-emerald-500/15 active:scale-[0.99]"
             >
-              <p className="text-xs font-semibold text-emerald-200">🔗 相性の良いオーラ</p>
+              <p className="text-xs font-semibold text-emerald-200">🔗 {t.aura.goodAura}</p>
               <p className="mt-2 break-words text-base font-bold text-emerald-100">
                 {profile.compatibility.good.name}
               </p>
               <p className="mt-2 text-[11px] text-emerald-100/60">
                 {profile.compatibility.good.name === "？？？"
-                  ? "タップでヒントを見る"
-                  : "タップで特徴を見る"}
+                  ? t.aura.tapSecret
+                  : t.aura.tapView}
               </p>
             </button>
             <button
@@ -543,14 +564,14 @@ export default function AuraCard({
               onClick={() => openCompat("bad")}
               className="rounded-2xl border border-rose-400/30 bg-rose-500/10 p-4 text-left transition hover:border-rose-300/50 hover:bg-rose-500/15 active:scale-[0.99]"
             >
-              <p className="text-xs font-semibold text-rose-200">⚔️ 危険なオーラ</p>
+              <p className="text-xs font-semibold text-rose-200">⚔️ {t.aura.badAura}</p>
               <p className="mt-2 break-words text-base font-bold text-rose-100">
                 {profile.compatibility.bad.name}
               </p>
               <p className="mt-2 text-[11px] text-rose-100/60">
                 {profile.compatibility.bad.name === "？？？"
-                  ? "タップでヒントを見る"
-                  : "タップで特徴を見る"}
+                  ? t.aura.tapSecret
+                  : t.aura.tapView}
               </p>
             </button>
           </div>
@@ -558,9 +579,9 @@ export default function AuraCard({
 
         {/* ステータス詳細・覚醒・占い */}
         <div className="rounded-2xl border border-white/15 bg-white/5 p-4 sm:p-5">
-          <SectionLabel>ステータス詳細</SectionLabel>
+          <SectionLabel>{t.aura.stats}</SectionLabel>
           <div className="mt-3 space-y-2.5">
-            {STAT_META.map((stat) => (
+            {stats.map((stat) => (
               <StatBar
                 key={stat.key}
                 label={stat.label}
@@ -573,7 +594,7 @@ export default function AuraCard({
 
         <div className="rounded-2xl border border-violet-400/30 bg-violet-500/10 p-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold tracking-[0.18em] text-violet-200">覚醒度</p>
+            <p className="text-xs font-semibold tracking-[0.18em] text-violet-200">{t.aura.awakening}</p>
             <span className="text-sm font-bold tabular-nums text-violet-100">
               {profile.awakening.percent}%
             </span>
@@ -588,13 +609,18 @@ export default function AuraCard({
         </div>
 
         <div className="rounded-2xl border border-cyan-400/25 bg-cyan-500/10 p-4">
-          <p className="text-xs font-semibold tracking-[0.18em] text-cyan-200">🌙 今日のオーラ占い</p>
+          <p className="text-xs font-semibold tracking-[0.18em] text-cyan-200">🌙 {t.aura.fortune}</p>
           <p className="mt-2 text-sm text-cyan-100">{profile.dailyFortune}</p>
         </div>
       </section>
 
       {compatPreview ? (
-        <CompatibilityAuraModal preview={compatPreview} onClose={() => setCompatPreview(null)} />
+        <CompatibilityAuraModal
+          preview={compatPreview}
+          onClose={() => setCompatPreview(null)}
+          locale={locale}
+          t={t}
+        />
       ) : null}
     </div>
   );
