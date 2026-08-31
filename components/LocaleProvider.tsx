@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -26,6 +27,16 @@ type LocaleProviderProps = {
 
 export function LocaleProvider({ children, initialLocale = DEFAULT_LOCALE }: LocaleProviderProps) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
+
+  useEffect(() => {
+    const hasCookie = document.cookie
+      .split(";")
+      .some((part) => part.trim().startsWith(`${LOCALE_COOKIE}=`));
+    if (!hasCookie) {
+      document.cookie = `${LOCALE_COOKIE}=${initialLocale};path=/;max-age=31536000;samesite=lax`;
+    }
+    document.documentElement.lang = initialLocale;
+  }, [initialLocale]);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);

@@ -1,7 +1,15 @@
 import type { Messages } from "./ja";
 
 export const enMessages: Messages = {
-  lang: { toggle: "日本語", label: "English" },
+  lang: {
+    toggle: "日本語",
+    label: "English",
+    switchToEn: "English",
+    switchToJa: "日本語",
+    bannerTitle: "View AuraMaker in English?",
+    bannerAction: "Switch to English",
+    bannerDismiss: "No thanks",
+  },
   header: {
     encyclopedia: "Dex",
     encyclopediaFull: "Aura Dex",

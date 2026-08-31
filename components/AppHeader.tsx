@@ -1,5 +1,11 @@
 import Header from "./Header";
+import LocaleSuggestBanner from "./LocaleSuggestBanner";
 
 export default function AppHeader() {
-  return <Header />;
+  return (
+    <>
+      <LocaleSuggestBanner />
+      <Header />
+    </>
+  );
 }

@@ -1,5 +1,13 @@
 export const jaMessages = {
-  lang: { toggle: "EN", label: "日本語" },
+  lang: {
+    toggle: "EN",
+    label: "日本語",
+    switchToEn: "English",
+    switchToJa: "日本語",
+    bannerTitle: "AuraMakerを英語で表示しますか？",
+    bannerAction: "英語に切り替える",
+    bannerDismiss: "このまま",
+  },
   header: {
     encyclopedia: "図鑑",
     encyclopediaFull: "オーラ図鑑",
