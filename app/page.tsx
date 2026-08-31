@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import AnonymousStartButton from "@/components/AnonymousStartButton";
 import AuraBackground from "@/components/AuraBackground";
+import RedirectIfLoggedIn from "@/components/RedirectIfLoggedIn";
 import { AURA_TYPES } from "@/lib/constants/auras";
 import { SERVICE_SHARE_TEXT } from "@/lib/constants/share";
 import { createClient } from "@/utils/supabase/server";
@@ -57,6 +58,7 @@ export default async function Home() {
 
   return (
     <main className="relative min-h-screen overflow-x-clip px-4 py-8 text-white sm:py-12">
+      <RedirectIfLoggedIn />
       <AuraBackground />
 
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl space-y-12 sm:space-y-16">

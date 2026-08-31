@@ -14,7 +14,20 @@ function needsSessionRefresh(pathname: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  if (!needsSessionRefresh(request.nextUrl.pathname)) {
+  const { pathname, searchParams } = request.nextUrl;
+
+  // OAuth code がトップ等に落ちた場合は callback へ寄せる
+  const code = searchParams.get("code");
+  if (code && pathname !== "/auth/callback") {
+    const callbackUrl = request.nextUrl.clone();
+    callbackUrl.pathname = "/auth/callback";
+    if (!callbackUrl.searchParams.has("next")) {
+      callbackUrl.searchParams.set("next", "/dashboard");
+    }
+    return NextResponse.redirect(callbackUrl);
+  }
+
+  if (!needsSessionRefresh(pathname)) {
     return NextResponse.next({ request });
   }
 
@@ -44,7 +57,13 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user && (pathname === "/" || pathname === "/login")) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
 
   return response;
 }

@@ -13,14 +13,19 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(message)}`, url.origin));
   }
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (error) {
-      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, url.origin));
-    }
+  if (!code) {
+    return NextResponse.redirect(
+      new URL("/login?error=missing_auth_code", url.origin),
+    );
   }
 
-  return NextResponse.redirect(new URL(next, url.origin));
+  const supabase = await createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, url.origin));
+  }
+
+  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  return NextResponse.redirect(new URL(safeNext, url.origin));
 }

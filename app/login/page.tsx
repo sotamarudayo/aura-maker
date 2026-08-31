@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import AnonymousStartButton from "@/components/AnonymousStartButton";
 import AuraBackground from "@/components/AuraBackground";
+import RedirectIfLoggedIn from "@/components/RedirectIfLoggedIn";
 import { createClient } from "@/utils/supabase/server";
 import LoginForm from "./LoginForm";
 
@@ -17,6 +18,7 @@ export default async function LoginPage() {
 
   return (
     <main className="relative flex flex-1 flex-col items-center overflow-x-clip px-4 py-8 text-white sm:py-12">
+      <RedirectIfLoggedIn />
       <AuraBackground />
       <div className="relative z-10 flex w-full max-w-md flex-col items-center gap-6 text-center">
         <div className="space-y-2">
