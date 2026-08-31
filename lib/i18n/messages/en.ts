@@ -32,6 +32,17 @@ export const enMessages: Messages = {
       "A personality read from how others see you — browse every aura type by lineage.",
     openEncyclopedia: "Open the Dex",
   },
+  anonymousStart: {
+    nameTitle: "Pick a display name first",
+    nameSub: "Shown on your vote page and share links (you can change it later)",
+    nameLabel: "Display name ({min}–{max} chars)",
+    namePlaceholder: "e.g. Alex / Sam",
+    submit: "Start with this name",
+    submitting: "Setting up...",
+    back: "Back",
+    nameError: "Display name must be {min}–{max} characters.",
+    createUserError: "Could not create your profile. Please try again.",
+  },
   encyclopedia: {
     title: "Discover all {count} aura types",
     sub: "Grouped by vibe families. Rarity runs Common → Secret. Secret types unlock after 10+ votes.",

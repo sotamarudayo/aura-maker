@@ -69,9 +69,9 @@ export default function HomeContent() {
           <div className="mt-8">
             <p className="text-sm font-semibold text-white/75">{t.landing.keywordHint}</p>
             <div className="mt-3 flex flex-wrap gap-2" aria-hidden>
-              {exampleWords.map((word) => (
+              {exampleWords.map((word, index) => (
                 <span
-                  key={word.label}
+                  key={`${index}-${word.label}`}
                   className={
                     word.selected
                       ? "rounded-full bg-violet-300 px-3 py-2 text-sm font-semibold text-black"

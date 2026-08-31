@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/components/LocaleProvider";
 import { trackEvent } from "@/lib/analytics";
 import { createClient } from "@/utils/supabase/client";
 
@@ -16,15 +17,18 @@ const NAME_MAX = 20;
 
 export default function AnonymousStartButton({
   className = "rounded-full bg-violet-300 px-6 py-3 font-semibold text-black disabled:opacity-60",
-  label = "登録なしですぐ始める（1タップ）",
+  label,
 }: AnonymousStartButtonProps) {
   const router = useRouter();
+  const { t } = useLocale();
   const supabase = useMemo(() => createClient(), []);
   const inputRef = useRef<HTMLInputElement>(null);
   const [askingName, setAskingName] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const buttonLabel = label ?? t.landing.startGuest;
 
   useEffect(() => {
     if (!askingName) return;
@@ -36,7 +40,11 @@ export default function AnonymousStartButton({
 
     const trimmed = displayName.trim();
     if (trimmed.length < NAME_MIN || trimmed.length > NAME_MAX) {
-      setError(`表示名は${NAME_MIN}〜${NAME_MAX}文字で入力してください。`);
+      setError(
+        t.anonymousStart.nameError
+          .replace("{min}", String(NAME_MIN))
+          .replace("{max}", String(NAME_MAX)),
+      );
       return;
     }
 
@@ -53,7 +61,7 @@ export default function AnonymousStartButton({
 
     const userId = signInData.user?.id;
     if (!userId) {
-      setError("ユーザーの作成に失敗しました。もう一度お試しください。");
+      setError(t.anonymousStart.createUserError);
       setLoading(false);
       return;
     }
@@ -88,7 +96,7 @@ export default function AnonymousStartButton({
           }}
           className={`w-full sm:w-auto ${className}`}
         >
-          {label}
+          {buttonLabel}
         </button>
       </div>
     );
@@ -101,19 +109,21 @@ export default function AnonymousStartButton({
         className="w-full max-w-md space-y-3 rounded-2xl border border-white/25 bg-black/45 p-4 backdrop-blur sm:p-5"
       >
         <div>
-          <p className="text-sm font-semibold text-violet-100">まず名前を決めよう</p>
-          <p className="mt-1 text-xs text-white/65">
-            投票ページやシェア文に表示されます（あとから変更できます）
-          </p>
+          <p className="text-sm font-semibold text-violet-100">{t.anonymousStart.nameTitle}</p>
+          <p className="mt-1 text-xs text-white/65">{t.anonymousStart.nameSub}</p>
         </div>
         <label className="block space-y-1.5">
-          <span className="text-sm text-white/80">表示名（{NAME_MIN}〜{NAME_MAX}文字）</span>
+          <span className="text-sm text-white/80">
+            {t.anonymousStart.nameLabel
+              .replace("{min}", String(NAME_MIN))
+              .replace("{max}", String(NAME_MAX))}
+          </span>
           <input
             ref={inputRef}
             value={displayName}
             maxLength={NAME_MAX}
             onChange={(event) => setDisplayName(event.target.value)}
-            placeholder="例：まる / アヤ"
+            placeholder={t.anonymousStart.namePlaceholder}
             disabled={loading}
             className="w-full rounded-xl border border-white/25 bg-black/50 px-3 py-2.5 text-sm text-white placeholder:text-white/35 outline-none ring-violet-300/40 focus:ring-2"
           />
@@ -124,7 +134,7 @@ export default function AnonymousStartButton({
             disabled={loading}
             className="w-full rounded-full bg-violet-300 px-5 py-2.5 text-sm font-bold text-black disabled:opacity-60 sm:flex-1"
           >
-            {loading ? "準備中..." : "この名前で始める"}
+            {loading ? t.anonymousStart.submitting : t.anonymousStart.submit}
           </button>
           <button
             type="button"
@@ -135,7 +145,7 @@ export default function AnonymousStartButton({
             }}
             className="w-full rounded-full border border-white/30 px-5 py-2.5 text-sm text-white/85 disabled:opacity-60 sm:w-auto"
           >
-            戻る
+            {t.anonymousStart.back}
           </button>
         </div>
         {error ? <p className="text-sm text-rose-300">{error}</p> : null}

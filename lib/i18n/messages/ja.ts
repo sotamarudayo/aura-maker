@@ -30,6 +30,17 @@ export const jaMessages = {
       "MBTIみたいな他人から見たタイプ診断。系統ごとに分かれたオーラを図鑑でチェック。",
     openEncyclopedia: "図鑑を開く",
   },
+  anonymousStart: {
+    nameTitle: "まず名前を決めよう",
+    nameSub: "投票ページやシェア文に表示されます（あとから変更できます）",
+    nameLabel: "表示名（{min}〜{max}文字）",
+    namePlaceholder: "例：まる / アヤ",
+    submit: "この名前で始める",
+    submitting: "準備中...",
+    back: "戻る",
+    nameError: "表示名は{min}〜{max}文字で入力してください。",
+    createUserError: "ユーザーの作成に失敗しました。もう一度お試しください。",
+  },
   encyclopedia: {
     title: "全{count}種類のオーラを発見しよう",
     sub: "似た空気感どうしで系統分け。レア度はコモン〜シークレットの5段階。シークレットは投票10票以上で判定が開く。",
