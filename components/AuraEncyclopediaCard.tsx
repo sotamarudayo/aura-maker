@@ -87,6 +87,7 @@ export default function AuraEncyclopediaCard({
             palette={aura.palette}
             lineage={lineage}
             secret={isSecret}
+            className="size-full"
           />
         </div>
 

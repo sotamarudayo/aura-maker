@@ -94,44 +94,48 @@ export default function AuraSphere({
   const dormant = !hasVotes && !secret;
 
   return (
-    <AuraOrbStage
-      lineage={lineage}
-      auraId={auraId}
-      className={`aura-sphere-stage ${className}`.trim()}
+    <div
+      className={`aura-sphere-root relative shrink-0 ${className}`.trim()}
       style={paletteVars(palette)}
     >
-      <div className="aura-sphere-bloom" aria-hidden />
-      <div className={`aura-sphere-halo ${pulse ? "aura-sphere-halo-pulse" : ""}`} aria-hidden />
-      <div className="aura-sphere-ring aura-sphere-ring-a" aria-hidden />
-      <div className="aura-sphere-ring aura-sphere-ring-b" aria-hidden />
-      <div className="aura-sphere-ring aura-sphere-ring-c" aria-hidden />
+      <AuraOrbStage
+        lineage={lineage}
+        auraId={auraId}
+        className="aura-sphere-stage size-full"
+      >
+        <div className="aura-sphere-bloom" aria-hidden />
+        <div className={`aura-sphere-halo ${pulse ? "aura-sphere-halo-pulse" : ""}`} aria-hidden />
+        <div className="aura-sphere-ring aura-sphere-ring-a" aria-hidden />
+        <div className="aura-sphere-ring aura-sphere-ring-b" aria-hidden />
+        <div className="aura-sphere-ring aura-sphere-ring-c" aria-hidden />
 
-      {evolutionMorphing && morphFromPalette ? (
-        <>
-          <AuraSphereBody
-            palette={morphFromPalette}
-            auraId={auraId}
-            className="aura-evolve-orb-from"
-          />
+        {evolutionMorphing && morphFromPalette ? (
+          <>
+            <AuraSphereBody
+              palette={morphFromPalette}
+              auraId={auraId}
+              className="aura-evolve-orb-from"
+            />
+            <AuraSphereBody
+              palette={palette}
+              auraId={auraId}
+              awakened={awakened}
+              className="aura-evolve-orb-to"
+            />
+          </>
+        ) : (
           <AuraSphereBody
             palette={palette}
             auraId={auraId}
+            dormant={dormant}
+            secret={secret}
             awakened={awakened}
-            className="aura-evolve-orb-to"
           />
-        </>
-      ) : (
-        <AuraSphereBody
-          palette={palette}
-          auraId={auraId}
-          dormant={dormant}
-          secret={secret}
-          awakened={awakened}
-        />
-      )}
+        )}
 
-      {children}
-    </AuraOrbStage>
+        {children}
+      </AuraOrbStage>
+    </div>
   );
 }
 

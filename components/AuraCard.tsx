@@ -103,6 +103,7 @@ function CompatAuraTile({
           palette={aura.palette}
           lineage={lineage}
           secret={isSecret}
+          className="size-full"
         />
       </div>
       <div className="min-w-0 flex-1">
@@ -198,6 +199,7 @@ function CompatibilityAuraModal({
               palette={aura.palette}
               lineage={lineage}
               secret={isSecret}
+              className="size-full"
             />
           </div>
 

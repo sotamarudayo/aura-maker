@@ -28,7 +28,7 @@ export default function AuraOrbStage({
 
   return (
     <div
-      className={`aura-orb-stage relative h-full w-full ${stageClass} ${className}`.trim()}
+      className={`aura-orb-stage relative size-full ${stageClass} ${className}`.trim()}
       style={style}
       data-lineage={lineage?.id}
       data-aura-id={auraId}
