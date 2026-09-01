@@ -173,6 +173,14 @@ body {
   aspect-ratio: 1 / 1;
 }
 
+.aura-sphere-root:not(.aura-sphere-compact) .aura-sphere-bloom {
+  inset: -34% -34% -16% -34%;
+}
+
+.aura-sphere-root:not(.aura-sphere-compact) .aura-sphere-halo {
+  inset: -22% -22% -10% -22%;
+}
+
 .aura-sphere-bloom {
   position: absolute;
   inset: -42%;

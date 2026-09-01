@@ -335,45 +335,46 @@ export default function AuraCard({
             <p className="text-sm font-semibold text-white/70 sm:text-base">{displayName}</p>
           ) : null}
 
-          <AuraSphere
-            auraId={aura.id}
-            palette={aura.palette}
-            lineage={lineage}
-            hasVotes={hasVotes}
-            awakened={awakened}
-            secret={aura.rarity === "secret"}
-            pulse={pulse}
-            evolutionMorphing={evolutionMorphing}
-            morphFromPalette={morphFromAura?.palette}
-            className="relative mt-3 h-40 w-40 sm:mt-4 sm:h-56 sm:w-56"
-          >
-            <AuraEvolutionPrompt active={evolutionPending && !evolutionMorphing} />
-          </AuraSphere>
+          <div className="relative mt-3 w-full sm:mt-4">
+            <AuraSphere
+              auraId={aura.id}
+              palette={aura.palette}
+              lineage={lineage}
+              hasVotes={hasVotes}
+              awakened={awakened}
+              secret={aura.rarity === "secret"}
+              pulse={pulse}
+              evolutionMorphing={evolutionMorphing}
+              morphFromPalette={morphFromAura?.palette}
+              className="relative mx-auto h-40 w-40 sm:h-56 sm:w-56"
+            >
+              <AuraEvolutionPrompt active={evolutionPending && !evolutionMorphing} />
+            </AuraSphere>
+          </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <div className="relative z-10 mt-6 flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/15 bg-black/80 px-3 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.55)] backdrop-blur-md sm:mt-7 sm:px-4">
             <span
-              className="rounded-full border px-3 py-1 text-xs font-black tracking-wide"
+              className="rounded-full border px-3 py-1 text-xs font-black tracking-wide text-white"
               style={{
-                borderColor: `${aura.palette.a}aa`,
-                background: `color-mix(in srgb, ${aura.palette.a} 22%, transparent)`,
-                color: "rgba(255,255,255,0.95)",
-                boxShadow: `0 0 16px ${aura.palette.a}55`,
+                borderColor: `${aura.palette.a}cc`,
+                background: `color-mix(in srgb, ${aura.palette.a} 38%, rgb(9 9 11))`,
+                boxShadow: `0 0 12px ${aura.palette.a}44`,
               }}
             >
               {getRarityLabel(aura.rarity, locale)}
             </span>
             {awakened ? (
-              <span className="rounded-full border border-amber-300/60 bg-amber-400/20 px-3 py-1 text-xs font-black text-amber-100">
+              <span className="rounded-full border border-amber-300/80 bg-amber-950/90 px-3 py-1 text-xs font-black text-amber-50 shadow-[0_0_12px_rgba(251,191,36,0.25)]">
                 {t.aura.awakened}
               </span>
             ) : null}
             <span
-              className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${
+              className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
                 profile.confidence === "provisional"
-                  ? "border-amber-300/50 bg-amber-500/20 text-amber-100"
+                  ? "border-amber-300/70 bg-amber-950/90 text-amber-50"
                   : profile.confidence === "growing"
-                    ? "border-cyan-300/40 bg-cyan-500/15 text-cyan-100"
-                    : "border-emerald-300/40 bg-emerald-500/15 text-emerald-100"
+                    ? "border-cyan-300/60 bg-cyan-950/90 text-cyan-50"
+                    : "border-emerald-300/60 bg-emerald-950/90 text-emerald-50"
               }`}
             >
               {profile.confidence === "provisional"
