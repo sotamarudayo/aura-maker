@@ -10,7 +10,7 @@ import { LINEAGE_EN } from "./en/lineages";
 export const WORD_EN: Record<string, string> = {
   "biju-bakuhatsu": "Face Card Maxed",
   "attoteki-shujinko": "Main Character Energy",
-  tomekikan: "Glass Skin",
+  tomeikan: "Glass Skin",
   charisma: "Charisma",
   hakanage: "Ethereal",
   "heisei-retro": "Retro Aesthetic",

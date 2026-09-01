@@ -2,8 +2,9 @@
 
 import type { CSSProperties } from "react";
 import { useLocale } from "@/components/LocaleProvider";
+import { AuraSphereCompact } from "@/components/AuraSphere";
 import type { AuraType } from "@/lib/constants/auras";
-import { SECRET_FLAVOR } from "@/lib/constants/auras";
+import { getAuraLineage, SECRET_FLAVOR } from "@/lib/constants/auras";
 import { getRarityLabel } from "@/lib/i18n/localize";
 
 type AuraEncyclopediaCardProps = {
@@ -26,10 +27,11 @@ export default function AuraEncyclopediaCard({
   const accentSoft = lineageAccentSoft ?? "rgba(255,255,255,0.06)";
   const cardSoft = `color-mix(in srgb, ${accent} 14%, transparent)`;
   const secretFlavor = locale === "en" ? t.aura.secretFlavor : SECRET_FLAVOR;
+  const lineage = getAuraLineage(aura.id);
 
   return (
     <article
-      className="aura-encyclopedia-card group relative w-full min-w-0 overflow-hidden rounded-2xl border p-0 backdrop-blur transition duration-300 hover:-translate-y-1"
+      className={`aura-encyclopedia-card group relative w-full min-w-0 overflow-hidden rounded-2xl border p-0 backdrop-blur transition duration-300 hover:-translate-y-1 ${lineage?.id === "legend" ? "aura-encyclopedia-legend" : ""}`}
       style={
         {
           "--lineage-accent": accent,
@@ -59,33 +61,9 @@ export default function AuraEncyclopediaCard({
       <div className="relative p-4 sm:p-5">
         <div className="aura-encyclopedia-glow pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-        {isSecret ? (
-          <div
-            className="aura-secret-orb relative mx-auto h-20 w-20 sm:h-24 sm:w-24"
-            style={{ boxShadow: `0 0 28px ${accent}66` }}
-          >
-            <div className="absolute inset-0 rounded-full bg-zinc-950" />
-            <div
-              className="absolute inset-[10%] rounded-full border"
-              style={{ borderColor: `${accent}66` }}
-            />
-            <div
-              className="absolute inset-0 flex items-center justify-center text-2xl font-black"
-              style={{ color: `${accent}cc` }}
-            >
-              ?
-            </div>
-          </div>
-        ) : (
-          <div
-            className="relative mx-auto h-20 w-20 rounded-full shadow-lg sm:h-24 sm:w-24"
-            style={{
-              background: aura.gradient,
-              border: `1px solid ${accent}55`,
-              boxShadow: `0 0 24px ${accent}33`,
-            }}
-          />
-        )}
+        <div className="relative mx-auto h-20 w-20 sm:h-24 sm:w-24">
+          <AuraSphereCompact palette={aura.palette} lineage={lineage} secret={isSecret} />
+        </div>
 
         <div className="relative mt-4 min-w-0 space-y-2">
           <div className="flex items-start justify-between gap-2">
@@ -100,15 +78,13 @@ export default function AuraEncyclopediaCard({
               ) : null}
             </div>
             <span
-              className={`w-fit shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-black tracking-wide ${
-                isSecret
-                  ? "border-violet-300/70 bg-violet-500/30 text-violet-100 shadow-[0_0_14px_rgba(124,58,237,0.4)]"
-                  : aura.rarity === "legendary"
-                    ? "border-amber-200/70 bg-amber-300/20 text-amber-100"
-                    : aura.rarity === "rare"
-                      ? "border-cyan-300/50 bg-cyan-400/15 text-cyan-100"
-                      : "border-white/20 bg-white/10 text-white/90"
-              }`}
+              className="w-fit shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-black tracking-wide"
+              style={{
+                borderColor: `${accent}aa`,
+                background: `color-mix(in srgb, ${accent} 20%, transparent)`,
+                boxShadow: `0 0 12px ${accent}44`,
+                color: "rgba(255,255,255,0.95)",
+              }}
             >
               {getRarityLabel(aura.rarity, locale)}
             </span>

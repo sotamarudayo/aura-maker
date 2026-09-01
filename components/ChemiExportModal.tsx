@@ -18,21 +18,96 @@ type ChemiExportModalProps = {
 
 function ExportBrandFooter() {
   return (
-    <div style={{ paddingTop: 4, textAlign: "center" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/brand/logo-mark.png"
-          alt=""
-          width={18}
-          height={18}
-          style={{ borderRadius: "50%", display: "block", width: 18, height: 18 }}
+    <div style={{ paddingTop: 6, textAlign: "center" }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: "0.12em",
+          color: "rgba(255,255,255,0.55)",
+        }}
+      >
+        ✦ AuraMaker ✦
+      </p>
+    </div>
+  );
+}
+
+function ChemiGaugeBar({ label, percent, color }: { label: string; percent: number; color: string }) {
+  return (
+    <div style={{ marginBottom: 6 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 3,
+          gap: 6,
+        }}
+      >
+        <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.72)" }}>{label}</span>
+        <span style={{ fontSize: 9, fontWeight: 800, color, flexShrink: 0 }}>{percent}%</span>
+      </div>
+      <div
+        style={{
+          height: 6,
+          borderRadius: 999,
+          background: "rgba(255,255,255,0.08)",
+          overflow: "hidden",
+          boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.06)`,
+        }}
+      >
+        <div
+          style={{
+            width: `${percent}%`,
+            height: "100%",
+            borderRadius: 999,
+            background: `linear-gradient(90deg, ${color}cc 0%, ${color} 100%)`,
+            boxShadow: `0 0 10px ${color}88`,
+          }}
         />
-        <p style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.45)", margin: 0 }}>
-          AuraMaker
-        </p>
       </div>
     </div>
+  );
+}
+
+function ChemiSourceOrb({
+  palette,
+  size,
+  offsetX,
+  zIndex,
+}: {
+  palette: ChemiParty["aura"]["palette"];
+  size: number;
+  offsetX: number;
+  zIndex: number;
+}) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        width: size,
+        height: size,
+        marginLeft: offsetX - size / 2,
+        marginTop: -size / 2,
+        borderRadius: "50%",
+        overflow: "hidden",
+        zIndex,
+        background: `
+          radial-gradient(circle at 30% 30%, ${palette.a} 0%, transparent 48%),
+          radial-gradient(circle at 70% 65%, ${palette.b} 0%, transparent 46%),
+          linear-gradient(160deg, ${palette.c}88 0%, #0a0818 100%)
+        `,
+        boxShadow: `
+          inset 0 0 16px rgba(255,255,255,0.14),
+          0 0 24px ${palette.a}77,
+          0 0 18px ${palette.b}55
+        `,
+      }}
+    />
   );
 }
 
@@ -47,12 +122,15 @@ function FusedChemiOrb({
   blended: ChemiParty["aura"]["palette"];
   size?: number;
 }) {
-  const glow = size + 44;
+  const orbSize = Math.round(size * 0.58);
+  const spread = Math.round(size * 0.22);
+  const glow = size + 56;
+
   return (
     <div
       style={{
         position: "relative",
-        width: size,
+        width: size + spread * 2,
         height: size,
         flexShrink: 0,
       }}
@@ -70,44 +148,50 @@ function FusedChemiOrb({
           background: `
             radial-gradient(circle at 32% 48%, ${paletteA.a}99 0%, transparent 52%),
             radial-gradient(circle at 68% 48%, ${paletteB.a}99 0%, transparent 52%),
-            radial-gradient(circle at 50% 50%, ${blended.b}66 0%, transparent 62%)
+            radial-gradient(circle at 50% 50%, ${blended.b}88 0%, transparent 58%)
           `,
-          filter: "blur(12px)",
-        }}
-      />
-      <div
-        style={{
-          position: "relative",
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          overflow: "hidden",
-          background: `
-            radial-gradient(circle at 28% 36%, ${paletteA.a} 0%, transparent 46%),
-            radial-gradient(circle at 72% 38%, ${paletteB.a} 0%, transparent 46%),
-            radial-gradient(circle at 50% 62%, ${blended.c} 0%, transparent 48%),
-            radial-gradient(circle at 40% 52%, ${paletteA.b}bb 0%, transparent 42%),
-            radial-gradient(circle at 60% 50%, ${paletteB.b}bb 0%, transparent 42%),
-            linear-gradient(135deg, ${paletteA.c}55 0%, ${paletteB.c}55 100%),
-            linear-gradient(160deg, #16112a 0%, #0a0818 100%)
-          `,
-          boxShadow: `
-            inset 0 0 20px rgba(255,255,255,0.16),
-            0 0 32px ${paletteA.a}66,
-            0 0 32px ${paletteB.a}55
-          `,
+          filter: "blur(14px)",
         }}
       />
       <div
         style={{
           position: "absolute",
-          inset: "18%",
+          left: "50%",
+          top: "50%",
+          width: Math.round(size * 0.34),
+          height: Math.round(size * 0.34),
+          marginLeft: -Math.round(size * 0.17),
+          marginTop: -Math.round(size * 0.17),
           borderRadius: "50%",
-          border: "1px solid rgba(255,255,255,0.12)",
-          boxShadow: `inset 0 0 18px ${blended.a}44`,
-          pointerEvents: "none",
+          zIndex: 3,
+          background: `radial-gradient(circle, rgba(255,255,255,0.95) 0%, ${blended.a}cc 35%, transparent 72%)`,
+          boxShadow: `0 0 28px ${blended.a}cc, 0 0 48px ${blended.b}88`,
         }}
       />
+      <div
+        style={{
+          position: "absolute",
+          inset: "8%",
+          borderRadius: "50%",
+          border: "1px solid rgba(255,255,255,0.1)",
+          transform: "rotate(-12deg)",
+          pointerEvents: "none",
+          zIndex: 4,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: "2%",
+          borderRadius: "50%",
+          border: "1px solid rgba(255,255,255,0.06)",
+          transform: "rotate(18deg)",
+          pointerEvents: "none",
+          zIndex: 4,
+        }}
+      />
+      <ChemiSourceOrb palette={paletteA} size={orbSize} offsetX={-spread} zIndex={1} />
+      <ChemiSourceOrb palette={paletteB} size={orbSize} offsetX={spread} zIndex={2} />
     </div>
   );
 }
@@ -123,7 +207,6 @@ function ChemiCardCanvas({
 }) {
   const chemi = calculateChemi(partyA, partyB);
   const { blendedPalette } = chemi;
-  const chemNameSize = chemi.chemName.length >= 12 ? 20 : chemi.chemName.length >= 9 ? 24 : 28;
 
   return (
     <div
@@ -177,7 +260,7 @@ function ChemiCardCanvas({
             alignItems: "center",
             justifyContent: "center",
             marginTop: 8,
-            height: 96,
+            height: 108,
             flexShrink: 0,
           }}
         >
@@ -185,7 +268,7 @@ function ChemiCardCanvas({
             paletteA={partyA.aura.palette}
             paletteB={partyB.aura.palette}
             blended={blendedPalette}
-            size={96}
+            size={100}
           />
         </div>
 
@@ -193,41 +276,18 @@ function ChemiCardCanvas({
           <p
             style={{
               margin: 0,
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: "0.18em",
-              color: "rgba(255,255,255,0.45)",
-            }}
-          >
-            ケミ名
-          </p>
-          <h3
-            style={{
-              marginTop: 3,
-              marginBottom: 0,
-              fontSize: chemNameSize,
+              fontSize: 17,
               fontWeight: 900,
-              lineHeight: 1.2,
+              lineHeight: 1.25,
               color: "#fff",
-              textShadow: `0 0 24px ${blendedPalette.a}aa`,
+              textShadow: `0 0 20px ${blendedPalette.a}66`,
             }}
           >
-            {chemi.chemName}
-          </h3>
-          <p
-            style={{
-              marginTop: 6,
-              marginBottom: 0,
-              fontSize: 20,
-              fontWeight: 900,
-              color: "#fde68a",
-            }}
-          >
-            相性 {chemi.compatibilityPercent}%
+            相性 {chemi.compatibilityPercent}%｜{chemi.chemName}
           </p>
           <p
             style={{
-              marginTop: 2,
+              marginTop: 4,
               marginBottom: 0,
               fontSize: 10,
               color: "rgba(255,255,255,0.55)",
@@ -235,6 +295,26 @@ function ChemiCardCanvas({
           >
             {partyA.aura.archetypeName} × {partyB.aura.archetypeName}
           </p>
+        </div>
+
+        <div
+          style={{
+            marginTop: 8,
+            borderRadius: 12,
+            border: "1px solid rgba(255,255,255,0.14)",
+            background: "rgba(0,0,0,0.22)",
+            padding: "8px 10px 4px",
+            flexShrink: 0,
+          }}
+        >
+          {chemi.gauges.map((gauge) => (
+            <ChemiGaugeBar
+              key={gauge.id}
+              label={gauge.label}
+              percent={gauge.percent}
+              color={gauge.color}
+            />
+          ))}
         </div>
 
         <div
@@ -264,42 +344,14 @@ function ChemiCardCanvas({
             style={{
               marginTop: 4,
               marginBottom: 0,
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: 600,
-              lineHeight: 1.4,
+              lineHeight: 1.35,
               color: "rgba(255,255,255,0.88)",
             }}
           >
             {chemi.ecologyText}
           </p>
-        </div>
-
-        <div
-          style={{
-            marginTop: 8,
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 5,
-            flexShrink: 0,
-          }}
-        >
-          {[...partyA.topWords.slice(0, 2), ...partyB.topWords.slice(0, 2)].map((word) => (
-            <span
-              key={word}
-              style={{
-                borderRadius: 999,
-                border: "1px solid rgba(255,255,255,0.2)",
-                background: "rgba(255,255,255,0.1)",
-                padding: "3px 8px",
-                fontSize: 10,
-                fontWeight: 700,
-                color: "#f5f3ff",
-              }}
-            >
-              #{word}
-            </span>
-          ))}
         </div>
 
         <div style={{ marginTop: 6, flexShrink: 0 }}>

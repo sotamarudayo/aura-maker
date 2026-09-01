@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { AuraEvolutionPrompt } from "@/components/AuraEvolutionOverlay";
+import AuraSphere, { AuraSphereCompact } from "@/components/AuraSphere";
 import { useLocale } from "@/components/LocaleProvider";
 import MorphingText from "@/components/MorphingText";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
@@ -120,21 +121,13 @@ function CompatibilityAuraModal({
         </div>
 
         <div className="mt-5 flex flex-col items-center text-center">
-          {isSecret ? (
-            <div className="relative h-24 w-24 rounded-full border border-violet-400/40 bg-zinc-950 shadow-[0_0_28px_rgba(124,58,237,0.45)]">
-              <div className="absolute inset-0 flex items-center justify-center text-3xl font-black text-violet-200/80">
-                ?
-              </div>
-            </div>
-          ) : (
-            <div
-              className="h-24 w-24 rounded-full border border-white/20 shadow-lg"
-              style={{
-                background: aura.gradient,
-                boxShadow: `0 0 28px ${aura.palette.a}66`,
-              }}
+          <div className="relative h-24 w-24">
+            <AuraSphereCompact
+              palette={aura.palette}
+              lineage={lineage}
+              secret={isSecret}
             />
-          )}
+          </div>
 
           <span className="mt-4 rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold">
             {getRarityLabel(aura.rarity, locale)}
@@ -211,6 +204,7 @@ export default function AuraCard({
       : topWords.slice(0, 3);
 
   const oneLineCatch = aura.catchCopy || catchCopy;
+  const lineage = getAuraLineage(aura.id);
 
   const topStatBadges = [...stats]
     .map((stat) => ({ ...stat, value: profile.stats[stat.key] }))
@@ -229,7 +223,7 @@ export default function AuraCard({
       {/* ========== First View: スクショ映え ========== */}
       {/* 進化演出の対象はここまで。取扱説明書（AURA MANUAL）以降は通常差し替えのみ */}
       <section
-        className="min-w-0 rounded-3xl border border-white/20 bg-black/35 p-5 backdrop-blur sm:p-8"
+        className={`min-w-0 rounded-3xl border bg-black/35 p-5 backdrop-blur sm:p-8 ${lineage?.id === "legend" ? "aura-result-legend-frame" : "border-white/20"}`}
         style={
           {
             "--card-a": aura.palette.a,
@@ -247,47 +241,29 @@ export default function AuraCard({
             <p className="text-sm font-semibold text-white/70 sm:text-base">{displayName}</p>
           ) : null}
 
-          <div className="relative mt-3 h-40 w-40 sm:mt-4 sm:h-56 sm:w-56">
-            <div className={`aura-card-halo ${pulse ? "aura-card-halo-pulse" : ""}`} />
-            <div className="aura-card-ring aura-card-ring-a" />
-            <div className="aura-card-ring aura-card-ring-b" />
-            {evolutionMorphing && morphFromAura ? (
-              <>
-                <div
-                  className="aura-card-core aura-evolve-orb-from"
-                  style={
-                    {
-                      "--card-a": morphFromAura.palette.a,
-                      "--card-b": morphFromAura.palette.b,
-                      "--card-c": morphFromAura.palette.c,
-                    } as CSSProperties
-                  }
-                />
-                <div
-                  className={`aura-card-core aura-evolve-orb-to ${awakened ? "aura-card-core-awakened" : ""}`}
-                />
-              </>
-            ) : (
-              <div
-                className={`aura-card-core ${hasVotes ? "" : "aura-card-core-dormant"} ${
-                  awakened ? "aura-card-core-awakened" : ""
-                }`}
-              />
-            )}
+          <AuraSphere
+            palette={aura.palette}
+            lineage={lineage}
+            hasVotes={hasVotes}
+            awakened={awakened}
+            secret={aura.rarity === "secret"}
+            pulse={pulse}
+            evolutionMorphing={evolutionMorphing}
+            morphFromPalette={morphFromAura?.palette}
+            className="relative mt-3 h-40 w-40 sm:mt-4 sm:h-56 sm:w-56"
+          >
             <AuraEvolutionPrompt active={evolutionPending && !evolutionMorphing} />
-          </div>
+          </AuraSphere>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             <span
-              className={`rounded-full border px-3 py-1 text-xs font-black tracking-wide ${
-                aura.rarity === "secret"
-                  ? "border-violet-300/70 bg-violet-500/30 text-violet-100 shadow-[0_0_18px_rgba(124,58,237,0.45)]"
-                  : aura.rarity === "legendary"
-                    ? "border-amber-200/70 bg-amber-300/20 text-amber-100 shadow-[0_0_16px_rgba(251,191,36,0.35)]"
-                    : aura.rarity === "rare"
-                      ? "border-cyan-300/50 bg-cyan-400/15 text-cyan-100"
-                      : "border-white/25 bg-white/10 text-white/90"
-              }`}
+              className="rounded-full border px-3 py-1 text-xs font-black tracking-wide"
+              style={{
+                borderColor: `${aura.palette.a}aa`,
+                background: `color-mix(in srgb, ${aura.palette.a} 22%, transparent)`,
+                color: "rgba(255,255,255,0.95)",
+                boxShadow: `0 0 16px ${aura.palette.a}55`,
+              }}
             >
               {getRarityLabel(aura.rarity, locale)}
             </span>

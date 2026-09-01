@@ -6,11 +6,21 @@ export type ChemiParty = {
   topWords: string[];
 };
 
+export type ChemiGaugeId = "talk" | "distance" | "vibe";
+
+export type ChemiGauge = {
+  id: ChemiGaugeId;
+  label: string;
+  percent: number;
+  color: string;
+};
+
 export type ChemiResult = {
   chemName: string;
   compatibilityPercent: number;
   ecologyText: string;
   blendedPalette: AuraType["palette"];
+  gauges: ChemiGauge[];
 };
 
 function sharedAttributes(a: AuraType, b: AuraType): string[] {
@@ -117,6 +127,40 @@ function blendPalette(a: AuraType["palette"], b: AuraType["palette"]): AuraType[
   };
 }
 
+function clampPercent(value: number) {
+  return Math.min(99, Math.max(55, Math.round(value)));
+}
+
+function buildGauges(
+  partyA: ChemiParty,
+  partyB: ChemiParty,
+  shared: string[],
+  conflict: number,
+  wordOverlap: number,
+): ChemiGauge[] {
+  const { aura: auraA } = partyA;
+  const { aura: auraB } = partyB;
+
+  let talk = 62 + wordOverlap * 14;
+  if (hasAttribute(auraA, "chaos") || hasAttribute(auraB, "chaos")) talk += 8;
+  if (hasAttribute(auraA, "warm") || hasAttribute(auraB, "warm")) talk += 6;
+  if (hasAttribute(auraA, "imp") || hasAttribute(auraB, "imp")) talk += 4;
+
+  let distance = 68 + shared.length * 7 - conflict * 5;
+  if (hasAttribute(auraA, "heal") && hasAttribute(auraB, "heal")) distance += 12;
+  if (hasAttribute(auraA, "void") || hasAttribute(auraB, "void")) distance -= 6;
+
+  let vibe = 60 + shared.length * 11 + wordOverlap * 7;
+  if (partyA.aura.id === partyB.aura.id) vibe += 10;
+  if (shared.includes("chaos") || shared.includes("otaku")) vibe += 6;
+
+  return [
+    { id: "talk", label: "会話相性", percent: clampPercent(talk), color: "#22d3ee" },
+    { id: "distance", label: "心地よい距離感", percent: clampPercent(distance), color: "#f472b6" },
+    { id: "vibe", label: "共有バイブ", percent: clampPercent(vibe), color: "#a855f7" },
+  ];
+}
+
 export function calculateChemi(partyA: ChemiParty, partyB: ChemiParty): ChemiResult {
   const shared = sharedAttributes(partyA.aura, partyB.aura);
   const conflict = conflictScore(partyA.aura, partyB.aura);
@@ -129,12 +173,13 @@ export function calculateChemi(partyA: ChemiParty, partyB: ChemiParty): ChemiRes
   if (partyA.aura.id === partyB.aura.id) {
     percent += 6;
   }
-  percent = Math.min(99, Math.max(55, Math.round(percent)));
+  percent = clampPercent(percent);
 
   return {
     chemName: buildChemName(partyA.aura, partyB.aura, shared),
     compatibilityPercent: percent,
     ecologyText: buildEcologyText(partyA.aura, partyB.aura, shared, conflict),
     blendedPalette: blendPalette(partyA.aura.palette, partyB.aura.palette),
+    gauges: buildGauges(partyA, partyB, shared, conflict, wordOverlap),
   };
 }
