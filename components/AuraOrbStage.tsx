@@ -33,8 +33,8 @@ export default function AuraOrbStage({
       data-lineage={lineage?.id}
       data-aura-id={auraId}
     >
-      <div className="aura-stage-atmosphere pointer-events-none absolute inset-0 overflow-hidden rounded-[28%]" aria-hidden />
-      <div className="aura-stage-rays pointer-events-none absolute inset-0 overflow-hidden rounded-[28%]" aria-hidden />
+      <div className="aura-stage-atmosphere pointer-events-none absolute inset-0 overflow-hidden rounded-full" aria-hidden />
+      <div className="aura-stage-rays pointer-events-none absolute inset-0 overflow-hidden rounded-full" aria-hidden />
       {children}
     </div>
   );

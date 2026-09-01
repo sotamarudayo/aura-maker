@@ -174,7 +174,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
       "あなたの纏う空気感は、安心と包容力の塊。そばにいるだけで呼吸が深くなります。",
     gradient:
       "radial-gradient(circle at 30% 25%, #fef08a, transparent 42%), radial-gradient(circle at 75% 70%, #fde047, transparent 48%), linear-gradient(135deg, #2a1a00 0%, #1a0f00 100%)",
-    palette: { a: "#fef08a", b: "#fde047", c: "#facc15" },
+    palette: { a: "#fef08a", b: "#6ee7b7", c: "#fde047" },
     keywords: ["癒やし枠", "マイナスイオン", "空気清浄機", "頼れる相棒", "実は寂しがり", "温厚", "面倒見いい"],
     attributes: ["heal", "warm"],
     rarity: "common",
@@ -305,7 +305,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
       "あなたの纏う空気感は、頭の回転が速いスパーク。会話にキレとテンポを与えます。",
     gradient:
       "radial-gradient(circle at 22% 28%, #22d3ee, transparent 32%), radial-gradient(circle at 78% 38%, #06b6d4, transparent 36%), radial-gradient(circle at 50% 88%, #0891b2, transparent 40%), linear-gradient(135deg, #042f2e 0%, #0c4a6e 100%)",
-    palette: { a: "#22d3ee", b: "#06b6d4", c: "#0891b2" },
+    palette: { a: "#22d3ee", b: "#f0fdff", c: "#0891b2" },
     keywords: ["知性派", "天才的バカ", "バグ技", "空気清浄機", "カリスマ"],
     attributes: ["intellect", "cool"],
     rarity: "uncommon",
@@ -347,7 +347,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
       "あなたの纏う空気感は、ニッチへの愛が輝く銀河。同好と出会うと一気に加速します。",
     gradient:
       "radial-gradient(circle at 20% 30%, #e879f9, transparent 45%), radial-gradient(circle at 80% 50%, #c026d3, transparent 50%), radial-gradient(circle at 50% 85%, #f472b6, transparent 55%), linear-gradient(135deg, #1a0520 0%, #2a0a2e 100%)",
-    palette: { a: "#e879f9", b: "#c026d3", c: "#f472b6" },
+    palette: { a: "#e879f9", b: "#c026d3", c: "#fbbf24" },
     keywords: ["限界オタク", "沼", "異世界転生", "概念", "バグ技", "NPC", "推し活の鬼", "推ししか勝たん"],
     attributes: ["otaku", "chaos"],
     rarity: "uncommon",
@@ -375,7 +375,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
       "あなたの纏う空気感は、感性の余白が美しいアーティスト気質。言葉にならない魅力があります。",
     gradient:
       "radial-gradient(circle at 30% 30%, #166534, transparent 35%), radial-gradient(circle at 70% 65%, #052e16, transparent 42%), radial-gradient(circle at 50% 50%, #14532d, transparent 55%), linear-gradient(135deg, #020617 0%, #052e16 100%)",
-    palette: { a: "#166534", b: "#14532d", c: "#052e16" },
+    palette: { a: "#4ade80", b: "#166534", c: "#052e16" },
     keywords: ["概念", "儚げ", "平成レトロ", "ミステリアス", "沼"],
     attributes: ["mystic", "intellect"],
     rarity: "rare",
@@ -417,7 +417,7 @@ export const STANDARD_AURA_TYPES: AuraType[] = [
       "あなたの纏う空気感は、言葉に重みがあるオラクル。周囲が自然と耳を傾けてしまいます。",
     gradient:
       "radial-gradient(circle at 35% 30%, #ffffff, transparent 28%), radial-gradient(circle at 70% 68%, #e2e8f0, transparent 42%), radial-gradient(circle at 50% 50%, #94a3b8, transparent 50%), linear-gradient(135deg, #1e293b 0%, #334155 100%)",
-    palette: { a: "#ffffff", b: "#e2e8f0", c: "#94a3b8" },
+    palette: { a: "#fef3c7", b: "#cbd5e1", c: "#64748b" },
     keywords: ["カリスマ", "知性派", "黒幕", "頼れる相棒", "圧倒的主人公"],
     attributes: ["legend", "intellect"],
     rarity: "legendary",

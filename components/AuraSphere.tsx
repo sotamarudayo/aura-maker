@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { AuraLineage, AuraPalette } from "@/lib/constants/auras";
 import AuraOrbStage from "@/components/AuraOrbStage";
+import AuraSpiralFilaments from "@/components/AuraSpiralFilaments";
 
 type AuraSphereProps = {
   palette: AuraPalette;
@@ -26,17 +27,21 @@ function paletteVars(palette: AuraPalette): CSSProperties {
 
 function AuraSphereBody({
   palette,
+  auraId,
   dormant = false,
   secret = false,
   awakened = false,
   className = "",
 }: {
   palette: AuraPalette;
+  auraId?: string;
   dormant?: boolean;
   secret?: boolean;
   awakened?: boolean;
   className?: string;
 }) {
+  const filamentId = auraId ?? "orb";
+
   return (
     <div
       className={`aura-sphere-body ${dormant ? "aura-sphere-dormant" : ""} ${secret ? "aura-sphere-secret-body" : ""} ${awakened ? "aura-sphere-awakened" : ""} ${className}`.trim()}
@@ -44,12 +49,22 @@ function AuraSphereBody({
     >
       {!dormant && !secret ? (
         <>
+          <div className="aura-sphere-vortex" aria-hidden />
+          <div className="aura-sphere-lobes" aria-hidden />
+          <div className="aura-sphere-lobes aura-sphere-lobes-deep" aria-hidden />
+          <AuraSpiralFilaments palette={palette} idPrefix={filamentId} />
+          <AuraSpiralFilaments
+            palette={palette}
+            idPrefix={`${filamentId}-alt`}
+            className="aura-sphere-filaments-alt"
+          />
           <div className="aura-sphere-swirl" aria-hidden />
           <div className="aura-sphere-swirl aura-sphere-swirl-alt" aria-hidden />
         </>
       ) : null}
       <div className="aura-sphere-glass" />
       <div className="aura-sphere-nucleus" aria-hidden />
+      <div className="aura-sphere-specular" aria-hidden />
       <div className="aura-sphere-rim" aria-hidden />
       {secret ? (
         <>
@@ -85,18 +100,30 @@ export default function AuraSphere({
       className={`aura-sphere-stage ${className}`.trim()}
       style={paletteVars(palette)}
     >
+      <div className="aura-sphere-bloom" aria-hidden />
       <div className={`aura-sphere-halo ${pulse ? "aura-sphere-halo-pulse" : ""}`} aria-hidden />
       <div className="aura-sphere-ring aura-sphere-ring-a" aria-hidden />
       <div className="aura-sphere-ring aura-sphere-ring-b" aria-hidden />
+      <div className="aura-sphere-ring aura-sphere-ring-c" aria-hidden />
 
       {evolutionMorphing && morphFromPalette ? (
         <>
-          <AuraSphereBody palette={morphFromPalette} className="aura-evolve-orb-from" />
-          <AuraSphereBody palette={palette} awakened={awakened} className="aura-evolve-orb-to" />
+          <AuraSphereBody
+            palette={morphFromPalette}
+            auraId={auraId}
+            className="aura-evolve-orb-from"
+          />
+          <AuraSphereBody
+            palette={palette}
+            auraId={auraId}
+            awakened={awakened}
+            className="aura-evolve-orb-to"
+          />
         </>
       ) : (
         <AuraSphereBody
           palette={palette}
+          auraId={auraId}
           dormant={dormant}
           secret={secret}
           awakened={awakened}
