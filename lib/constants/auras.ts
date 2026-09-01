@@ -2172,6 +2172,16 @@ export function calculateAuraType(
   };
 }
 
+export function getAuraCatalogEcology(auraId: string): { habitat?: string; weakness?: string } {
+  const habitat = HABITAT_BY_AURA[auraId];
+  const ecology = ECOLOGY_BY_AURA[auraId];
+  if (!habitat && !ecology) return {};
+  return {
+    habitat,
+    weakness: ecology?.weakness,
+  };
+}
+
 export function getAuraById(id: string): AuraType | undefined {
   return ALL_AURA_TYPES.find((aura) => aura.id === id);
 }

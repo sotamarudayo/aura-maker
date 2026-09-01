@@ -6,8 +6,9 @@ import AuraSphere, { AuraSphereCompact } from "@/components/AuraSphere";
 import { useLocale } from "@/components/LocaleProvider";
 import MorphingText from "@/components/MorphingText";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
-import { getAuraById, getAuraLineage, SECRET_FLAVOR } from "@/lib/constants/auras";
+import { getAuraById, getAuraCatalogEcology, getAuraLineage, SECRET_FLAVOR } from "@/lib/constants/auras";
 import { getRarityLabel, localizeAuraType } from "@/lib/i18n/localize";
+import { AURA_EN } from "@/lib/i18n/en/auras";
 import type { Messages } from "@/lib/i18n/messages";
 import type { Locale } from "@/lib/i18n/types";
 
@@ -67,6 +68,65 @@ type CompatPreview = {
   aura: AuraType;
 };
 
+function CompatAuraTile({
+  kind,
+  auraId,
+  onOpen,
+  locale,
+  t,
+}: {
+  kind: "good" | "bad";
+  auraId: string;
+  onOpen: () => void;
+  locale: Locale;
+  t: Messages;
+}) {
+  const raw = getAuraById(auraId);
+  if (!raw) return null;
+  const aura = localizeAuraType(raw, locale);
+  const isSecret = aura.rarity === "secret";
+  const lineage = getAuraLineage(aura.id);
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition active:scale-[0.99] sm:p-4 ${
+        kind === "good"
+          ? "border-emerald-400/30 bg-emerald-500/10 hover:border-emerald-300/50 hover:bg-emerald-500/15"
+          : "border-rose-400/30 bg-rose-500/10 hover:border-rose-300/50 hover:bg-rose-500/15"
+      }`}
+    >
+      <div className="relative h-14 w-14 shrink-0 sm:h-16 sm:w-16">
+        <AuraSphereCompact
+          auraId={aura.id}
+          palette={aura.palette}
+          lineage={lineage}
+          secret={isSecret}
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p
+          className={`text-xs font-semibold ${kind === "good" ? "text-emerald-200" : "text-rose-200"}`}
+        >
+          {kind === "good" ? `🔗 ${t.aura.goodAura}` : `⚔️ ${t.aura.badAura}`}
+        </p>
+        <p
+          className={`mt-1 break-words text-base font-black leading-snug ${kind === "good" ? "text-emerald-50" : "text-rose-50"}`}
+        >
+          {isSecret ? t.aura.secretName : aura.archetypeName}
+        </p>
+        {!isSecret ? (
+          <p className="mt-0.5 break-words text-[11px] text-white/50">{aura.name}</p>
+        ) : null}
+        <p className={`mt-1.5 text-[11px] ${kind === "good" ? "text-emerald-100/60" : "text-rose-100/60"}`}>
+          {isSecret ? t.aura.tapSecret : t.aura.tapView}
+        </p>
+      </div>
+    </button>
+  );
+}
+
 function CompatibilityAuraModal({
   preview,
   onClose,
@@ -82,6 +142,13 @@ function CompatibilityAuraModal({
   const isSecret = aura.rarity === "secret";
   const lineage = getAuraLineage(aura.id);
   const secretFlavor = locale === "en" ? t.aura.secretFlavor : SECRET_FLAVOR;
+  const catalogEcology =
+    locale === "en" && AURA_EN[aura.id]
+      ? {
+          habitat: AURA_EN[aura.id].ecology.habitat,
+          weakness: AURA_EN[aura.id].ecology.weakness,
+        }
+      : getAuraCatalogEcology(aura.id);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -100,7 +167,11 @@ function CompatibilityAuraModal({
       onClick={onClose}
     >
       <div
-        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/20 bg-zinc-950 p-5 text-white shadow-2xl sm:p-6"
+        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border bg-zinc-950 p-5 text-white shadow-2xl sm:p-6"
+        style={{
+          borderColor: `${aura.palette.a}66`,
+          boxShadow: `0 0 40px ${aura.palette.a}33`,
+        }}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3">
@@ -121,8 +192,9 @@ function CompatibilityAuraModal({
         </div>
 
         <div className="mt-5 flex flex-col items-center text-center">
-          <div className="relative h-24 w-24">
+          <div className="relative h-28 w-28 sm:h-32 sm:w-32">
             <AuraSphereCompact
+              auraId={aura.id}
               palette={aura.palette}
               lineage={lineage}
               secret={isSecret}
@@ -154,11 +226,31 @@ function CompatibilityAuraModal({
               {aura.keywords.slice(0, 6).map((word) => (
                 <span
                   key={word}
-                  className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/80"
+                  className="rounded-full border px-2.5 py-1 text-xs font-semibold text-white/80"
+                  style={{
+                    borderColor: `${aura.palette.a}55`,
+                    background: `color-mix(in srgb, ${aura.palette.a} 15%, transparent)`,
+                  }}
                 >
                   #{word}
                 </span>
               ))}
+            </div>
+          ) : null}
+          {!isSecret && (catalogEcology.habitat || catalogEcology.weakness) ? (
+            <div className="mt-5 w-full space-y-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-left text-xs">
+              {catalogEcology.habitat ? (
+                <p>
+                  <span className="font-bold text-violet-200">{t.aura.habitat}：</span>
+                  <span className="text-white/75">{catalogEcology.habitat}</span>
+                </p>
+              ) : null}
+              {catalogEcology.weakness ? (
+                <p>
+                  <span className="font-bold text-amber-200">{t.aura.weakness}：</span>
+                  <span className="text-white/75">{catalogEcology.weakness}</span>
+                </p>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -242,6 +334,7 @@ export default function AuraCard({
           ) : null}
 
           <AuraSphere
+            auraId={aura.id}
             palette={aura.palette}
             lineage={lineage}
             hasVotes={hasVotes}
@@ -520,36 +613,20 @@ export default function AuraCard({
           <SectionLabel>{t.aura.compat}</SectionLabel>
           <p className="mt-1 text-[11px] text-white/45">{t.aura.compatSub}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => openCompat("good")}
-              className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-left transition hover:border-emerald-300/50 hover:bg-emerald-500/15 active:scale-[0.99]"
-            >
-              <p className="text-xs font-semibold text-emerald-200">🔗 {t.aura.goodAura}</p>
-              <p className="mt-2 break-words text-base font-bold text-emerald-100">
-                {profile.compatibility.good.name}
-              </p>
-              <p className="mt-2 text-[11px] text-emerald-100/60">
-                {profile.compatibility.good.name === "？？？"
-                  ? t.aura.tapSecret
-                  : t.aura.tapView}
-              </p>
-            </button>
-            <button
-              type="button"
-              onClick={() => openCompat("bad")}
-              className="rounded-2xl border border-rose-400/30 bg-rose-500/10 p-4 text-left transition hover:border-rose-300/50 hover:bg-rose-500/15 active:scale-[0.99]"
-            >
-              <p className="text-xs font-semibold text-rose-200">⚔️ {t.aura.badAura}</p>
-              <p className="mt-2 break-words text-base font-bold text-rose-100">
-                {profile.compatibility.bad.name}
-              </p>
-              <p className="mt-2 text-[11px] text-rose-100/60">
-                {profile.compatibility.bad.name === "？？？"
-                  ? t.aura.tapSecret
-                  : t.aura.tapView}
-              </p>
-            </button>
+            <CompatAuraTile
+              kind="good"
+              auraId={profile.compatibility.good.id}
+              onOpen={() => openCompat("good")}
+              locale={locale}
+              t={t}
+            />
+            <CompatAuraTile
+              kind="bad"
+              auraId={profile.compatibility.bad.id}
+              onOpen={() => openCompat("bad")}
+              locale={locale}
+              t={t}
+            />
           </div>
         </div>
 

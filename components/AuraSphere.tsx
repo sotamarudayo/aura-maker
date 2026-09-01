@@ -4,6 +4,7 @@ import AuraOrbStage from "@/components/AuraOrbStage";
 
 type AuraSphereProps = {
   palette: AuraPalette;
+  auraId?: string;
   lineage?: AuraLineage;
   hasVotes?: boolean;
   awakened?: boolean;
@@ -64,6 +65,7 @@ function AuraSphereBody({
 
 export default function AuraSphere({
   palette,
+  auraId,
   lineage,
   hasVotes = true,
   awakened = false,
@@ -79,6 +81,7 @@ export default function AuraSphere({
   return (
     <AuraOrbStage
       lineage={lineage}
+      auraId={auraId}
       className={`aura-sphere-stage ${className}`.trim()}
       style={paletteVars(palette)}
     >
@@ -107,11 +110,13 @@ export default function AuraSphere({
 
 export function AuraSphereCompact({
   palette,
+  auraId,
   lineage,
   secret = false,
   className = "",
 }: {
   palette: AuraPalette;
+  auraId?: string;
   lineage?: AuraLineage;
   secret?: boolean;
   className?: string;
@@ -119,6 +124,7 @@ export function AuraSphereCompact({
   return (
     <AuraSphere
       palette={palette}
+      auraId={auraId}
       lineage={lineage}
       hasVotes={!secret}
       secret={secret}
