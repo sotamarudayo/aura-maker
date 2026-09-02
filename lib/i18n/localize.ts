@@ -123,13 +123,15 @@ export function localizeWordLabels(labels: string[], locale: Locale): string[] {
 export function localizeAuraType(aura: AuraType, locale: Locale): AuraType {
   if (locale === "ja") return aura;
   const en = AURA_EN[aura.id];
-  if (!en) return aura;
+  const keywords = localizeWordLabels([...aura.keywords], locale);
+  if (!en) return { ...aura, keywords };
   return {
     ...aura,
     name: en.name,
     archetypeName: en.archetypeName,
     catchCopy: en.catchCopy,
     description: en.description,
+    keywords,
   };
 }
 
