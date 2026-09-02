@@ -352,29 +352,29 @@ export default function AuraCard({
             </AuraSphere>
           </div>
 
-          <div className="relative z-10 mt-6 flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/15 bg-black/80 px-3 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.55)] backdrop-blur-md sm:mt-7 sm:px-4">
+          <div className="relative z-10 mt-6 flex flex-wrap items-center justify-center gap-2 sm:mt-7">
             <span
-              className="rounded-full border px-3 py-1 text-xs font-black tracking-wide text-white"
+              className="rounded-full border px-3 py-1 text-xs font-black tracking-wide text-white shadow-[0_2px_10px_rgba(0,0,0,0.75)]"
               style={{
                 borderColor: `${aura.palette.a}cc`,
                 background: `color-mix(in srgb, ${aura.palette.a} 38%, rgb(9 9 11))`,
-                boxShadow: `0 0 12px ${aura.palette.a}44`,
+                boxShadow: `0 2px 10px rgba(0,0,0,0.75), 0 0 12px ${aura.palette.a}44`,
               }}
             >
               {getRarityLabel(aura.rarity, locale)}
             </span>
             {awakened ? (
-              <span className="rounded-full border border-amber-300/80 bg-amber-950/90 px-3 py-1 text-xs font-black text-amber-50 shadow-[0_0_12px_rgba(251,191,36,0.25)]">
+              <span className="rounded-full border border-amber-300/80 bg-amber-950 px-3 py-1 text-xs font-black text-amber-50 shadow-[0_2px_10px_rgba(0,0,0,0.75),0_0_12px_rgba(251,191,36,0.25)]">
                 {t.aura.awakened}
               </span>
             ) : null}
             <span
-              className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
+              className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold shadow-[0_2px_10px_rgba(0,0,0,0.75)] ${
                 profile.confidence === "provisional"
-                  ? "border-amber-300/70 bg-amber-950/90 text-amber-50"
+                  ? "border-amber-300/70 bg-amber-950 text-amber-50"
                   : profile.confidence === "growing"
-                    ? "border-cyan-300/60 bg-cyan-950/90 text-cyan-50"
-                    : "border-emerald-300/60 bg-emerald-950/90 text-emerald-50"
+                    ? "border-cyan-300/60 bg-cyan-950 text-cyan-50"
+                    : "border-emerald-300/60 bg-emerald-950 text-emerald-50"
               }`}
             >
               {profile.confidence === "provisional"
