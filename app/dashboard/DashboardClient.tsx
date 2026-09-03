@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 import AuraBackground from "@/components/AuraBackground";
 import AuraCard from "@/components/AuraCard";
 import LinkAccountModal from "@/components/LinkAccountModal";
+import VoteUrlNudgeModal from "@/components/VoteUrlNudgeModal";
 import { useLocale } from "@/components/LocaleProvider";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import { calculateAuraType, type AuraCalculationResult, type AuraType } from "@/lib/constants/auras";
@@ -90,10 +91,12 @@ export default function DashboardClient({
   const [evolutionMorphing, setEvolutionMorphing] = useState(false);
   const [morphFromAura, setMorphFromAura] = useState<AuraType | null>(null);
   const [morphFromCatchCopy, setMorphFromCatchCopy] = useState<string | null>(null);
+  const [voteNudgeOpen, setVoteNudgeOpen] = useState(false);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
   const voteUrl = `${siteUrl}/vote/${userId}`;
+  const voteNudgeStorageKey = `aura-vote-url-nudge:${userId}`;
 
   useEffect(() => {
     setFusions(initialFusions);
@@ -161,6 +164,19 @@ export default function DashboardClient({
   );
   const auraWords = friendWords.length > 0 ? friendWords : selfWords;
   const rankingWords = friendWords.length > 0 ? friendWords : selfWords;
+
+  useEffect(() => {
+    if (auraWords.length === 0) return;
+    if (typeof window === "undefined") return;
+    if (window.sessionStorage.getItem(voteNudgeStorageKey) === "1") return;
+
+    const timer = window.setTimeout(() => {
+      setVoteNudgeOpen(true);
+      trackEvent("vote_url_nudge_shown");
+    }, 3200);
+
+    return () => window.clearTimeout(timer);
+  }, [auraWords.length, voteNudgeStorageKey]);
 
   const ranking = useMemo(() => buildCounts(rankingWords), [rankingWords]);
   const auraResult = useMemo(
@@ -257,6 +273,23 @@ export default function DashboardClient({
     toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
   }
 
+  function dismissVoteNudge() {
+    setVoteNudgeOpen(false);
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(voteNudgeStorageKey, "1");
+    }
+    trackEvent("vote_url_nudge_dismissed");
+  }
+
+  async function copyVoteUrlFromNudge() {
+    await copyVoteUrlOnly();
+    setVoteNudgeOpen(false);
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(voteNudgeStorageKey, "1");
+    }
+    trackEvent("vote_url_nudge_copied");
+  }
+
   async function copyServiceUrl() {
     await navigator.clipboard.writeText(siteUrl);
     trackEvent("copy_service_url", { source: "dashboard" });
@@ -317,6 +350,12 @@ export default function DashboardClient({
         open={linkModalOpen}
         onClose={() => setLinkModalOpen(false)}
         onLinked={handleAccountLinked}
+      />
+
+      <VoteUrlNudgeModal
+        open={voteNudgeOpen}
+        onCopy={copyVoteUrlFromNudge}
+        onDismiss={dismissVoteNudge}
       />
 
       <StoryExportModal

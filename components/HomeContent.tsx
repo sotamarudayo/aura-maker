@@ -1,11 +1,13 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import AnonymousStartButton from "@/components/AnonymousStartButton";
 import AuraBackground from "@/components/AuraBackground";
+import { AuraSphereCompact } from "@/components/AuraSphere";
 import { useLocale } from "@/components/LocaleProvider";
-import { AURA_TYPES } from "@/lib/constants/auras";
-import { getLocalizedWordLabel } from "@/lib/i18n/localize";
+import { AURA_TYPES, getAuraById, getAuraLineage } from "@/lib/constants/auras";
+import { getLocalizedWordLabel, getRarityLabel, localizeAuraType } from "@/lib/i18n/localize";
 
 const LANDING_EXAMPLE_WORDS_JA = [
   "カリスマ",
@@ -21,6 +23,7 @@ const LANDING_EXAMPLE_WORDS_JA = [
 ] as const;
 
 const LANDING_SELECTED = new Set([0, 2, 5]);
+const LANDING_EXAMPLE_AURA_ID = "sunrise-hero";
 
 export default function HomeContent() {
   const { locale, t } = useLocale();
@@ -29,6 +32,10 @@ export default function HomeContent() {
     label: getLocalizedWordLabel(label, locale),
     selected: LANDING_SELECTED.has(index),
   }));
+
+  const rawExampleAura = getAuraById(LANDING_EXAMPLE_AURA_ID);
+  const exampleAura = rawExampleAura ? localizeAuraType(rawExampleAura, locale) : null;
+  const exampleLineage = exampleAura ? getAuraLineage(exampleAura.id) : undefined;
 
   return (
     <main className="relative min-h-screen overflow-x-clip px-4 py-8 text-white sm:py-12">
@@ -55,15 +62,68 @@ export default function HomeContent() {
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
             {t.landing.hero}
           </h1>
-          <p className="mt-5 max-w-2xl text-white/80">{t.landing.sub}</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <AnonymousStartButton className="w-full rounded-full bg-violet-300 px-6 py-3 text-center font-semibold text-black disabled:opacity-60 sm:w-auto" />
-            <Link
-              href="/login"
-              className="rounded-full border border-white/30 px-6 py-3 text-center font-semibold text-white sm:w-auto"
+          <p className="mt-5 max-w-2xl rounded-2xl border border-violet-300/40 bg-violet-500/15 px-4 py-3.5 text-base font-semibold leading-relaxed text-violet-50 shadow-[0_0_24px_rgba(167,139,250,0.18)] sm:px-5 sm:py-4 sm:text-lg">
+            {t.landing.sub}
+          </p>
+
+          {exampleAura ? (
+            <div
+              className="mt-8 rounded-2xl border border-white/15 bg-black/40 px-4 py-5 text-center sm:px-6 sm:py-6"
+              style={
+                {
+                  "--card-a": exampleAura.palette.a,
+                  "--card-b": exampleAura.palette.b,
+                  "--card-c": exampleAura.palette.c,
+                  borderColor: `${exampleAura.palette.a}55`,
+                } as CSSProperties
+              }
             >
-              {t.landing.login}
-            </Link>
+              <div className="space-y-1">
+                <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-2.5 py-0.5 text-[10px] font-black tracking-wide text-white/80">
+                  {t.landing.exampleLabel}
+                </span>
+                <p className="text-xs font-semibold text-white/60 sm:text-sm">{t.landing.exampleCaption}</p>
+              </div>
+
+              <div className="relative mx-auto mt-4 h-28 w-28 sm:h-32 sm:w-32">
+                <AuraSphereCompact
+                  auraId={exampleAura.id}
+                  palette={exampleAura.palette}
+                  lineage={exampleLineage}
+                  className="size-full"
+                />
+              </div>
+
+              <span
+                className="mt-4 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black tracking-wide text-white"
+                style={{
+                  borderColor: `${exampleAura.palette.a}aa`,
+                  background: `color-mix(in srgb, ${exampleAura.palette.a} 22%, transparent)`,
+                }}
+              >
+                {getRarityLabel(exampleAura.rarity, locale)}
+              </span>
+
+              <h2
+                className="mt-3 text-2xl font-black leading-tight sm:text-3xl"
+                style={{
+                  backgroundImage: `linear-gradient(120deg, #fff 0%, ${exampleAura.palette.a} 42%, ${exampleAura.palette.b} 78%, ${exampleAura.palette.c} 100%)`,
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                {exampleAura.archetypeName}
+              </h2>
+              <p className="mt-1 text-xs font-medium" style={{ color: `${exampleAura.palette.a}cc` }}>
+                {exampleAura.name}
+              </p>
+              <p className="mt-2 text-sm font-medium text-white/75">{exampleAura.catchCopy}</p>
+            </div>
+          ) : null}
+
+          <div className="mt-8">
+            <AnonymousStartButton className="w-full rounded-full bg-violet-300 px-6 py-3.5 text-center text-base font-bold text-black disabled:opacity-60 sm:w-auto sm:min-w-56 sm:py-4 sm:text-lg" />
           </div>
 
           <div className="mt-8">
