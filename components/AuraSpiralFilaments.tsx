@@ -44,8 +44,11 @@ export default function AuraSpiralFilaments({
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
+        <clipPath id={gid("clip")}>
+          <circle cx="50" cy="50" r="50" />
+        </clipPath>
       </defs>
-      <g filter={`url(#${gid("glow")})`}>
+      <g clipPath={`url(#${gid("clip")})`} filter={`url(#${gid("glow")})`}>
         <path
           d="M50 50 C49 36 62 18 78 26 C90 32 88 48 50 50"
           stroke={`url(#${gid("g1")})`}

@@ -103,35 +103,36 @@ export default function AuraSphere({
         auraId={auraId}
         className="aura-sphere-stage size-full"
       >
-        <div className="aura-sphere-bloom" aria-hidden />
-        <div className={`aura-sphere-halo ${pulse ? "aura-sphere-halo-pulse" : ""}`} aria-hidden />
-        <div className="aura-sphere-ring aura-sphere-ring-a" aria-hidden />
-        <div className="aura-sphere-ring aura-sphere-ring-b" aria-hidden />
-        <div className="aura-sphere-ring aura-sphere-ring-c" aria-hidden />
-
-        {evolutionMorphing && morphFromPalette ? (
-          <>
-            <AuraSphereBody
-              palette={morphFromPalette}
-              auraId={auraId}
-              className="aura-evolve-orb-from"
-            />
+        <div className="aura-sphere-clip">
+          <div className="aura-sphere-bloom" aria-hidden />
+          <div className={`aura-sphere-halo ${pulse ? "aura-sphere-halo-pulse" : ""}`} aria-hidden />
+          {evolutionMorphing && morphFromPalette ? (
+            <>
+              <AuraSphereBody
+                palette={morphFromPalette}
+                auraId={auraId}
+                className="aura-evolve-orb-from"
+              />
+              <AuraSphereBody
+                palette={palette}
+                auraId={auraId}
+                awakened={awakened}
+                className="aura-evolve-orb-to"
+              />
+            </>
+          ) : (
             <AuraSphereBody
               palette={palette}
               auraId={auraId}
+              dormant={dormant}
+              secret={secret}
               awakened={awakened}
-              className="aura-evolve-orb-to"
             />
-          </>
-        ) : (
-          <AuraSphereBody
-            palette={palette}
-            auraId={auraId}
-            dormant={dormant}
-            secret={secret}
-            awakened={awakened}
-          />
-        )}
+          )}
+        </div>
+        <div className="aura-sphere-ring aura-sphere-ring-a" aria-hidden />
+        <div className="aura-sphere-ring aura-sphere-ring-b" aria-hidden />
+        <div className="aura-sphere-ring aura-sphere-ring-c" aria-hidden />
 
         {children}
       </AuraOrbStage>

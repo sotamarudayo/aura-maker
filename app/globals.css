@@ -166,7 +166,19 @@ body {
   position: relative;
   border-radius: 9999px;
   overflow: visible;
-  isolation: isolate;
+}
+
+.aura-sphere-clip {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 50%;
+  overflow: hidden;
+  clip-path: circle(50% at 50% 50%);
+  -webkit-clip-path: circle(50% at 50% 50%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 98%, transparent 100%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 98%, transparent 100%);
+  pointer-events: none;
 }
 
 .aura-sphere-root {
@@ -191,7 +203,6 @@ body {
   z-index: 0;
   animation: aura-bloom-pulse 4.5s ease-in-out infinite;
   pointer-events: none;
-  transform: translateZ(0);
 }
 
 .aura-sphere-bloom::before {
@@ -229,7 +240,6 @@ body {
   transition: opacity 500ms ease;
   z-index: 1;
   pointer-events: none;
-  transform: translateZ(0);
 }
 
 .aura-card-halo::before,
@@ -288,15 +298,12 @@ body {
   0%,
   100% {
     opacity: 0.88;
-    filter: brightness(1);
   }
   40% {
     opacity: 1;
-    filter: brightness(1.15);
   }
   70% {
     opacity: 0.92;
-    filter: brightness(1.05);
   }
 }
 
@@ -434,7 +441,6 @@ body {
     color-mix(in srgb, var(--card-b) 85%, transparent) 46%,
     transparent 72%
   );
-  filter: blur(0.5px) saturate(1.35);
   animation: aura-nucleus-pulse 3.2s ease-in-out infinite;
   mix-blend-mode: screen;
   z-index: 4;
@@ -589,6 +595,8 @@ body {
 .aura-orb-stage .aura-stage-atmosphere,
 .aura-orb-stage .aura-stage-rays {
   z-index: 0;
+  clip-path: circle(50% at 50% 50%);
+  -webkit-clip-path: circle(50% at 50% 50%);
 }
 
 .aura-stage-solar .aura-stage-atmosphere {
@@ -660,7 +668,6 @@ body {
 
 .aura-stage-chaos .aura-sphere-filaments {
   animation-duration: 11s;
-  filter: drop-shadow(0 0 8px var(--card-a)) drop-shadow(0 0 6px var(--card-b));
 }
 
 .aura-stage-chaos .aura-sphere-lobes {
