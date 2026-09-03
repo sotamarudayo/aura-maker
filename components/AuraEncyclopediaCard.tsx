@@ -30,7 +30,7 @@ export default function AuraEncyclopediaCard({
 
   return (
     <article
-      className={`aura-encyclopedia-card group relative w-full min-w-0 overflow-hidden rounded-2xl border p-0 transition duration-300 hover:-translate-y-1 ${lineage?.id === "legend" ? "aura-encyclopedia-legend" : ""}`}
+      className={`aura-encyclopedia-card group relative w-full min-w-0 overflow-hidden rounded-2xl border p-0 backdrop-blur transition duration-300 hover:-translate-y-1 ${lineage?.id === "legend" ? "aura-encyclopedia-legend" : ""}`}
       style={
         {
           "--lineage-accent": accent,
@@ -73,7 +73,15 @@ export default function AuraEncyclopediaCard({
       <div className="relative p-4 sm:p-5">
         <div className="aura-encyclopedia-glow pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-        <div className="relative mx-auto size-24 overflow-hidden rounded-full sm:size-28">
+        <div className="relative mx-auto h-24 w-24 sm:h-28 sm:w-28">
+          <div
+            className="pointer-events-none absolute inset-[-18%] rounded-full opacity-90"
+            style={{
+              background: `radial-gradient(circle, color-mix(in srgb, ${accent} 45%, transparent) 0%, transparent 68%)`,
+              filter: "blur(18px)",
+            }}
+            aria-hidden
+          />
           <AuraSphereCompact
             auraId={aura.id}
             palette={aura.palette}

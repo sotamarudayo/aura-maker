@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import AnonymousStartButton from "@/components/AnonymousStartButton";
-import AuraEncyclopediaCard from "@/components/AuraEncyclopediaCard";
+import LazyAuraEncyclopediaCard from "@/components/LazyAuraEncyclopediaCard";
 import { useLocale } from "@/components/LocaleProvider";
 import {
   AURA_LINEAGES,
@@ -78,7 +78,7 @@ export default function AuraEncyclopediaSection({
 
               <div className="grid min-w-0 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
                 {auras.map((aura, index) => (
-                  <AuraEncyclopediaCard
+                  <LazyAuraEncyclopediaCard
                     key={aura.id}
                     aura={aura}
                     lineageCode={`${lineage.code}${String(index + 1).padStart(2, "0")}`}
