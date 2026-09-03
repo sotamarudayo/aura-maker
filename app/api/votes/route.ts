@@ -8,6 +8,11 @@ import {
   VOTE_DEDUP_HOURS,
   VOTER_COOKIE_NAME,
 } from "@/lib/votes/fingerprint";
+import {
+  isVoteRelationship,
+  normalizeVoterDisplayName,
+  type VoteRelationship,
+} from "@/lib/votes/relationship";
 import { MAX_VOTE_WORDS, MIN_VOTE_WORDS, normalizeVoteWords } from "@/lib/votes/validate";
 
 type VoteInsertRow = {
@@ -15,6 +20,8 @@ type VoteInsertRow = {
   word: string;
   is_self_vote: boolean;
   voter_fingerprint: string;
+  relationship_type: VoteRelationship | null;
+  voter_display_name: string | null;
 };
 
 function jsonError(message: string, status: number, code?: string) {
@@ -84,12 +91,16 @@ export async function POST(request: NextRequest) {
     targetUserId?: unknown;
     words?: unknown;
     isSelfVote?: unknown;
+    relationship?: unknown;
+    voterDisplayName?: unknown;
   };
 
   const targetUserId =
     typeof record.targetUserId === "string" ? record.targetUserId.trim() : "";
   const isSelfVote = record.isSelfVote === true;
   const words = normalizeVoteWords(record.words);
+  const relationship = isVoteRelationship(record.relationship) ? record.relationship : null;
+  const voterDisplayName = normalizeVoterDisplayName(record.voterDisplayName);
 
   if (!targetUserId) {
     return jsonError("targetUserId is required.", 400, "missing_target");
@@ -148,6 +159,8 @@ export async function POST(request: NextRequest) {
       word,
       is_self_vote: true,
       voter_fingerprint: fingerprint,
+      relationship_type: null,
+      voter_display_name: null,
     }));
 
     const { error: insertError } = await admin.from("votes").insert(rows);
@@ -168,6 +181,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ ok: true, isSelfVote: true });
+  }
+
+  if (!relationship) {
+    return jsonError("relationship is required.", 400, "missing_relationship");
   }
 
   const supabase = await createClient();
@@ -199,6 +216,8 @@ export async function POST(request: NextRequest) {
     word,
     is_self_vote: false,
     voter_fingerprint: fingerprint,
+    relationship_type: relationship,
+    voter_display_name: voterDisplayName,
   }));
 
   const { error: insertError } = await admin.from("votes").insert(rows);
@@ -209,6 +228,8 @@ export async function POST(request: NextRequest) {
   const { error: sessionError } = await admin.from("vote_sessions").insert({
     target_user_id: targetUserId,
     voter_fingerprint: fingerprint,
+    relationship_type: relationship,
+    voter_display_name: voterDisplayName,
   });
 
   if (sessionError) {

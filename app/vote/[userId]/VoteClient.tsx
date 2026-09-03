@@ -18,6 +18,11 @@ import {
 import { getLocalizedWordLabel } from "@/lib/i18n/localize";
 import { trackEvent } from "@/lib/analytics";
 import { checkVoteStatus, submitVotesViaApi } from "@/lib/votes/client";
+import {
+  MAX_VOTER_DISPLAY_NAME_LENGTH,
+  VOTE_RELATIONSHIPS,
+  type VoteRelationship,
+} from "@/lib/votes/relationship";
 import { readVoteSent, subscribeVoteSent } from "@/lib/utils/vote-sent";
 import { createClient } from "@/utils/supabase/client";
 import type { VoteWord } from "@/lib/constants/words";
@@ -33,6 +38,8 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
   const supabase = useMemo(() => createClient(), []);
   const [currentDisplayName, setCurrentDisplayName] = useState(() => displayName);
   const [selected, setSelected] = useState<VoteWord[]>([]);
+  const [relationship, setRelationship] = useState<VoteRelationship | null>(null);
+  const [nickname, setNickname] = useState("");
   const localSent = useSyncExternalStore(
     subscribeVoteSent,
     () => readVoteSent(userId),
@@ -94,6 +101,10 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
   }
 
   async function submitVote() {
+    if (!relationship) {
+      setError(t.voteFlow.relationshipRequired);
+      return;
+    }
     if (selected.length === 0) {
       setError(t.common.pickAtLeastOne);
       return;
@@ -102,7 +113,11 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
     setSending(true);
     setError(null);
 
-    const result = await submitVotesViaApi(userId, selected, { locale });
+    const result = await submitVotesViaApi(userId, selected, {
+      locale,
+      relationship,
+      voterDisplayName: nickname,
+    });
     if (!result.ok) {
       if (result.code === "duplicate_vote") {
         setServerSent(true);
@@ -112,10 +127,16 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
       return;
     }
 
-    trackEvent("vote_submit", { word_count: selected.length });
+    trackEvent("vote_submit", {
+      word_count: selected.length,
+      relationship,
+      has_nickname: nickname.trim().length > 0,
+    });
     const wordsQuery = selected.map((word) => encodeURIComponent(word)).join(",");
     router.push(`/vote/${userId}/success?words=${wordsQuery}`);
   }
+
+  const canSubmit = Boolean(relationship) && selected.length > 0 && !sending;
 
   if (sent) {
     return (
@@ -172,6 +193,51 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
           </ol>
         </div>
 
+        <div className="mt-6 space-y-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-sm font-bold text-white">{t.voteFlow.relationshipLabel}</p>
+            <p className="text-xs text-white/50">{t.voteFlow.relationshipHint}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {VOTE_RELATIONSHIPS.map((id) => {
+              const active = relationship === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  disabled={sending}
+                  onClick={() => setRelationship(id)}
+                  className={`rounded-full px-3.5 py-2 text-sm font-semibold transition disabled:opacity-60 ${
+                    active
+                      ? "bg-cyan-300 text-black"
+                      : "border border-white/25 bg-white/10 text-white/85 hover:bg-white/15"
+                  }`}
+                >
+                  {t.voteFlow.relationships[id]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-2">
+          <label htmlFor="voter-nickname" className="block text-sm font-bold text-white">
+            {t.voteFlow.nicknameLabel}
+          </label>
+          <input
+            id="voter-nickname"
+            type="text"
+            value={nickname}
+            maxLength={MAX_VOTER_DISPLAY_NAME_LENGTH}
+            disabled={sending}
+            autoComplete="nickname"
+            placeholder={t.voteFlow.nicknamePlaceholder}
+            onChange={(event) => setNickname(event.target.value)}
+            className="w-full rounded-xl border border-white/25 bg-black/50 px-3 py-2.5 text-sm text-white placeholder:text-white/35 outline-none ring-cyan-300/40 focus:ring-2 disabled:opacity-60"
+          />
+          <p className="text-xs text-white/50">{t.voteFlow.nicknameHint}</p>
+        </div>
+
         <VoteWordPicker selected={selected} onToggle={toggleWord} disabled={sending} />
 
         {error ? <p className="mt-4 text-sm text-rose-300">{error}</p> : null}
@@ -181,13 +247,19 @@ export default function VoteClient({ userId, displayName }: VoteClientProps) {
         <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-3 gap-y-2">
           <button
             type="button"
-            disabled={sending || selected.length === 0}
+            disabled={!canSubmit}
             onClick={submitVote}
             className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-bold text-black disabled:opacity-60 sm:px-6 sm:text-base"
           >
             {sending ? t.common.sending : buildVoteSubmitLabel(selected.length, locale)}
           </button>
           <p className="min-w-0 flex-1 break-words text-sm text-white/80">
+            {relationship ? (
+              <span className="mr-2 inline-flex rounded-full border border-cyan-300/40 bg-cyan-500/15 px-2 py-0.5 text-xs font-bold text-cyan-100">
+                {t.voteFlow.relationships[relationship]}
+                {nickname.trim() ? ` · ${nickname.trim()}` : ""}
+              </span>
+            ) : null}
             {t.common.selected}
             {selected.map((word) => getLocalizedWordLabel(word, locale)).join(" / ") || t.common.none}
           </p>

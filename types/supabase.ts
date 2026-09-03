@@ -49,6 +49,8 @@ export type Database = {
           created_at: string;
           is_self_vote: boolean;
           voter_fingerprint: string | null;
+          relationship_type: string | null;
+          voter_display_name: string | null;
         };
         Insert: {
           id?: string;
@@ -57,6 +59,8 @@ export type Database = {
           created_at?: string;
           is_self_vote?: boolean;
           voter_fingerprint?: string | null;
+          relationship_type?: string | null;
+          voter_display_name?: string | null;
         };
         Update: {
           id?: string;
@@ -65,6 +69,8 @@ export type Database = {
           created_at?: string;
           is_self_vote?: boolean;
           voter_fingerprint?: string | null;
+          relationship_type?: string | null;
+          voter_display_name?: string | null;
         };
         Relationships: [
           {
@@ -82,18 +88,24 @@ export type Database = {
           target_user_id: string;
           voter_fingerprint: string;
           created_at: string;
+          relationship_type: string | null;
+          voter_display_name: string | null;
         };
         Insert: {
           id?: string;
           target_user_id: string;
           voter_fingerprint: string;
           created_at?: string;
+          relationship_type?: string | null;
+          voter_display_name?: string | null;
         };
         Update: {
           id?: string;
           target_user_id?: string;
           voter_fingerprint?: string;
           created_at?: string;
+          relationship_type?: string | null;
+          voter_display_name?: string | null;
         };
         Relationships: [
           {

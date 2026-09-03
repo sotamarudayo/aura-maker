@@ -3,9 +3,11 @@
 import { useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { toPng } from "html-to-image";
-import { calculateChemi, type ChemiParty } from "@/lib/chemi/calculate-chemi";
+import { useLocale } from "@/components/LocaleProvider";
+import { calculateChemi, type ChemiParty, type ChemiResult } from "@/lib/chemi/calculate-chemi";
 import { buildExternalBrowserHref, isInAppBrowser } from "@/lib/utils/external-browser";
 import { trackEvent } from "@/lib/analytics";
+import type { Messages } from "@/lib/i18n/messages";
 
 type ChemiExportModalProps = {
   open: boolean;
@@ -200,13 +202,16 @@ function ChemiCardCanvas({
   partyA,
   partyB,
   siteUrl,
+  chemi,
+  t,
 }: {
   partyA: ChemiParty;
   partyB: ChemiParty;
   siteUrl: string;
+  chemi: ChemiResult;
+  t: Messages["chemi"];
 }) {
-  const chemi = calculateChemi(partyA, partyB);
-  const { blendedPalette } = chemi;
+  const { blendedPalette, relationship } = chemi;
 
   return (
     <div
@@ -238,7 +243,7 @@ function ChemiCardCanvas({
               fontWeight: 700,
             }}
           >
-            CHEMI CARD
+            RELATIONSHIP CARD
           </p>
           <p
             style={{
@@ -260,7 +265,7 @@ function ChemiCardCanvas({
             alignItems: "center",
             justifyContent: "center",
             marginTop: 8,
-            height: 108,
+            height: 100,
             flexShrink: 0,
           }}
         >
@@ -268,7 +273,7 @@ function ChemiCardCanvas({
             paletteA={partyA.aura.palette}
             paletteB={partyB.aura.palette}
             blended={blendedPalette}
-            size={100}
+            size={96}
           />
         </div>
 
@@ -276,21 +281,34 @@ function ChemiCardCanvas({
           <p
             style={{
               margin: 0,
-              fontSize: 17,
+              fontSize: 18,
               fontWeight: 900,
               lineHeight: 1.25,
               color: "#fff",
               textShadow: `0 0 20px ${blendedPalette.a}66`,
             }}
           >
-            相性 {chemi.compatibilityPercent}%｜{chemi.chemName}
+            {relationship.typeName}
+          </p>
+          <p
+            style={{
+              marginTop: 6,
+              marginBottom: 0,
+              fontSize: 11,
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.82)",
+            }}
+          >
+            {t.youLabel} → {relationship.roleYou}
+            <span style={{ margin: "0 6px", color: "rgba(255,255,255,0.35)" }}>·</span>
+            {t.partnerLabel} → {relationship.rolePartner}
           </p>
           <p
             style={{
               marginTop: 4,
               marginBottom: 0,
               fontSize: 10,
-              color: "rgba(255,255,255,0.55)",
+              color: "rgba(255,255,255,0.5)",
             }}
           >
             {partyA.aura.archetypeName} × {partyB.aura.archetypeName}
@@ -315,6 +333,17 @@ function ChemiCardCanvas({
               color={gauge.color}
             />
           ))}
+          <p
+            style={{
+              margin: "2px 0 6px",
+              textAlign: "right",
+              fontSize: 9,
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.45)",
+            }}
+          >
+            {t.chemScore.replace("{percent}", String(chemi.compatibilityPercent))}
+          </p>
         </div>
 
         <div
@@ -338,7 +367,7 @@ function ChemiCardCanvas({
               color: "rgba(196,181,253,0.9)",
             }}
           >
-            コンビの生態
+            {t.relationshipEcology}
           </p>
           <p
             style={{
@@ -350,7 +379,7 @@ function ChemiCardCanvas({
               color: "rgba(255,255,255,0.88)",
             }}
           >
-            {chemi.ecologyText}
+            {relationship.story}
           </p>
         </div>
 
@@ -381,7 +410,7 @@ function ChemiCardCanvas({
             color: "rgba(255,255,255,0.28)",
           }}
         >
-          2人のオーラを診断する 👇
+          {t.footerCta}
         </p>
       </div>
     </div>
@@ -400,10 +429,16 @@ export default function ChemiExportModal({
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const { locale, t } = useLocale();
 
   if (!open) return null;
 
-  const chemi = calculateChemi(partyA, partyB);
+  const chemi = calculateChemi(partyA, partyB, locale);
+  const shareText = t.chemi.shareText
+    .replace("{type}", chemi.relationship.typeName)
+    .replace("{you}", chemi.relationship.roleYou)
+    .replace("{partner}", chemi.relationship.rolePartner)
+    .replace("{site}", siteUrl);
 
   async function exportPng(): Promise<string | null> {
     if (!canvasRef.current) return null;
@@ -482,8 +517,8 @@ export default function ChemiExportModal({
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: `${partyA.displayName} × ${partyB.displayName} のケミカード`,
-          text: `${chemi.chemName}（相性${chemi.compatibilityPercent}%）\n${siteUrl}`,
+          title: `${partyA.displayName} × ${partyB.displayName}`,
+          text: shareText,
         });
         trackEvent("export_chemi_image", { method: "native_share" });
         onSaved?.();
@@ -504,9 +539,12 @@ export default function ChemiExportModal({
       <div className="max-h-[95vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/20 bg-zinc-950 p-5 text-white shadow-2xl md:p-6">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold">融合ケミカードをシェア</h2>
+            <h2 className="text-xl font-bold">{t.chemi.exportTitle}</h2>
             <p className="mt-1 text-sm text-white/70">
-              {partyA.displayName} × {partyB.displayName} · 相性 {chemi.compatibilityPercent}%
+              {t.chemi.exportSub
+                .replace("{a}", partyA.displayName)
+                .replace("{b}", partyB.displayName)
+                .replace("{type}", chemi.relationship.typeName)}
             </p>
           </div>
           <button
@@ -537,7 +575,13 @@ export default function ChemiExportModal({
               } as CSSProperties
             }
           >
-            <ChemiCardCanvas partyA={partyA} partyB={partyB} siteUrl={siteUrl} />
+            <ChemiCardCanvas
+              partyA={partyA}
+              partyB={partyB}
+              siteUrl={siteUrl}
+              chemi={chemi}
+              t={t.chemi}
+            />
           </div>
 
           <div className="flex w-full flex-col gap-2">
@@ -550,10 +594,10 @@ export default function ChemiExportModal({
               {exporting ? (
                 <>
                   <span className="story-export-spinner inline-block h-4 w-4 rounded-full border-2 border-black/30 border-t-black" />
-                  生成中...
+                  {t.chemi.saving}
                 </>
               ) : (
-                "📸 インスタストーリーで相性を発表"
+                `📸 ${t.chemi.shareIg}`
               )}
             </button>
             <button
@@ -562,14 +606,14 @@ export default function ChemiExportModal({
               disabled={exporting}
               className="rounded-full border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white/90 disabled:opacity-70"
             >
-              📤 端末でシェア
+              📤 {t.chemi.shareNative}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white/80"
             >
-              閉じる
+              {t.common.close}
             </button>
           </div>
 

@@ -2,6 +2,7 @@
 
 import { getMessages } from "@/lib/i18n/messages";
 import type { Locale } from "@/lib/i18n/types";
+import type { VoteRelationship } from "@/lib/votes/relationship";
 import { markVoteSent } from "@/lib/utils/vote-sent";
 
 export type SubmitVotesResult =
@@ -11,7 +12,12 @@ export type SubmitVotesResult =
 export async function submitVotesViaApi(
   targetUserId: string,
   words: string[],
-  options?: { isSelfVote?: boolean; locale?: Locale },
+  options?: {
+    isSelfVote?: boolean;
+    locale?: Locale;
+    relationship?: VoteRelationship;
+    voterDisplayName?: string;
+  },
 ): Promise<SubmitVotesResult> {
   const response = await fetch("/api/votes", {
     method: "POST",
@@ -21,6 +27,8 @@ export async function submitVotesViaApi(
       targetUserId,
       words,
       isSelfVote: options?.isSelfVote ?? false,
+      relationship: options?.relationship,
+      voterDisplayName: options?.voterDisplayName,
     }),
   });
 

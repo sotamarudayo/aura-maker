@@ -101,13 +101,13 @@ export function buildVotePageSubcopy(displayName: string, locale: Locale = "ja")
 
 /** 投票後に何が起きるか（3ステップ） */
 export const VOTE_PAGE_FLOW = [
-  "あなたが印象ワードを選んで送る（匿名）",
+  "関係性を選んで、印象ワードを送る（呼び名は任意・匿名OK）",
   "友達の投票が集まっていく",
   "集まった印象からオーラタイプと診断結果が完成",
 ] as const;
 
 export const VOTE_PAGE_FLOW_EN = [
-  "You pick impression words and send (anonymous)",
+  "Pick how you know them, then send impression words (name optional)",
   "Votes stack up from friends",
   "Their impressions become an aura type + diagnosis",
 ] as const;

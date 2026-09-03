@@ -1,4 +1,9 @@
 import type { AuraType } from "@/lib/constants/auras";
+import type { Locale } from "@/lib/i18n/types";
+import {
+  diagnoseChemiRelationship,
+  type ChemiRelationshipDiagnosis,
+} from "@/lib/chemi/relationship-diagnosis";
 
 export type ChemiParty = {
   displayName: string;
@@ -16,9 +21,12 @@ export type ChemiGauge = {
 };
 
 export type ChemiResult = {
+  /** 旧コンビ名（サブ表示用） */
   chemName: string;
   compatibilityPercent: number;
+  /** 関係性ストーリー（ecology と同内容） */
   ecologyText: string;
+  relationship: ChemiRelationshipDiagnosis;
   blendedPalette: AuraType["palette"];
   gauges: ChemiGauge[];
 };
@@ -41,6 +49,9 @@ function conflictScore(a: AuraType, b: AuraType): number {
   if (bAttrs.includes("crystal") && aAttrs.includes("warm")) score += 2;
   if (bAttrs.includes("god") && aAttrs.includes("heal")) score += 2;
   if (bAttrs.includes("void") && aAttrs.includes("chaos")) score += 1;
+  // symmetric checks
+  if (aAttrs.includes("void") && (bAttrs.includes("warm") || bAttrs.includes("hero"))) score += 3;
+  if (aAttrs.includes("chaos") && bAttrs.includes("heal")) score += 3;
   return score;
 }
 
@@ -49,7 +60,14 @@ function sharedWordCount(wordsA: string[], wordsB: string[]): number {
   return wordsA.filter((word) => setB.has(word)).length;
 }
 
-function buildChemName(auraA: AuraType, auraB: AuraType, shared: string[]): string {
+function buildChemName(auraA: AuraType, auraB: AuraType, shared: string[], locale: Locale): string {
+  if (locale === "en") {
+    if (hasAttribute(auraA, "chaos") && hasAttribute(auraB, "chaos")) return "Dangerous Duo";
+    if (hasAttribute(auraA, "heal") && hasAttribute(auraB, "heal")) return "Heal Unit";
+    if (shared.includes("imp")) return "Gap Twin Spark";
+    return `${auraA.archetypeName} × ${auraB.archetypeName}`;
+  }
+
   if (hasAttribute(auraA, "chaos") && hasAttribute(auraB, "chaos")) {
     return "危険な爆走コンビ";
   }
@@ -61,10 +79,7 @@ function buildChemName(auraA: AuraType, auraB: AuraType, shared: string[]): stri
   ) {
     return "禁忌好奇心コンビ";
   }
-  if (
-    auraA.id === "menhera-pulse" ||
-    auraB.id === "menhera-pulse"
-  ) {
+  if (auraA.id === "menhera-pulse" || auraB.id === "menhera-pulse") {
     return "かまって共依存コンビ";
   }
   if (
@@ -97,28 +112,6 @@ function buildChemName(auraA: AuraType, auraB: AuraType, shared: string[]): stri
   return `${shortA}×${shortB}`;
 }
 
-function buildEcologyText(auraA: AuraType, auraB: AuraType, shared: string[], conflict: number): string {
-  if (hasAttribute(auraA, "chaos") && hasAttribute(auraB, "chaos")) {
-    return "一緒にいると朝まで帰れなくなる。テンションだけは永久機関。";
-  }
-  if (conflict >= 3) {
-    return "片方が暴走した時にもう片方がブレーキをかける関係性。止めるのも煽るのもうまい。";
-  }
-  if (shared.includes("heal")) {
-    return "落ち込んだ方を自然に立て直す、静かな共依存コンビ。";
-  }
-  if (hasAttribute(auraA, "otaku") || hasAttribute(auraB, "otaku")) {
-    return "推しの話が始まると周囲の会話速度が3倍になる。止められない。";
-  }
-  if (hasAttribute(auraA, "mystic") || hasAttribute(auraB, "mystic")) {
-    return "一緒にいると勝手に考察モードに入る。雑談のはずが長編になる。";
-  }
-  if (hasAttribute(auraA, "hero") || hasAttribute(auraB, "hero")) {
-    return "困った時に自然と横並びで前に出る。頼られると強くなる二人。";
-  }
-  return "ノリは合うのに予測不能。SNSでイジり合える距離感の持ち主。";
-}
-
 function blendPalette(a: AuraType["palette"], b: AuraType["palette"]): AuraType["palette"] {
   return {
     a: a.a,
@@ -131,15 +124,24 @@ function clampPercent(value: number) {
   return Math.min(99, Math.max(55, Math.round(value)));
 }
 
+function gaugeLabels(locale: Locale): Record<ChemiGaugeId, string> {
+  if (locale === "en") {
+    return { talk: "Talk flow", distance: "Easy distance", vibe: "Shared vibe" };
+  }
+  return { talk: "会話のノリ", distance: "心地よい距離", vibe: "共有バイブ" };
+}
+
 function buildGauges(
   partyA: ChemiParty,
   partyB: ChemiParty,
   shared: string[],
   conflict: number,
   wordOverlap: number,
+  locale: Locale,
 ): ChemiGauge[] {
   const { aura: auraA } = partyA;
   const { aura: auraB } = partyB;
+  const labels = gaugeLabels(locale);
 
   let talk = 62 + wordOverlap * 14;
   if (hasAttribute(auraA, "chaos") || hasAttribute(auraB, "chaos")) talk += 8;
@@ -155,16 +157,21 @@ function buildGauges(
   if (shared.includes("chaos") || shared.includes("otaku")) vibe += 6;
 
   return [
-    { id: "talk", label: "会話相性", percent: clampPercent(talk), color: "#22d3ee" },
-    { id: "distance", label: "心地よい距離感", percent: clampPercent(distance), color: "#f472b6" },
-    { id: "vibe", label: "共有バイブ", percent: clampPercent(vibe), color: "#a855f7" },
+    { id: "talk", label: labels.talk, percent: clampPercent(talk), color: "#22d3ee" },
+    { id: "distance", label: labels.distance, percent: clampPercent(distance), color: "#f472b6" },
+    { id: "vibe", label: labels.vibe, percent: clampPercent(vibe), color: "#a855f7" },
   ];
 }
 
-export function calculateChemi(partyA: ChemiParty, partyB: ChemiParty): ChemiResult {
+export function calculateChemi(
+  partyA: ChemiParty,
+  partyB: ChemiParty,
+  locale: Locale = "ja",
+): ChemiResult {
   const shared = sharedAttributes(partyA.aura, partyB.aura);
   const conflict = conflictScore(partyA.aura, partyB.aura);
   const wordOverlap = sharedWordCount(partyA.topWords, partyB.topWords);
+  const relationship = diagnoseChemiRelationship(partyA, partyB, shared, conflict, locale);
 
   let percent = 58 + shared.length * 9 + wordOverlap * 8;
   if (conflict > 0) {
@@ -176,10 +183,11 @@ export function calculateChemi(partyA: ChemiParty, partyB: ChemiParty): ChemiRes
   percent = clampPercent(percent);
 
   return {
-    chemName: buildChemName(partyA.aura, partyB.aura, shared),
+    chemName: buildChemName(partyA.aura, partyB.aura, shared, locale),
     compatibilityPercent: percent,
-    ecologyText: buildEcologyText(partyA.aura, partyB.aura, shared, conflict),
+    ecologyText: relationship.story,
+    relationship,
     blendedPalette: blendPalette(partyA.aura.palette, partyB.aura.palette),
-    gauges: buildGauges(partyA, partyB, shared, conflict, wordOverlap),
+    gauges: buildGauges(partyA, partyB, shared, conflict, wordOverlap, locale),
   };
 }

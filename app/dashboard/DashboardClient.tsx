@@ -11,9 +11,12 @@ import LinkAccountModal from "@/components/LinkAccountModal";
 import VoteUrlNudgeModal from "@/components/VoteUrlNudgeModal";
 import { useLocale } from "@/components/LocaleProvider";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
+import RelationshipFacesCard from "@/components/RelationshipFacesCard";
+import { groupFriendVotesByRelationship } from "@/lib/votes/relationship-faces";
+import { isVoteRelationship } from "@/lib/votes/relationship";
 import { calculateAuraType, type AuraCalculationResult, type AuraType } from "@/lib/constants/auras";
 import { localizeAuraResult, localizeAuraType, getLocalizedWordLabel } from "@/lib/i18n/localize";
-import type { ChemiParty } from "@/lib/chemi/calculate-chemi";
+import { calculateChemi, type ChemiParty } from "@/lib/chemi/calculate-chemi";
 import type {
   DashboardFusionPartner,
   DashboardFusions,
@@ -35,6 +38,21 @@ const AuraEvolutionOverlay = dynamic(() => import("@/components/AuraEvolutionOve
 type VoteEntry = {
   word: string;
   isSelfVote: boolean;
+  relationshipType: string | null;
+  voterDisplayName: string | null;
+};
+
+type RankingNamedVoter = {
+  name: string;
+  relationshipType: string | null;
+};
+
+type RankingRow = {
+  word: string;
+  count: number;
+  named: RankingNamedVoter[];
+  anonymousCount: number;
+  selfCount: number;
 };
 
 type DashboardClientProps = {
@@ -53,6 +71,37 @@ function buildCounts(words: string[]) {
     map.set(word, (map.get(word) ?? 0) + 1);
   }
   return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+}
+
+function buildRankingRows(votes: VoteEntry[], friendFirst: boolean): RankingRow[] {
+  const relevant = votes.filter((vote) => (friendFirst ? !vote.isSelfVote : vote.isSelfVote));
+  const map = new Map<string, RankingRow>();
+
+  for (const vote of relevant) {
+    const existing = map.get(vote.word) ?? {
+      word: vote.word,
+      count: 0,
+      named: [],
+      anonymousCount: 0,
+      selfCount: 0,
+    };
+    existing.count += 1;
+    if (vote.isSelfVote) {
+      existing.selfCount += 1;
+    } else if (vote.voterDisplayName) {
+      if (!existing.named.some((item) => item.name === vote.voterDisplayName)) {
+        existing.named.push({
+          name: vote.voterDisplayName,
+          relationshipType: vote.relationshipType,
+        });
+      }
+    } else {
+      existing.anonymousCount += 1;
+    }
+    map.set(vote.word, existing);
+  }
+
+  return Array.from(map.values()).sort((a, b) => b.count - a.count || a.word.localeCompare(b.word, "ja"));
 }
 
 export default function DashboardClient({
@@ -125,8 +174,15 @@ export default function DashboardClient({
         (payload) => {
           const word = payload.new.word;
           const isSelfVote = payload.new.is_self_vote === true;
+          const relationshipRaw = payload.new.relationship_type;
+          const relationshipType =
+            typeof relationshipRaw === "string" && isVoteRelationship(relationshipRaw)
+              ? relationshipRaw
+              : null;
+          const voterRaw = payload.new.voter_display_name;
+          const voterDisplayName = typeof voterRaw === "string" && voterRaw.trim() ? voterRaw.trim() : null;
           if (typeof word === "string") {
-            setVotes((prev) => [{ word, isSelfVote }, ...prev]);
+            setVotes((prev) => [{ word, isSelfVote, relationshipType, voterDisplayName }, ...prev]);
             if (!isSelfVote) {
               setPulseActive(true);
               setToastMessage(
@@ -164,6 +220,7 @@ export default function DashboardClient({
     () => votes.filter((vote) => !vote.isSelfVote).map((vote) => vote.word),
     [votes],
   );
+  const relationshipFaces = useMemo(() => groupFriendVotesByRelationship(votes), [votes]);
   const auraWords = friendWords.length > 0 ? friendWords : selfWords;
   const rankingWords = friendWords.length > 0 ? friendWords : selfWords;
 
@@ -186,6 +243,10 @@ export default function DashboardClient({
   }, [pendingAura]);
 
   const ranking = useMemo(() => buildCounts(rankingWords), [rankingWords]);
+  const rankingRows = useMemo(
+    () => buildRankingRows(votes, friendWords.length > 0),
+    [votes, friendWords.length],
+  );
   const auraResult = useMemo(
     () => calculateAuraType(auraWords, { userId, displayName }),
     [auraWords, userId, displayName],
@@ -488,6 +549,14 @@ export default function DashboardClient({
           onEvolve={() => setEvolveToken((n) => n + 1)}
         />
 
+        {relationshipFaces.length > 0 ? (
+          <RelationshipFacesCard
+            displayName={displayName}
+            userId={userId}
+            faces={relationshipFaces}
+          />
+        ) : null}
+
         {selfWords.length > 0 && friendWords.length > 0 ? (
           <SelfFriendGapCard
             displayName={displayName}
@@ -622,6 +691,12 @@ export default function DashboardClient({
                     <div className="min-w-0">
                       <p className="font-semibold text-white">{partner.partnerDisplayName}</p>
                       <p className="mt-1 text-sm text-white/60">{partner.partnerArchetypeName}</p>
+                      <p className="mt-1 text-xs font-semibold text-fuchsia-200/90">
+                        {
+                          calculateChemi(ownerParty, partner.partnerParty, locale).relationship
+                            .typeName
+                        }
+                      </p>
                     </div>
                     <button
                       type="button"
@@ -654,20 +729,48 @@ export default function DashboardClient({
                 </span>
               ) : null}
             </p>
+            {friendWords.length > 0 ? (
+              <p className="mt-1 text-xs text-white/45">{t.dashboard.voterHint}</p>
+            ) : null}
             <ul className="mt-4 space-y-2">
-              {ranking.slice(0, 10).map(([word, count], index) => (
+              {rankingRows.slice(0, 10).map((row, index) => (
                 <li
-                  key={word}
-                  className="flex min-w-0 items-center justify-between gap-3 rounded-lg bg-white/10 px-3 py-2"
+                  key={row.word}
+                  className="min-w-0 rounded-lg bg-white/10 px-3 py-2"
                 >
-                  <span className="min-w-0 truncate">
-                    {index + 1}. {getLocalizedWordLabel(word, locale)}
-                  </span>
-                  <span
-                    className={`shrink-0 font-semibold tabular-nums ${lastVotedWord === word ? "vote-pop text-cyan-200" : ""}`}
-                  >
-                    {count}
-                  </span>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="min-w-0 truncate">
+                      {index + 1}. {getLocalizedWordLabel(row.word, locale)}
+                    </span>
+                    <span
+                      className={`shrink-0 font-semibold tabular-nums ${lastVotedWord === row.word ? "vote-pop text-cyan-200" : ""}`}
+                    >
+                      {row.count}
+                    </span>
+                  </div>
+                  {friendWords.length > 0 && (row.named.length > 0 || row.anonymousCount > 0) ? (
+                    <p className="mt-1.5 min-w-0 break-words text-xs leading-relaxed text-white/55">
+                      {[
+                        ...row.named.map((voter) => {
+                          const relation =
+                            voter.relationshipType && isVoteRelationship(voter.relationshipType)
+                              ? t.voteFlow.relationships[voter.relationshipType]
+                              : null;
+                          return relation ? `${voter.name}（${relation}）` : voter.name;
+                        }),
+                        row.anonymousCount > 0
+                          ? row.anonymousCount === 1
+                            ? t.dashboard.anonymousVoter
+                            : t.dashboard.anonymousVoterCount.replace(
+                                "{count}",
+                                String(row.anonymousCount),
+                              )
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  ) : null}
                 </li>
               ))}
             </ul>
