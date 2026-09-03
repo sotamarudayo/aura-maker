@@ -185,6 +185,8 @@ body {
   position: absolute;
   inset: -42%;
   border-radius: 9999px;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 36%, transparent 70%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 36%, transparent 70%);
   background:
     radial-gradient(circle at 26% 34%, color-mix(in srgb, var(--card-a) 88%, transparent) 0%, transparent 40%),
     radial-gradient(circle at 74% 30%, color-mix(in srgb, var(--card-b) 84%, transparent) 0%, transparent 38%),
@@ -213,6 +215,8 @@ body {
   position: absolute;
   inset: -28%;
   border-radius: 9999px;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 34%, transparent 68%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 34%, transparent 68%);
   filter: blur(52px) saturate(1.4);
   background:
     radial-gradient(circle at 26% 24%, var(--card-a) 0%, transparent 46%),
