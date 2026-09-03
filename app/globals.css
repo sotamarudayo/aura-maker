@@ -187,15 +187,23 @@ body {
   border-radius: 9999px;
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 36%, transparent 70%);
   mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 36%, transparent 70%);
+  opacity: 0.96;
+  z-index: 0;
+  animation: aura-bloom-pulse 4.5s ease-in-out infinite;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.aura-sphere-bloom::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   background:
     radial-gradient(circle at 26% 34%, color-mix(in srgb, var(--card-a) 88%, transparent) 0%, transparent 40%),
     radial-gradient(circle at 74% 30%, color-mix(in srgb, var(--card-b) 84%, transparent) 0%, transparent 38%),
     radial-gradient(circle at 50% 74%, color-mix(in srgb, var(--card-c) 80%, transparent) 0%, transparent 42%);
   filter: blur(36px) saturate(1.35);
-  opacity: 0.96;
-  z-index: 0;
-  animation: aura-bloom-pulse 4.5s ease-in-out infinite;
-  pointer-events: none;
 }
 
 @keyframes aura-bloom-pulse {
@@ -217,15 +225,24 @@ body {
   border-radius: 9999px;
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 34%, transparent 68%);
   mask-image: radial-gradient(circle at 50% 50%, #000 0%, #000 34%, transparent 68%);
+  opacity: 0.78;
+  transition: opacity 500ms ease;
+  z-index: 1;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.aura-card-halo::before,
+.aura-sphere-halo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   filter: blur(52px) saturate(1.4);
   background:
     radial-gradient(circle at 26% 24%, var(--card-a) 0%, transparent 46%),
     radial-gradient(circle at 76% 36%, var(--card-b) 0%, transparent 50%),
     radial-gradient(circle at 50% 80%, var(--card-c) 0%, transparent 52%);
-  opacity: 0.78;
-  transition: background 500ms ease, opacity 500ms ease;
-  z-index: 1;
-  pointer-events: none;
 }
 
 .aura-card-halo-pulse,
@@ -308,7 +325,6 @@ body {
   border-radius: 9999px;
   overflow: hidden;
   animation: aura-sphere-float 4s ease-in-out infinite;
-  filter: saturate(1.2);
   box-shadow:
     0 0 36px color-mix(in srgb, var(--card-a) 72%, transparent),
     0 0 64px color-mix(in srgb, var(--card-b) 48%, transparent),
@@ -325,7 +341,6 @@ body {
     radial-gradient(circle at 22% 28%, var(--card-a) 0%, transparent 38%),
     radial-gradient(circle at 78% 30%, var(--card-b) 0%, transparent 36%),
     radial-gradient(circle at 50% 82%, var(--card-c) 0%, transparent 40%);
-  filter: saturate(1.35);
   z-index: 0;
 }
 
@@ -339,7 +354,6 @@ body {
     radial-gradient(circle at 50% 84%, var(--card-c) 0%, transparent 34%);
   opacity: 0.88;
   mix-blend-mode: screen;
-  filter: saturate(1.45);
   z-index: 1;
 }
 
@@ -347,7 +361,6 @@ body {
   inset: 6%;
   opacity: 0.62;
   mix-blend-mode: color-dodge;
-  filter: saturate(1.55) blur(1px);
   animation: aura-sphere-spin-reverse 26s linear infinite;
 }
 
@@ -384,7 +397,6 @@ body {
   );
   animation: aura-sphere-spin 10s linear infinite;
   z-index: 1;
-  filter: saturate(1.3);
 }
 
 .aura-sphere-swirl-alt {
@@ -408,7 +420,6 @@ body {
     0 0 32px var(--card-a),
     0 0 56px color-mix(in srgb, var(--card-b) 55%, transparent),
     0 0 72px color-mix(in srgb, var(--card-c) 35%, transparent);
-  backdrop-filter: blur(2px) saturate(1.5);
   z-index: 3;
 }
 
@@ -564,7 +575,10 @@ body {
 
 .aura-sphere-compact .aura-sphere-bloom {
   inset: -36%;
-  filter: blur(28px);
+}
+
+.aura-sphere-compact .aura-sphere-bloom::before {
+  filter: blur(28px) saturate(1.35);
 }
 
 .aura-sphere-compact .aura-sphere-secret-mark {
@@ -600,7 +614,10 @@ body {
 
 .aura-stage-solar .aura-sphere-halo {
   opacity: 0.98;
-  filter: blur(58px);
+}
+
+.aura-stage-solar .aura-sphere-halo::before {
+  filter: blur(58px) saturate(1.4);
 }
 
 .aura-stage-solar .aura-sphere-nucleus {
@@ -613,7 +630,7 @@ body {
   );
 }
 
-.aura-stage-solar .aura-sphere-bloom {
+.aura-stage-solar .aura-sphere-bloom::before {
   background:
     radial-gradient(circle at 26% 34%, color-mix(in srgb, var(--card-a) 90%, transparent) 0%, transparent 40%),
     radial-gradient(circle at 74% 30%, color-mix(in srgb, var(--card-b) 85%, transparent) 0%, transparent 38%),
@@ -648,12 +665,14 @@ body {
 
 .aura-stage-chaos .aura-sphere-lobes {
   opacity: 0.95;
-  filter: saturate(1.6);
 }
 
 .aura-stage-chaos .aura-sphere-bloom {
-  filter: blur(42px);
   opacity: 1;
+}
+
+.aura-stage-chaos .aura-sphere-bloom::before {
+  filter: blur(42px) saturate(1.35);
 }
 
 .aura-stage-chaos .aura-sphere-glass {
@@ -674,7 +693,9 @@ body {
 }
 
 .aura-stage-mystic .aura-sphere-glass {
-  backdrop-filter: blur(8px) saturate(1.25);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.22) 52%, rgba(0, 0, 0, 0.42) 100%),
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.34) 0%, transparent 22%);
 }
 
 .aura-stage-mystic .aura-sphere-rim {
@@ -746,7 +767,10 @@ body {
 
 .aura-orb-stage[data-aura-id="soft-peach"] .aura-sphere-halo {
   opacity: 0.88;
-  filter: blur(32px);
+}
+
+.aura-orb-stage[data-aura-id="soft-peach"] .aura-sphere-halo::before {
+  filter: blur(32px) saturate(1.4);
 }
 
 .aura-orb-stage[data-aura-id="chaos-neon"] .aura-sphere-swirl {
@@ -783,8 +807,11 @@ body {
 }
 
 .aura-orb-stage[data-aura-id="velvet-muse"] .aura-sphere-halo {
-  filter: blur(48px);
   opacity: 0.7;
+}
+
+.aura-orb-stage[data-aura-id="velvet-muse"] .aura-sphere-halo::before {
+  filter: blur(48px) saturate(1.4);
 }
 
 .aura-orb-stage[data-aura-id="legendary-prism"] .aura-sphere-swirl {
