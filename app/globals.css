@@ -173,22 +173,21 @@ body {
 }
 
 .aura-sphere-root:not(.aura-sphere-compact) .aura-sphere-bloom {
-  inset: -48% -48% -28% -48%;
+  inset: -34% -34% -16% -34%;
 }
 
 .aura-sphere-root:not(.aura-sphere-compact) .aura-sphere-halo {
-  inset: -32% -32% -18% -32%;
+  inset: -22% -22% -10% -22%;
 }
 
 .aura-sphere-bloom {
   position: absolute;
-  inset: -48%;
+  inset: -42%;
   border-radius: 50%;
   background:
-    radial-gradient(circle closest-side at 26% 34%, color-mix(in srgb, var(--card-a) 70%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 74% 30%, color-mix(in srgb, var(--card-b) 64%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 50% 74%, color-mix(in srgb, var(--card-c) 60%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 50% 50%, color-mix(in srgb, var(--card-a) 34%, transparent) 0%, transparent 100%);
+    radial-gradient(circle at 26% 34%, color-mix(in srgb, var(--card-a) 88%, transparent) 0%, transparent 40%),
+    radial-gradient(circle at 74% 30%, color-mix(in srgb, var(--card-b) 84%, transparent) 0%, transparent 38%),
+    radial-gradient(circle at 50% 74%, color-mix(in srgb, var(--card-c) 80%, transparent) 0%, transparent 42%);
   opacity: 0.96;
   z-index: 0;
   animation: aura-bloom-pulse 4.5s ease-in-out infinite;
@@ -210,12 +209,12 @@ body {
 .aura-card-halo,
 .aura-sphere-halo {
   position: absolute;
-  inset: -36%;
+  inset: -28%;
   border-radius: 50%;
   background:
-    radial-gradient(circle closest-side at 26% 24%, color-mix(in srgb, var(--card-a) 48%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 76% 36%, color-mix(in srgb, var(--card-b) 42%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 50% 80%, color-mix(in srgb, var(--card-c) 38%, transparent) 0%, transparent 100%);
+    radial-gradient(circle at 26% 24%, color-mix(in srgb, var(--card-a) 70%, transparent) 0%, transparent 46%),
+    radial-gradient(circle at 76% 36%, color-mix(in srgb, var(--card-b) 62%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, color-mix(in srgb, var(--card-c) 55%, transparent) 0%, transparent 52%);
   opacity: 0.78;
   transition: opacity 500ms ease;
   z-index: 1;
@@ -327,14 +326,12 @@ body {
     radial-gradient(circle at 80% 28%, var(--card-b) 0%, transparent 30%),
     radial-gradient(circle at 50% 84%, var(--card-c) 0%, transparent 34%);
   opacity: 0.88;
-  mix-blend-mode: screen;
   z-index: 1;
 }
 
 .aura-sphere-lobes-deep {
   inset: 6%;
   opacity: 0.62;
-  mix-blend-mode: color-dodge;
   animation: aura-sphere-spin-reverse 26s linear infinite;
 }
 
@@ -353,7 +350,6 @@ body {
   width: 92%;
   height: 92%;
   opacity: 0.72;
-  mix-blend-mode: screen;
   animation: aura-sphere-spin-reverse 22s linear infinite;
 }
 
@@ -377,7 +373,6 @@ body {
   inset: -35%;
   opacity: 0.42;
   animation: aura-sphere-spin-reverse 14s linear infinite;
-  mix-blend-mode: screen;
 }
 
 .aura-sphere-glass {
@@ -409,7 +404,6 @@ body {
     transparent 72%
   );
   animation: aura-nucleus-pulse 3.2s ease-in-out infinite;
-  mix-blend-mode: screen;
   z-index: 4;
 }
 
@@ -547,7 +541,7 @@ body {
 }
 
 .aura-sphere-compact .aura-sphere-bloom {
-  inset: -42%;
+  inset: -36%;
 }
 
 .aura-sphere-compact .aura-sphere-secret-mark {
@@ -557,7 +551,7 @@ body {
 /* 系統ごとの背景・球体演出 */
 .aura-orb-stage .aura-stage-atmosphere,
 .aura-orb-stage .aura-stage-rays {
-  z-index: 0;
+  display: none;
 }
 
 .aura-stage-solar .aura-stage-atmosphere {
@@ -597,10 +591,9 @@ body {
 
 .aura-stage-solar .aura-sphere-bloom {
   background:
-    radial-gradient(circle closest-side at 26% 34%, color-mix(in srgb, var(--card-a) 74%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 74% 30%, color-mix(in srgb, var(--card-b) 68%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 50% 74%, color-mix(in srgb, var(--card-c) 62%, transparent) 0%, transparent 100%),
-    radial-gradient(circle closest-side at 50% 50%, color-mix(in srgb, var(--card-a) 36%, transparent) 0%, transparent 100%);
+    radial-gradient(circle at 26% 34%, color-mix(in srgb, var(--card-a) 90%, transparent) 0%, transparent 40%),
+    radial-gradient(circle at 74% 30%, color-mix(in srgb, var(--card-b) 85%, transparent) 0%, transparent 38%),
+    radial-gradient(circle at 50% 74%, color-mix(in srgb, var(--card-c) 80%, transparent) 0%, transparent 42%);
 }
 
 .aura-stage-chaos .aura-stage-atmosphere {
@@ -736,7 +729,6 @@ body {
 
 .aura-orb-stage[data-aura-id="hentai-nebula"] .aura-sphere-swirl-alt {
   opacity: 0.62;
-  mix-blend-mode: color-dodge;
 }
 
 .aura-orb-stage[data-aura-id="otaku-galaxy"] .aura-sphere-swirl {
