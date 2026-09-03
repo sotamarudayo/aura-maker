@@ -26,7 +26,6 @@ export default function AuraEncyclopediaCard({
   const cardSoft = `color-mix(in srgb, ${accent} 14%, transparent)`;
   const secretFlavor = locale === "en" ? t.aura.secretFlavor : SECRET_FLAVOR;
   const lineage = getAuraLineage(aura.id);
-  const signatureKeywords = aura.keywords.slice(0, 3);
 
   return (
     <article
@@ -55,11 +54,6 @@ export default function AuraEncyclopediaCard({
         >
           {lineageCode ?? "??"}
         </span>
-        {!isSecret && signatureKeywords.length > 0 ? (
-          <span className="truncate text-[10px] font-semibold text-white/55">
-            #{signatureKeywords.join(" · #")}
-          </span>
-        ) : null}
       </div>
 
       <div
@@ -113,22 +107,6 @@ export default function AuraEncyclopediaCard({
           <p className="break-words text-xs leading-relaxed text-white/70">
             {isSecret ? secretFlavor : aura.description}
           </p>
-          {!isSecret && signatureKeywords.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {signatureKeywords.map((word) => (
-                <span
-                  key={word}
-                  className="rounded-full border px-2 py-0.5 text-[10px] font-semibold text-white/80"
-                  style={{
-                    borderColor: `${accent}55`,
-                    background: `color-mix(in srgb, ${accent} 12%, transparent)`,
-                  }}
-                >
-                  {word}
-                </span>
-              ))}
-            </div>
-          ) : null}
         </div>
       </div>
     </article>
