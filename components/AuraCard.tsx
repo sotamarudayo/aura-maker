@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { AuraEvolutionPrompt } from "@/components/AuraEvolutionOverlay";
-import AuraSphere, { AuraSphereCompact } from "@/components/AuraSphere";
+import AuraSphere, { AuraSphereCompact, type EvolutionStyle } from "@/components/AuraSphere";
 import { useLocale } from "@/components/LocaleProvider";
 import MorphingText from "@/components/MorphingText";
 import type { AuraType, DynamicAuraProfile } from "@/lib/constants/auras";
@@ -22,10 +21,14 @@ type AuraCardProps = {
   displayName?: string;
   /** 10票以上で解放される覚醒ビジュアル */
   awakened?: boolean;
-  /** 進化待ち：オーブ上に Tap、名前欄に Change Your Aura */
+  /** 進化待ち：オーブ上に「進化する」ボタン */
   evolutionPending?: boolean;
   /** じわっと変化中（色クロスフェード＋文字フェード） */
   evolutionMorphing?: boolean;
+  /** 進化演出スタイル（プレビュー切替用。本番は真の輝き） */
+  evolutionStyle?: EvolutionStyle;
+  /** 「進化する」ボタン押下 */
+  onEvolve?: () => void;
   /** モーフィング元のオーラ（オーブ色・文言のクロスフェード用） */
   morphFromAura?: AuraType | null;
   /** モーフィング元のキャッチコピー */
@@ -278,6 +281,8 @@ export default function AuraCard({
   awakened = false,
   evolutionPending = false,
   evolutionMorphing = false,
+  evolutionStyle = "core-pulse",
+  onEvolve,
   morphFromAura = null,
   morphFromCatchCopy = null,
 }: AuraCardProps) {
@@ -328,9 +333,18 @@ export default function AuraCard({
       >
         <div className="flex flex-col items-center text-center">
           {evolutionPending && !evolutionMorphing ? (
-            <p className="aura-evolve-title font-display text-xl text-white/90 sm:text-2xl">
-              {t.aura.changeYourAura}
-            </p>
+            <div className="flex flex-col items-center gap-3">
+              <p className="aura-evolve-title font-display text-xl text-white/90 sm:text-2xl">
+                {t.aura.changeYourAura}
+              </p>
+              <button
+                type="button"
+                onClick={onEvolve}
+                className="aura-evolve-action rounded-full border border-violet-200/70 bg-violet-300 px-6 py-2.5 text-sm font-black text-black shadow-[0_0_24px_rgba(196,181,253,0.45)] transition hover:bg-violet-200 sm:px-7 sm:text-base"
+              >
+                {t.dashboard.evolutionAction}
+              </button>
+            </div>
           ) : displayName ? (
             <p className="text-sm font-semibold text-white/70 sm:text-base">{displayName}</p>
           ) : null}
@@ -346,10 +360,9 @@ export default function AuraCard({
               pulse={pulse}
               evolutionMorphing={evolutionMorphing}
               morphFromPalette={morphFromAura?.palette}
+              evolutionStyle={evolutionStyle}
               className="relative mx-auto h-40 w-40 sm:h-56 sm:w-56"
-            >
-              <AuraEvolutionPrompt active={evolutionPending && !evolutionMorphing} />
-            </AuraSphere>
+            />
           </div>
 
           <div className="relative z-10 mt-6 flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/15 bg-black/80 px-3 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.55)] backdrop-blur-md sm:mt-7 sm:px-4">

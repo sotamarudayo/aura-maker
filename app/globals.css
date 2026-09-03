@@ -454,11 +454,19 @@ body {
 .aura-card-ring-a {
   inset: 4%;
   transform: rotate(15deg);
-  animation: aura-drift-b 10s ease-in-out infinite;
   border-color: color-mix(in srgb, var(--card-a) 55%, white);
   box-shadow:
     0 0 18px color-mix(in srgb, var(--card-a) 70%, transparent),
     inset 0 0 12px color-mix(in srgb, var(--card-a) 28%, transparent);
+}
+
+.aura-sphere-ring-a {
+  /* 進化終わりと同じ姿勢から、サイズはそのまま平行移動でゆらぐ */
+  animation: aura-sphere-ring-drift-a 20s ease-in-out infinite;
+}
+
+.aura-card-ring-a {
+  animation: aura-drift-b 10s ease-in-out infinite;
 }
 
 .aura-sphere-ring-b,
@@ -466,9 +474,16 @@ body {
   inset: -2%;
   transform: rotate(-25deg);
   opacity: 0.72;
-  animation: aura-drift-c 14s ease-in-out infinite;
   border-color: color-mix(in srgb, var(--card-b) 55%, white);
   box-shadow: 0 0 16px color-mix(in srgb, var(--card-b) 65%, transparent);
+}
+
+.aura-sphere-ring-b {
+  animation: aura-sphere-ring-drift-b 26s ease-in-out infinite;
+}
+
+.aura-card-ring-b {
+  animation: aura-drift-c 14s ease-in-out infinite;
 }
 
 .aura-sphere-ring-c {
@@ -477,7 +492,55 @@ body {
   opacity: 0.48;
   border-color: color-mix(in srgb, var(--card-c) 50%, white);
   box-shadow: 0 0 14px color-mix(in srgb, var(--card-c) 55%, transparent);
-  animation: aura-drift-a 18s ease-in-out infinite;
+  animation: aura-sphere-ring-drift-c 32s ease-in-out infinite;
+}
+
+@keyframes aura-sphere-ring-drift-a {
+  0%,
+  100% {
+    transform: rotate(15deg) translate(0%, 0%);
+  }
+  25% {
+    transform: rotate(28deg) translate(14%, -12%);
+  }
+  50% {
+    transform: rotate(8deg) translate(-16%, 10%);
+  }
+  75% {
+    transform: rotate(32deg) translate(10%, 14%);
+  }
+}
+
+@keyframes aura-sphere-ring-drift-b {
+  0%,
+  100% {
+    transform: rotate(-25deg) translate(0%, 0%);
+  }
+  25% {
+    transform: rotate(-40deg) translate(-15%, 12%);
+  }
+  50% {
+    transform: rotate(-12deg) translate(14%, -14%);
+  }
+  75% {
+    transform: rotate(-36deg) translate(-12%, -10%);
+  }
+}
+
+@keyframes aura-sphere-ring-drift-c {
+  0%,
+  100% {
+    transform: rotate(40deg) translate(0%, 0%);
+  }
+  25% {
+    transform: rotate(55deg) translate(12%, 16%);
+  }
+  50% {
+    transform: rotate(22deg) translate(-14%, -12%);
+  }
+  75% {
+    transform: rotate(58deg) translate(16%, -8%);
+  }
 }
 
 .aura-sphere-dormant .aura-sphere-glass {
@@ -873,29 +936,348 @@ body {
   }
   100% {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.94);
   }
 }
 
 @keyframes aura-evolve-orb-to {
   0% {
     opacity: 0;
-    transform: scale(1.08);
-    filter: brightness(1.4) saturate(1.25);
+    transform: scale(1.06);
   }
   100% {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1) saturate(1);
   }
 }
 
+.aura-evolve-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: center center;
+}
+
+/* 進化中は光のにじみのループを止め、親のフェードだけ動かす */
+.aura-evolve-glow-from .aura-sphere-bloom,
+.aura-evolve-glow-from .aura-sphere-halo,
+.aura-evolve-glow-to .aura-sphere-bloom,
+.aura-evolve-glow-to .aura-sphere-halo {
+  animation: none;
+}
+
+/* 輪っかは位置固定。色だけゆっくり追従（スケールしない） */
+.aura-sphere-root[data-evolve-style] .aura-sphere-ring {
+  transition:
+    border-color 2.6s ease-in-out,
+    box-shadow 2.6s ease-in-out,
+    opacity 2.6s ease-in-out;
+}
+
+@keyframes aura-evolve-glow-from {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes aura-evolve-glow-to {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.aura-evolve-glow-from {
+  animation: aura-evolve-glow-from 2.6s ease-in-out both;
+}
+
+.aura-evolve-glow-to {
+  opacity: 0;
+  animation: aura-evolve-glow-to 2.6s ease-in-out both;
+}
+
 .aura-evolve-orb-from {
-  animation: aura-evolve-orb-from 2.2s ease-in-out forwards;
+  animation: aura-evolve-orb-from 2.6s ease-in-out both;
+  transform-origin: center center;
+  will-change: opacity, transform, filter;
+  backface-visibility: hidden;
 }
 
 .aura-evolve-orb-to {
-  animation: aura-evolve-orb-to 2.2s ease-in-out forwards;
+  opacity: 0;
+  animation: aura-evolve-orb-to 2.6s ease-in-out both;
+  transform-origin: center center;
+  will-change: opacity, transform, filter;
+  backface-visibility: hidden;
+}
+
+/* 進化中は内側の渦・フィラメントを止めて、二重描画のチラつきを抑える */
+.aura-evolve-orb-from .aura-sphere-filaments,
+.aura-evolve-orb-from .aura-sphere-filaments-alt,
+.aura-evolve-orb-from .aura-sphere-swirl,
+.aura-evolve-orb-from .aura-sphere-swirl-alt,
+.aura-evolve-orb-from .aura-sphere-lobes-deep,
+.aura-evolve-orb-from .aura-sphere-nucleus,
+.aura-evolve-orb-to .aura-sphere-filaments,
+.aura-evolve-orb-to .aura-sphere-filaments-alt,
+.aura-evolve-orb-to .aura-sphere-swirl,
+.aura-evolve-orb-to .aura-sphere-swirl-alt,
+.aura-evolve-orb-to .aura-sphere-lobes-deep,
+.aura-evolve-orb-to .aura-sphere-nucleus {
+  animation-play-state: paused;
+}
+
+/* collapse: 本体だけ収縮。輪っかは動かさない */
+@keyframes aura-evolve-collapse-from {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  45% {
+    opacity: 0.35;
+    transform: scale(0.42);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.28);
+  }
+}
+
+@keyframes aura-evolve-collapse-to {
+  0%,
+  40% {
+    opacity: 0;
+    transform: scale(0.28);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+[data-evolve-style="collapse"] .aura-evolve-glow-from {
+  animation: aura-evolve-glow-from 2.8s ease-in-out both;
+}
+
+[data-evolve-style="collapse"] .aura-evolve-glow-to {
+  animation: aura-evolve-glow-to 2.8s ease-in-out both;
+}
+
+[data-evolve-style="collapse"] .aura-evolve-orb-from {
+  animation: aura-evolve-collapse-from 2.8s ease-in-out both;
+}
+
+[data-evolve-style="collapse"] .aura-evolve-orb-to {
+  animation: aura-evolve-collapse-to 2.8s ease-in-out both;
+}
+
+/* ring-burst: 本体の輪っかは固定。別レイヤーが外へ広がる */
+@keyframes aura-evolve-burst-ring {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+.aura-evolve-burst {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.aura-evolve-burst-ring {
+  position: absolute;
+  inset: 2%;
+  border-radius: 9999px;
+  border: 1.5px solid color-mix(in srgb, var(--card-a) 70%, white);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--card-a) 55%, transparent);
+  animation: aura-evolve-burst-ring 2.4s ease-out both;
+}
+
+.aura-evolve-burst-ring-delayed {
+  inset: -4%;
+  border-color: color-mix(in srgb, var(--card-b) 65%, white);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--card-b) 50%, transparent);
+  animation-delay: 0.18s;
+}
+
+[data-evolve-style="ring-burst"] .aura-evolve-glow-from {
+  animation: aura-evolve-glow-from 2.7s ease-in-out both;
+}
+
+[data-evolve-style="ring-burst"] .aura-evolve-glow-to {
+  animation: aura-evolve-glow-to 2.7s ease-in-out both;
+}
+
+[data-evolve-style="ring-burst"] .aura-evolve-orb-from {
+  animation: aura-evolve-orb-from 2.7s ease-in-out both;
+}
+
+[data-evolve-style="ring-burst"] .aura-evolve-orb-to {
+  animation: aura-evolve-orb-to 2.7s ease-in-out both;
+}
+
+/* core-pulse / 真の輝き: 前半は旧オーラを保ち、後半でゆっくり入れ替え */
+@keyframes aura-evolve-core-from {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  28% {
+    opacity: 1;
+    transform: scale(1.035);
+    filter: brightness(1.4);
+  }
+  55% {
+    opacity: 0.72;
+    transform: scale(1.01);
+    filter: brightness(1.15);
+  }
+  78% {
+    opacity: 0.28;
+    transform: scale(0.985);
+    filter: brightness(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.97);
+    filter: brightness(1);
+  }
+}
+
+@keyframes aura-evolve-core-to {
+  0%,
+  28% {
+    opacity: 0;
+    transform: scale(1.03);
+    filter: brightness(1.2);
+  }
+  55% {
+    opacity: 0.28;
+    transform: scale(1.02);
+    filter: brightness(1.12);
+  }
+  78% {
+    opacity: 0.72;
+    transform: scale(1.005);
+    filter: brightness(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes aura-evolve-rings-gather-a {
+  0% {
+    transform: rotate(15deg) translate(0%, 0%) scale(1);
+    opacity: 0.72;
+  }
+  22% {
+    transform: rotate(8deg) translate(0%, 0%) scale(0.36);
+    opacity: 0.95;
+  }
+  40% {
+    transform: rotate(12deg) translate(0%, 0%) scale(0.4);
+    opacity: 0.9;
+  }
+  /* ここで広がりきり → 終わりは通常ゆらぎの開始姿勢と同じ */
+  68% {
+    transform: rotate(15deg) translate(0%, 0%) scale(1);
+    opacity: 0.72;
+  }
+  100% {
+    transform: rotate(15deg) translate(0%, 0%) scale(1);
+    opacity: 0.72;
+  }
+}
+
+@keyframes aura-evolve-rings-gather-b {
+  0% {
+    transform: rotate(-25deg) translate(0%, 0%) scale(1);
+    opacity: 0.72;
+  }
+  20% {
+    transform: rotate(-12deg) translate(0%, 0%) scale(0.3);
+    opacity: 0.92;
+  }
+  42% {
+    transform: rotate(-18deg) translate(0%, 0%) scale(0.34);
+    opacity: 0.86;
+  }
+  68% {
+    transform: rotate(-25deg) translate(0%, 0%) scale(1);
+    opacity: 0.72;
+  }
+  100% {
+    transform: rotate(-25deg) translate(0%, 0%) scale(1);
+    opacity: 0.72;
+  }
+}
+
+@keyframes aura-evolve-rings-gather-c {
+  0% {
+    transform: rotate(40deg) translate(0%, 0%) scale(1);
+    opacity: 0.48;
+  }
+  18% {
+    transform: rotate(18deg) translate(0%, 0%) scale(0.22);
+    opacity: 0.85;
+  }
+  44% {
+    transform: rotate(28deg) translate(0%, 0%) scale(0.28);
+    opacity: 0.72;
+  }
+  70% {
+    transform: rotate(40deg) translate(0%, 0%) scale(1);
+    opacity: 0.48;
+  }
+  100% {
+    transform: rotate(40deg) translate(0%, 0%) scale(1);
+    opacity: 0.48;
+  }
+}
+
+[data-evolve-style="core-pulse"] .aura-evolve-glow-from {
+  animation: aura-evolve-glow-from 2.8s ease-in-out both;
+}
+
+[data-evolve-style="core-pulse"] .aura-evolve-glow-to {
+  animation: aura-evolve-glow-to 2.8s ease-in-out both;
+}
+
+[data-evolve-style="core-pulse"] .aura-evolve-orb-from {
+  animation: aura-evolve-core-from 2.8s ease-in-out both;
+}
+
+[data-evolve-style="core-pulse"] .aura-evolve-orb-to {
+  animation: aura-evolve-core-to 2.8s ease-in-out both;
+}
+
+/* 広がり後に通常ゆらぎへ繋ぐ（終わり姿勢 = drift の 0%）。!important で無限ループ側を抑止 */
+[data-evolve-style="core-pulse"] .aura-sphere-ring-a {
+  animation: aura-evolve-rings-gather-a 2.8s cubic-bezier(0.4, 0.05, 0.2, 1) both !important;
+}
+
+[data-evolve-style="core-pulse"] .aura-sphere-ring-b {
+  animation: aura-evolve-rings-gather-b 2.8s cubic-bezier(0.4, 0.05, 0.2, 1) both !important;
+}
+
+[data-evolve-style="core-pulse"] .aura-sphere-ring-c {
+  animation: aura-evolve-rings-gather-c 2.8s cubic-bezier(0.4, 0.05, 0.2, 1) both !important;
 }
 
 @keyframes aura-evolve-orb-breathe {
@@ -949,6 +1331,10 @@ body {
 
 .aura-evolve-tap {
   animation: aura-evolve-tap 1.35s ease-in-out infinite;
+}
+
+.aura-evolve-action {
+  animation: aura-evolve-tap 1.8s ease-in-out infinite;
 }
 
 @keyframes aura-evolve-title {
@@ -1006,9 +1392,35 @@ body {
   .aura-evolve-orb-ring,
   .aura-evolve-orb-ring-slow,
   .aura-evolve-tap,
-  .aura-evolve-title,
-  .aura-evolve-orb-from,
+  .aura-evolve-action,
+  .aura-evolve-title {
+    animation: none;
+  }
+
+  .aura-evolve-glow-from {
+    animation: aura-evolve-glow-from 0.01s linear forwards;
+  }
+
+  .aura-evolve-orb-from {
+    animation: aura-evolve-orb-from 0.01s linear forwards;
+  }
+
+  .aura-evolve-glow-to {
+    animation: aura-evolve-glow-to 0.01s linear forwards;
+  }
+
   .aura-evolve-orb-to {
+    animation: aura-evolve-orb-to 0.01s linear forwards;
+  }
+
+  .aura-evolve-burst-ring {
+    animation: none;
+    opacity: 0;
+  }
+
+  [data-evolve-style="core-pulse"] .aura-sphere-ring-a,
+  [data-evolve-style="core-pulse"] .aura-sphere-ring-b,
+  [data-evolve-style="core-pulse"] .aura-sphere-ring-c {
     animation: none;
   }
 }

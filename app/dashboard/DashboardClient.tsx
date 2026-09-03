@@ -92,6 +92,8 @@ export default function DashboardClient({
   const [morphFromAura, setMorphFromAura] = useState<AuraType | null>(null);
   const [morphFromCatchCopy, setMorphFromCatchCopy] = useState<string | null>(null);
   const [voteNudgeOpen, setVoteNudgeOpen] = useState(false);
+  const [evolutionTapReady, setEvolutionTapReady] = useState(false);
+  const [evolveToken, setEvolveToken] = useState(0);
   const pulseTimerRef = useRef<number | null>(null);
   const toastTimerRef = useRef<number | null>(null);
   const wordTimerRef = useRef<number | null>(null);
@@ -166,9 +168,10 @@ export default function DashboardClient({
   const rankingWords = friendWords.length > 0 ? friendWords : selfWords;
 
   useEffect(() => {
-    if (auraWords.length === 0) return;
+    // 自己診断の結果が出たあと、一度だけ案内（ログインのたびには出さない）
+    if (selfWords.length === 0) return;
     if (typeof window === "undefined") return;
-    if (window.sessionStorage.getItem(voteNudgeStorageKey) === "1") return;
+    if (window.localStorage.getItem(voteNudgeStorageKey) === "1") return;
 
     const timer = window.setTimeout(() => {
       setVoteNudgeOpen(true);
@@ -176,7 +179,11 @@ export default function DashboardClient({
     }, 3200);
 
     return () => window.clearTimeout(timer);
-  }, [auraWords.length, voteNudgeStorageKey]);
+  }, [selfWords.length, voteNudgeStorageKey]);
+
+  useEffect(() => {
+    if (!pendingAura) setEvolutionTapReady(false);
+  }, [pendingAura]);
 
   const ranking = useMemo(() => buildCounts(rankingWords), [rankingWords]);
   const auraResult = useMemo(
@@ -276,7 +283,7 @@ export default function DashboardClient({
   function dismissVoteNudge() {
     setVoteNudgeOpen(false);
     if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(voteNudgeStorageKey, "1");
+      window.localStorage.setItem(voteNudgeStorageKey, "1");
     }
     trackEvent("vote_url_nudge_dismissed");
   }
@@ -285,7 +292,7 @@ export default function DashboardClient({
     await copyVoteUrlOnly();
     setVoteNudgeOpen(false);
     if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(voteNudgeStorageKey, "1");
+      window.localStorage.setItem(voteNudgeStorageKey, "1");
     }
     trackEvent("vote_url_nudge_copied");
   }
@@ -377,12 +384,15 @@ export default function DashboardClient({
         <AuraEvolutionOverlay
           fromAura={morphFromAura ?? displayedAura.aura}
           toAura={pendingAura.aura}
+          evolveToken={evolveToken}
+          onDeferTap={() => setEvolutionTapReady(true)}
           onReveal={() => {
             const next = pendingAuraRef.current;
             if (!next) return;
             setMorphFromAura(displayedAura.aura);
             setMorphFromCatchCopy(displayedAura.personalizedCatchCopy);
             setEvolutionMorphing(true);
+            setEvolutionTapReady(false);
             setDisplayedAura(next);
           }}
           onComplete={() => {
@@ -395,6 +405,7 @@ export default function DashboardClient({
             pendingAuraRef.current = null;
             setPendingAura(null);
             setEvolutionMorphing(false);
+            setEvolutionTapReady(false);
             setMorphFromAura(null);
             setMorphFromCatchCopy(null);
             if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
@@ -470,10 +481,11 @@ export default function DashboardClient({
           pulse={pulseActive}
           displayName={displayName}
           awakened={isAwakened}
-          evolutionPending={Boolean(pendingAura)}
+          evolutionPending={Boolean(pendingAura) && evolutionTapReady}
           evolutionMorphing={evolutionMorphing}
           morphFromAura={localizedMorphFromAura}
           morphFromCatchCopy={morphFromCatchCopy}
+          onEvolve={() => setEvolveToken((n) => n + 1)}
         />
 
         {selfWords.length > 0 && friendWords.length > 0 ? (

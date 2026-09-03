@@ -3,6 +3,8 @@ import type { AuraLineage, AuraPalette } from "@/lib/constants/auras";
 import AuraOrbStage from "@/components/AuraOrbStage";
 import AuraSpiralFilaments from "@/components/AuraSpiralFilaments";
 
+export type EvolutionStyle = "crossfade" | "collapse" | "ring-burst" | "core-pulse";
+
 type AuraSphereProps = {
   palette: AuraPalette;
   auraId?: string;
@@ -13,6 +15,7 @@ type AuraSphereProps = {
   pulse?: boolean;
   evolutionMorphing?: boolean;
   morphFromPalette?: AuraPalette;
+  evolutionStyle?: EvolutionStyle;
   className?: string;
   children?: ReactNode;
 };
@@ -78,6 +81,34 @@ function AuraSphereBody({
   );
 }
 
+/** 光のにじみだけ（輪っかは含めない＝進化中に位置が飛ばない） */
+function AuraSphereGlow({
+  palette,
+  pulse = false,
+  layerClass = "",
+}: {
+  palette: AuraPalette;
+  pulse?: boolean;
+  layerClass?: string;
+}) {
+  return (
+    <div className={`aura-evolve-layer ${layerClass}`.trim()} style={paletteVars(palette)} aria-hidden>
+      <div className="aura-sphere-bloom" />
+      <div className={`aura-sphere-halo ${pulse ? "aura-sphere-halo-pulse" : ""}`} />
+    </div>
+  );
+}
+
+function AuraSphereRings() {
+  return (
+    <>
+      <div className="aura-sphere-ring aura-sphere-ring-a" aria-hidden />
+      <div className="aura-sphere-ring aura-sphere-ring-b" aria-hidden />
+      <div className="aura-sphere-ring aura-sphere-ring-c" aria-hidden />
+    </>
+  );
+}
+
 export default function AuraSphere({
   palette,
   auraId,
@@ -88,50 +119,66 @@ export default function AuraSphere({
   pulse = false,
   evolutionMorphing = false,
   morphFromPalette,
+  evolutionStyle = "core-pulse",
   className = "",
   children,
 }: AuraSphereProps) {
   const dormant = !hasVotes && !secret;
+  const morphing = Boolean(evolutionMorphing && morphFromPalette);
 
   return (
     <div
       className={`aura-sphere-root relative shrink-0 ${className}`.trim()}
       style={paletteVars(palette)}
+      data-evolve-style={morphing ? evolutionStyle : undefined}
     >
       <AuraOrbStage
         lineage={lineage}
         auraId={auraId}
         className="aura-sphere-stage size-full"
       >
-        <div className="aura-sphere-bloom" aria-hidden />
-        <div className={`aura-sphere-halo ${pulse ? "aura-sphere-halo-pulse" : ""}`} aria-hidden />
-        <div className="aura-sphere-ring aura-sphere-ring-a" aria-hidden />
-        <div className="aura-sphere-ring aura-sphere-ring-b" aria-hidden />
-        <div className="aura-sphere-ring aura-sphere-ring-c" aria-hidden />
-
-        {evolutionMorphing && morphFromPalette ? (
-          <>
-            <AuraSphereBody
-              palette={morphFromPalette}
-              auraId={auraId}
-              className="aura-evolve-orb-from"
-            />
-            <AuraSphereBody
-              palette={palette}
-              auraId={auraId}
-              awakened={awakened}
-              className="aura-evolve-orb-to"
-            />
-          </>
-        ) : (
-          <AuraSphereBody
-            palette={palette}
-            auraId={auraId}
-            dormant={dormant}
-            secret={secret}
-            awakened={awakened}
+        {/* メイン光は key 固定で付け替えず、進化時だけ旧光を重ねる */}
+        {morphing && morphFromPalette ? (
+          <AuraSphereGlow
+            key="glow-from"
+            palette={morphFromPalette}
+            layerClass="aura-evolve-glow-from"
           />
-        )}
+        ) : null}
+        <AuraSphereGlow
+          key="glow-to"
+          palette={palette}
+          pulse={pulse}
+          layerClass={morphing ? "aura-evolve-glow-to" : ""}
+        />
+
+        <AuraSphereRings />
+
+        {morphing && evolutionStyle === "ring-burst" ? (
+          <div className="aura-evolve-burst" aria-hidden>
+            <div className="aura-evolve-burst-ring" />
+            <div className="aura-evolve-burst-ring aura-evolve-burst-ring-delayed" />
+          </div>
+        ) : null}
+
+        {/* 本体も key 固定。進化終了で作り直さない＝中身のパッ切りを防ぐ */}
+        {morphing && morphFromPalette ? (
+          <AuraSphereBody
+            key="orb-from"
+            palette={morphFromPalette}
+            auraId="evolve-from"
+            className="aura-evolve-orb-from"
+          />
+        ) : null}
+        <AuraSphereBody
+          key="orb-to"
+          palette={palette}
+          auraId={auraId ?? "evolve-to"}
+          dormant={!morphing && dormant}
+          secret={!morphing && secret}
+          awakened={awakened}
+          className={morphing ? "aura-evolve-orb-to" : ""}
+        />
 
         {children}
       </AuraOrbStage>
