@@ -463,6 +463,7 @@ body {
 .aura-sphere-ring-a {
   /* 進化終わりと同じ姿勢から、サイズはそのまま平行移動でゆらぐ */
   animation: aura-sphere-ring-drift-a 20s ease-in-out infinite;
+  animation-delay: var(--ring-drift-delay-a, 0s);
 }
 
 .aura-card-ring-a {
@@ -480,6 +481,7 @@ body {
 
 .aura-sphere-ring-b {
   animation: aura-sphere-ring-drift-b 26s ease-in-out infinite;
+  animation-delay: var(--ring-drift-delay-b, 0s);
 }
 
 .aura-card-ring-b {
@@ -493,6 +495,7 @@ body {
   border-color: color-mix(in srgb, var(--card-c) 50%, white);
   box-shadow: 0 0 14px color-mix(in srgb, var(--card-c) 55%, transparent);
   animation: aura-sphere-ring-drift-c 32s ease-in-out infinite;
+  animation-delay: var(--ring-drift-delay-c, 0s);
 }
 
 @keyframes aura-sphere-ring-drift-a {

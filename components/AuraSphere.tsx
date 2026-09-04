@@ -28,6 +28,29 @@ function paletteVars(palette: AuraPalette): CSSProperties {
   } as CSSProperties;
 }
 
+/** auraId ごとに輪の位相をずらす（負の delay = 周期の途中から開始） */
+function ringDriftPhaseVars(auraId?: string): CSSProperties {
+  if (!auraId) return {};
+
+  let hash = 2166136261;
+  for (let i = 0; i < auraId.length; i += 1) {
+    hash ^= auraId.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  const u = hash >>> 0;
+
+  // 各輪の周期（20 / 26 / 32s）内でバラバラにずらす
+  const delayA = -((u % 2000) / 100);
+  const delayB = -(((u >>> 7) % 2600) / 100);
+  const delayC = -(((u >>> 14) % 3200) / 100);
+
+  return {
+    "--ring-drift-delay-a": `${delayA}s`,
+    "--ring-drift-delay-b": `${delayB}s`,
+    "--ring-drift-delay-c": `${delayC}s`,
+  } as CSSProperties;
+}
+
 function AuraSphereBody({
   palette,
   auraId,
@@ -129,7 +152,7 @@ export default function AuraSphere({
   return (
     <div
       className={`aura-sphere-root relative shrink-0 ${className}`.trim()}
-      style={paletteVars(palette)}
+      style={{ ...paletteVars(palette), ...ringDriftPhaseVars(auraId) }}
       data-evolve-style={morphing ? evolutionStyle : undefined}
     >
       <AuraOrbStage
