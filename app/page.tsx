@@ -3,6 +3,7 @@ import HomeContent from "@/components/HomeContent";
 import { buildPageMetadata } from "@/lib/i18n/metadata";
 import { getSeoCopy } from "@/lib/i18n/seo";
 import { getServerLocale } from "@/lib/i18n/server";
+import { getPublicStats } from "@/lib/stats/public";
 import { createClient } from "@/utils/supabase/server";
 import type { Metadata } from "next";
 
@@ -27,5 +28,6 @@ export default async function Home() {
     redirect("/dashboard");
   }
 
-  return <HomeContent />;
+  const stats = await getPublicStats();
+  return <HomeContent stats={stats} />;
 }

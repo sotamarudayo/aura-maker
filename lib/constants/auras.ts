@@ -1873,11 +1873,19 @@ function buildSpecialMove(aura: AuraType, topWords: string[]): string {
 }
 
 function buildShareLine(aura: AuraType, topWords: string[], displayName?: string): string {
-  const who = displayName ?? "俺";
-  const shortName = aura.name.replace(/オーラ$/, "");
+  const who = displayName?.trim() || "私";
   const tags =
-    topWords.length > 0 ? topWords.map((word) => `#${word}`).join(" ") : "#AuraMaker";
-  return `友達から見た${who}、${aura.archetypeName}やったわ 🔮\n（${shortName}）\n${tags} #AuraMaker`;
+    topWords.length > 0
+      ? topWords
+          .slice(0, 3)
+          .map((word) => `#${word.replace(/\s+/g, "")}`)
+          .join(" ")
+      : "";
+  return [
+    `${who}の友達目線オーラは「${aura.archetypeName}」だった🔮`,
+    "自分では知らない、自分を知る。",
+    `${tags} #AuraMaker #オーラ診断`.replace(/^\s+/, "").trim(),
+  ].join("\n");
 }
 
 function buildDailyFortune(userId: string | undefined, aura: AuraType): string {

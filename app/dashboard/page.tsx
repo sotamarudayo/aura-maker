@@ -73,7 +73,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const [{ data: votes }, siteUrl, initialFusions] = await Promise.all([
     supabase
       .from("votes")
-      .select("word, is_self_vote, relationship_type, voter_display_name")
+      .select("word, is_self_vote, relationship_type, voter_display_name, created_at")
       .eq("target_user_id", user.id),
     resolveSiteUrl(),
     loadDashboardFusions(user.id),
@@ -88,6 +88,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         isSelfVote: vote.is_self_vote ?? false,
         relationshipType: vote.relationship_type ?? null,
         voterDisplayName: vote.voter_display_name ?? null,
+        createdAt: vote.created_at ?? null,
       }))}
       initialIsAnonymous={user.is_anonymous ?? false}
       initialFusions={initialFusions}

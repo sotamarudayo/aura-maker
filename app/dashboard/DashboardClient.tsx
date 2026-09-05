@@ -12,11 +12,13 @@ import VoteUrlNudgeModal from "@/components/VoteUrlNudgeModal";
 import { useLocale } from "@/components/LocaleProvider";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import RelationshipFacesCard from "@/components/RelationshipFacesCard";
+import AuraMonthLogCard from "@/components/AuraMonthLogCard";
 import { groupFriendVotesByRelationship } from "@/lib/votes/relationship-faces";
 import { isVoteRelationship } from "@/lib/votes/relationship";
 import { calculateAuraType, type AuraCalculationResult, type AuraType } from "@/lib/constants/auras";
 import { localizeAuraResult, localizeAuraType, getLocalizedWordLabel } from "@/lib/i18n/localize";
 import { calculateChemi, type ChemiParty } from "@/lib/chemi/calculate-chemi";
+import { buildResultFlexShareUrls } from "@/lib/constants/share";
 import type {
   DashboardFusionPartner,
   DashboardFusions,
@@ -40,6 +42,7 @@ type VoteEntry = {
   isSelfVote: boolean;
   relationshipType: string | null;
   voterDisplayName: string | null;
+  createdAt: string | null;
 };
 
 type RankingNamedVoter = {
@@ -182,7 +185,16 @@ export default function DashboardClient({
           const voterRaw = payload.new.voter_display_name;
           const voterDisplayName = typeof voterRaw === "string" && voterRaw.trim() ? voterRaw.trim() : null;
           if (typeof word === "string") {
-            setVotes((prev) => [{ word, isSelfVote, relationshipType, voterDisplayName }, ...prev]);
+            setVotes((prev) => [
+              {
+                word,
+                isSelfVote,
+                relationshipType,
+                voterDisplayName,
+                createdAt: new Date().toISOString(),
+              },
+              ...prev,
+            ]);
             if (!isSelfVote) {
               setPulseActive(true);
               setToastMessage(
@@ -225,18 +237,18 @@ export default function DashboardClient({
   const rankingWords = friendWords.length > 0 ? friendWords : selfWords;
 
   useEffect(() => {
-    // 自己診断の結果が出たあと、一度だけ案内（ログインのたびには出さない）
-    if (selfWords.length === 0) return;
+    // 友達票がまだ無い人へ、投票URL案内を一度だけ
+    if (friendWords.length > 0) return;
     if (typeof window === "undefined") return;
     if (window.localStorage.getItem(voteNudgeStorageKey) === "1") return;
 
     const timer = window.setTimeout(() => {
       setVoteNudgeOpen(true);
       trackEvent("vote_url_nudge_shown");
-    }, 3200);
+    }, 2400);
 
     return () => window.clearTimeout(timer);
-  }, [selfWords.length, voteNudgeStorageKey]);
+  }, [friendWords.length, voteNudgeStorageKey]);
 
   useEffect(() => {
     if (!pendingAura) setEvolutionTapReady(false);
@@ -566,6 +578,8 @@ export default function DashboardClient({
           />
         ) : null}
 
+        <AuraMonthLogCard votes={votes} />
+
         <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
           <h2 className="text-xl font-bold">{t.dashboard.shareTitle}</h2>
           <p className="mt-1 text-sm text-white/70">{t.dashboard.shareSub}</p>
@@ -581,6 +595,58 @@ export default function DashboardClient({
             >
               {t.dashboard.shareImage}
             </button>
+            {(() => {
+              const flex = buildResultFlexShareUrls(
+                visibleAura.aura.archetypeName,
+                siteUrl,
+                locale,
+              );
+              return (
+                <>
+                  <a
+                    href={flex.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() =>
+                      trackEvent("share_result_flex", {
+                        channel: "twitter",
+                        aura: visibleAura.aura.id,
+                      })
+                    }
+                    className="flex min-h-[3.25rem] items-center justify-center rounded-2xl border-2 border-sky-200/80 bg-sky-400 px-5 py-4 text-center text-base font-black leading-snug text-black shadow-lg sm:text-lg"
+                  >
+                    {t.dashboard.shareFlex}
+                  </a>
+                  <a
+                    href={flex.line}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() =>
+                      trackEvent("share_result_flex", {
+                        channel: "line",
+                        aura: visibleAura.aura.id,
+                      })
+                    }
+                    className="flex min-h-[3.25rem] items-center justify-center rounded-2xl border-2 border-emerald-200/80 bg-emerald-400 px-5 py-4 text-center text-base font-black leading-snug text-black shadow-lg sm:text-lg"
+                  >
+                    {t.dashboard.shareLine}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(flex.text);
+                      trackEvent("share_result_flex", { channel: "copy", aura: visibleAura.aura.id });
+                      setToastMessage(t.dashboard.shareTextCopied);
+                      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+                      toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 1800);
+                    }}
+                    className="min-h-[3rem] rounded-2xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white"
+                  >
+                    {t.dashboard.copyShareText}
+                  </button>
+                </>
+              );
+            })()}
             <button
               type="button"
               onClick={copyVoteUrlOnly}

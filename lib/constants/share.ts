@@ -130,3 +130,46 @@ export function buildVoteThanksMessage(displayName: string, locale: Locale = "ja
     ? `Your impression just joined ${displayName}'s aura. More votes = a sharper read.`
     : `${displayName}さんのオーラ診断に、あなたの印象が加わりました。投票が増えるほど診断結果が育っていきます。`;
 }
+
+/** 結果をX/ストーリー向けにワンタップ投稿する本文 */
+export function buildResultFlexShareText(
+  archetypeName: string,
+  siteUrl: string,
+  locale: Locale = "ja",
+) {
+  if (locale === "en") {
+    return [
+      `My friend-view aura is “${archetypeName}” 🔮`,
+      "See yourself through your friends' eyes.",
+      `${siteUrl} #AuraMaker`,
+    ].join("\n");
+  }
+  return [
+    `私の友達目線オーラは「${archetypeName}」だった🔮`,
+    "自分では知らない、自分を知る。",
+    `${siteUrl} #AuraMaker #オーラ診断 #${archetypeName.replace(/\s+/g, "")}`,
+  ].join("\n");
+}
+
+export function buildResultFlexShareUrls(
+  archetypeName: string,
+  siteUrl: string,
+  locale: Locale = "ja",
+) {
+  const text = buildResultFlexShareText(archetypeName, siteUrl, locale);
+  const encodedText = encodeURIComponent(text);
+  const encodedUrl = encodeURIComponent(siteUrl);
+  return {
+    text,
+    twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+    line: `https://line.me/R/msg/text/?${encodeURIComponent(text)}`,
+  };
+}
+
+/** 固定ハッシュタグ（SNS文化用） */
+export const SHARE_HASHTAGS_JA = ["#AuraMaker", "#オーラ診断", "#私のトリセツ", "#友達目線"] as const;
+export const SHARE_HASHTAGS_EN = ["#AuraMaker", "#auraquiz", "#howothersseeme"] as const;
+
+export function getShareHashtags(locale: Locale = "ja") {
+  return locale === "en" ? SHARE_HASHTAGS_EN : SHARE_HASHTAGS_JA;
+}

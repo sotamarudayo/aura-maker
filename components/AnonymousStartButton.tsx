@@ -10,6 +10,8 @@ import { createClient } from "@/utils/supabase/client";
 type AnonymousStartButtonProps = {
   className?: string;
   label?: string;
+  onStarted?: () => void;
+  startSource?: string;
 };
 
 const NAME_MIN = 1;
@@ -18,6 +20,8 @@ const NAME_MAX = 20;
 export default function AnonymousStartButton({
   className = "rounded-full bg-violet-300 px-6 py-3 font-semibold text-black disabled:opacity-60",
   label,
+  onStarted,
+  startSource = "default",
 }: AnonymousStartButtonProps) {
   const router = useRouter();
   const { t } = useLocale();
@@ -80,7 +84,8 @@ export default function AnonymousStartButton({
       return;
     }
 
-    trackEvent("start_anonymous", { has_display_name: true });
+    trackEvent("start_anonymous", { has_display_name: true, source: startSource });
+    onStarted?.();
     router.push("/onboarding/self-vote");
     router.refresh();
   }

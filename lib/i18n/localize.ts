@@ -184,7 +184,7 @@ export function localizeDynamicProfile(
     shadowText: enAura?.shadow ?? profile.shadowText,
     ecology: enAura?.ecology ?? profile.ecology,
     specialMove: enAura?.specialMove(topWords) ?? profile.specialMove,
-    shareLine: `My aura is ${archetype} on AuraMaker ✨`,
+    shareLine: `My friend-view aura is ${archetype} on AuraMaker 🔮\nSee the you you don't know yet. #AuraMaker`,
     dailyFortune: enAura?.fortune ?? profile.dailyFortune,
     confidenceLabel: confidenceLabelEn(profile.confidence),
     evidence: profile.evidence.map((item) => ({

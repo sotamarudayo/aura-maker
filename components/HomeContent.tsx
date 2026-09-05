@@ -8,6 +8,7 @@ import { AuraSphereCompact } from "@/components/AuraSphere";
 import { useLocale } from "@/components/LocaleProvider";
 import { AURA_TYPES, getAuraById, getAuraLineage } from "@/lib/constants/auras";
 import { getLocalizedWordLabel, getRarityLabel, localizeAuraType } from "@/lib/i18n/localize";
+import type { PublicStats } from "@/lib/stats/public";
 
 const LANDING_EXAMPLE_WORDS_JA = [
   "カリスマ",
@@ -25,7 +26,11 @@ const LANDING_EXAMPLE_WORDS_JA = [
 const LANDING_SELECTED = new Set([0, 2, 5]);
 const LANDING_EXAMPLE_AURA_ID = "sunrise-hero";
 
-export default function HomeContent() {
+type HomeContentProps = {
+  stats?: PublicStats;
+};
+
+export default function HomeContent({ stats }: HomeContentProps) {
   const { locale, t } = useLocale();
 
   const exampleWords = LANDING_EXAMPLE_WORDS_JA.map((label, index) => ({
@@ -36,6 +41,8 @@ export default function HomeContent() {
   const rawExampleAura = getAuraById(LANDING_EXAMPLE_AURA_ID);
   const exampleAura = rawExampleAura ? localizeAuraType(rawExampleAura, locale) : null;
   const exampleLineage = exampleAura ? getAuraLineage(exampleAura.id) : undefined;
+  const auraCount = stats?.auraTypeCount ?? AURA_TYPES.length;
+  const voteCount = stats?.friendVoteCount ?? 0;
 
   return (
     <main className="relative min-h-screen overflow-x-clip px-4 py-8 text-white sm:py-12">
@@ -55,6 +62,12 @@ export default function HomeContent() {
           >
             {t.landing.viewEncyclopedia}
           </Link>
+          <Link
+            href="/blog"
+            className="rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
+          >
+            {t.header.blog}
+          </Link>
         </div>
 
         <section className="rounded-3xl border border-white/20 bg-black/35 p-5 backdrop-blur sm:p-8 md:p-10">
@@ -65,6 +78,23 @@ export default function HomeContent() {
           <p className="mt-5 max-w-2xl rounded-2xl border border-violet-300/40 bg-violet-500/15 px-4 py-3.5 text-base font-semibold leading-relaxed text-violet-50 shadow-[0_0_24px_rgba(167,139,250,0.18)] sm:px-5 sm:py-4 sm:text-lg">
             {t.landing.sub}
           </p>
+
+          <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold sm:text-sm">
+            {voteCount > 0 ? (
+              <span className="rounded-full border border-cyan-200/40 bg-cyan-400/15 px-3 py-1.5 text-cyan-50">
+                {t.landing.proofVotes.replace(
+                  "{count}",
+                  voteCount.toLocaleString(locale === "en" ? "en" : "ja"),
+                )}
+              </span>
+            ) : null}
+            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-white/85">
+              {t.landing.proofAuras.replace("{count}", String(auraCount))}
+            </span>
+            <span className="rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-white/60">
+              {t.landing.proofNote}
+            </span>
+          </div>
 
           {exampleAura ? (
             <div
@@ -82,7 +112,9 @@ export default function HomeContent() {
                 <span className="inline-flex rounded-full border border-white/25 bg-white/10 px-2.5 py-0.5 text-[10px] font-black tracking-wide text-white/80">
                   {t.landing.exampleLabel}
                 </span>
-                <p className="text-xs font-semibold text-white/60 sm:text-sm">{t.landing.exampleCaption}</p>
+                <p className="text-xs font-semibold text-white/60 sm:text-sm">
+                  {t.landing.exampleCaption}
+                </p>
               </div>
 
               <div className="relative mx-auto mt-4 h-28 w-28 sm:h-32 sm:w-32">
@@ -149,7 +181,7 @@ export default function HomeContent() {
         <section className="rounded-3xl border border-white/15 bg-black/30 p-6 text-center backdrop-blur sm:p-8">
           <p className="font-display text-2xl text-violet-200 sm:text-3xl">Aura Encyclopedia</p>
           <h2 className="mt-2 text-2xl font-black sm:text-3xl">
-            {t.landing.encyclopediaTitle.replace("{count}", String(AURA_TYPES.length))}
+            {t.landing.encyclopediaTitle.replace("{count}", String(auraCount))}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-white/70 sm:text-base">
             {t.landing.encyclopediaSub}

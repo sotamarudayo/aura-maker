@@ -17,12 +17,12 @@ export type SeoCopy = {
 };
 
 const SEO_JA: SeoCopy = {
-  siteTitle: "AuraMaker | 友達から見た自分のオーラがわかる",
+  siteTitle: "AuraMaker | 自分では知らない、自分を知る。",
   siteDescription:
-    "周りからどう思われてるか、知りたくない？友達にURLを送ってキーワードを選んでもらうだけでオーラ診断。登録不要・匿名OK。",
-  homeTitle: "AuraMaker | 友達から見た自分のオーラがわかる",
+    "自分では知らない、自分を知る。友達にURLを送ってキーワードを選んでもらうだけでオーラ診断。登録不要・匿名OK。",
+  homeTitle: "AuraMaker | 自分では知らない、自分を知る。",
   homeDescription:
-    "周りからどう思われてるか、知りたくない？友達にURLを送ってキーワードを選んでもらうだけでオーラ診断。登録不要・匿名OK。",
+    "自分では知らない、自分を知る。友達にURLを送ってキーワードを選んでもらうだけでオーラ診断。登録不要・匿名OK。",
   aurasTitle: "オーラ図鑑",
   aurasDescription:
     "AuraMakerの全22種類のオーラタイプ一覧。友達の印象ワードから決まる、他人から見たタイプ診断の図鑑。",
@@ -32,7 +32,7 @@ const SEO_JA: SeoCopy = {
   faqTitle: "よくある質問",
   faqDescription:
     "AuraMakerとは？MBTIとの違い、匿名投票、所要時間、無料かどうかなど、初めての方向けFAQ。",
-  ogImageAlt: "AuraMaker | 友達から見た自分のオーラがわかる",
+  ogImageAlt: "AuraMaker | 自分では知らない、自分を知る。",
   keywords: [
     "オーラ診断",
     "友達 印象 診断",
@@ -47,12 +47,12 @@ const SEO_JA: SeoCopy = {
 };
 
 const SEO_EN: SeoCopy = {
-  siteTitle: "AuraMaker | See Your Aura Through Friends' Eyes",
+  siteTitle: "AuraMaker | See the you you don't know yet",
   siteDescription:
-    "Curious how people actually see you? Send friends a link — they pick impression words, your aura reveals itself. Free, anonymous, no signup.",
-  homeTitle: "AuraMaker | See Your Aura Through Friends' Eyes",
+    "See the you you don't know yet. Friends pick impression words — your aura reveals itself. Free, anonymous, no signup.",
+  homeTitle: "AuraMaker | See the you you don't know yet",
   homeDescription:
-    "Curious how people actually see you? Send friends a link — they pick impression words, your aura reveals itself. Free, anonymous, no signup.",
+    "See the you you don't know yet. Friends pick impression words — your aura reveals itself. Free, anonymous, no signup.",
   aurasTitle: "Aura Dex — All 22 Personality Auras",
   aurasDescription:
     "Browse every aura type in AuraMaker. A personality read built from how friends describe you — Common to Secret rarity.",

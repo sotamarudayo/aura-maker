@@ -1,7 +1,7 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import AuraBackground from "@/components/AuraBackground";
 import { useLocale } from "@/components/LocaleProvider";
 import VoteWordPicker, { VOTE_PICKER_MAX } from "@/components/VoteWordPicker";
@@ -9,6 +9,7 @@ import { trackEvent } from "@/lib/analytics";
 import { getLocalizedWordLabel } from "@/lib/i18n/localize";
 import { submitVotesViaApi } from "@/lib/votes/client";
 import type { VoteWord } from "@/lib/constants/words";
+import { createClient } from "@/utils/supabase/client";
 
 type SelfVoteClientProps = {
   userId: string;
@@ -18,12 +19,14 @@ type SelfVoteClientProps = {
 export default function SelfVoteClient({ userId, displayName }: SelfVoteClientProps) {
   const router = useRouter();
   const { locale, t } = useLocale();
+  const supabase = useMemo(() => createClient(), []);
   const [selected, setSelected] = useState<VoteWord[]>([]);
   const [sending, setSending] = useState(false);
+  const [skipping, setSkipping] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   function toggleWord(word: VoteWord) {
-    if (sending) return;
+    if (sending || skipping) return;
     setSelected((prev) => {
       if (prev.includes(word)) {
         return prev.filter((item) => item !== word);
@@ -56,8 +59,29 @@ export default function SelfVoteClient({ userId, displayName }: SelfVoteClientPr
     router.refresh();
   }
 
+  async function skipToDashboard() {
+    setSkipping(true);
+    setError(null);
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ self_vote_completed: true })
+      .eq("id", userId);
+
+    if (updateError) {
+      setError(updateError.message);
+      setSkipping(false);
+      return;
+    }
+
+    trackEvent("self_vote_skip");
+    router.push("/dashboard");
+    router.refresh();
+  }
+
+  const busy = sending || skipping;
+
   return (
-    <main className="relative min-h-screen overflow-x-clip px-4 py-8 pb-28 text-white sm:py-10 sm:pb-32">
+    <main className="relative min-h-screen overflow-x-clip px-4 py-8 pb-36 text-white sm:py-10 sm:pb-40">
       <AuraBackground />
       <section className="relative z-10 mx-auto w-full min-w-0 max-w-4xl rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur sm:p-6 md:p-8">
         <div className="rounded-xl border border-fuchsia-300/25 bg-fuchsia-500/10 p-4">
@@ -75,7 +99,7 @@ export default function SelfVoteClient({ userId, displayName }: SelfVoteClientPr
         <VoteWordPicker
           selected={selected}
           onToggle={toggleWord}
-          disabled={sending}
+          disabled={busy}
           hint={t.onboarding.hint}
         />
 
@@ -83,21 +107,33 @@ export default function SelfVoteClient({ userId, displayName }: SelfVoteClientPr
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/15 bg-black/80 px-4 py-3 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-3 gap-y-2">
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <button
+              type="button"
+              disabled={busy || selected.length === 0}
+              onClick={submitSelfVote}
+              className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black disabled:opacity-60 sm:px-6 sm:text-base"
+            >
+              {sending
+                ? t.common.saving
+                : t.onboarding.submit.replace("{count}", String(selected.length))}
+            </button>
+            <p className="min-w-0 flex-1 break-words text-sm text-white/80">
+              {t.common.selected}
+              {selected.map((word) => getLocalizedWordLabel(word, locale)).join(" / ") ||
+                t.common.none}
+            </p>
+          </div>
           <button
             type="button"
-            disabled={sending || selected.length === 0}
-            onClick={submitSelfVote}
-            className="rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-5 py-3 text-sm font-black text-black disabled:opacity-60 sm:px-6 sm:text-base"
+            disabled={busy}
+            onClick={skipToDashboard}
+            className="text-left text-sm font-semibold text-cyan-200/90 underline-offset-2 hover:underline disabled:opacity-60"
           >
-            {sending
-              ? t.common.saving
-              : t.onboarding.submit.replace("{count}", String(selected.length))}
+            {skipping ? t.common.saving : t.onboarding.skip}
           </button>
-          <p className="min-w-0 flex-1 break-words text-sm text-white/80">
-            {t.common.selected}
-            {selected.map((word) => getLocalizedWordLabel(word, locale)).join(" / ") || t.common.none}
-          </p>
+          <p className="text-xs text-white/45">{t.onboarding.skipHint}</p>
         </div>
       </div>
     </main>
