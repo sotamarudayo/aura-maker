@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AnonymousStartButton from "@/components/AnonymousStartButton";
 import AuraBackground from "@/components/AuraBackground";
 import OpenInBrowserCta from "@/components/OpenInBrowserCta";
 import { useLocale } from "@/components/LocaleProvider";
+import { trackEvent } from "@/lib/analytics";
 import { buildVoteThanksMessage } from "@/lib/constants/share";
 
 type SuccessClientProps = {
@@ -15,6 +17,10 @@ type SuccessClientProps = {
 export default function SuccessClient({ targetDisplayName }: SuccessClientProps) {
   const router = useRouter();
   const { locale, t } = useLocale();
+
+  useEffect(() => {
+    trackEvent("mutual_invite_shown", { source: "vote_success" });
+  }, []);
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-x-clip px-4 py-8 text-white sm:py-10">
@@ -33,6 +39,7 @@ export default function SuccessClient({ targetDisplayName }: SuccessClientProps)
               className="w-full rounded-full bg-gradient-to-r from-violet-300 via-fuchsia-200 to-cyan-200 px-4 py-3.5 text-center text-sm font-black leading-snug text-black disabled:opacity-60 sm:text-base"
               label={t.success.startOwn}
               startSource="vote_success"
+              onStarted={() => trackEvent("mutual_invite_cta", { source: "vote_success" })}
             />
             <p className="mt-2 text-center text-xs text-white/50">{t.success.startOwnSub}</p>
           </div>

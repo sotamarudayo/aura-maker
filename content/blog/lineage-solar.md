@@ -3,7 +3,7 @@ slug: lineage-solar
 title: "【太陽系】主人公番長・空気清浄機枠など、癒しと陽キャのオーラまとめ"
 description: "AuraMaker太陽系（SL）のオーラ一覧。主人公番長、空気清浄機枠、距離感近すぎ系、飯テロ番長などの特徴をまとめ。"
 date: "2026-09-05"
-cover: "/blog/lineage-solar-cover.png"
+cover: "/blog/lineage-solar-cover.webp"
 ---
 
 AuraMakerのオーラは系統分けされています。  

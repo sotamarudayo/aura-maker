@@ -3,7 +3,7 @@ slug: lineage-legend
 title: "【伝説系】夢語り野郎・語り部の神など、野心と物語のオーラまとめ"
 description: "AuraMaker伝説系（LG）のまとめ。夢語り野郎、語り部の神、全属性持ち神、説教聞かせマンの特徴。"
 date: "2026-09-05"
-cover: "/blog/lineage-legend-cover.png"
+cover: "/blog/lineage-legend-cover.webp"
 ---
 
 **伝説系（LG）** は、野心・物語・説得力。頂点クラスの光をまとう系統です。

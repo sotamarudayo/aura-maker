@@ -3,7 +3,7 @@ slug: how-to-choose-friend-diagnosis
 title: "他人目線診断の選び方｜友達に聞くタイプ診断で失敗しないコツ"
 description: "他人目線・友達投票型の性格診断を選ぶときのチェックリスト。AuraMakerの向き不向きと、票の集め方も解説。"
 date: "2026-09-05"
-cover: "/blog/friend-diagnosis-cover.png"
+cover: "/blog/friend-diagnosis-cover.webp"
 ---
 
 「自己診断は飽きた。友達に聞いてみたい」

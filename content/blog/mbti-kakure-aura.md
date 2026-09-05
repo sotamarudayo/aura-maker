@@ -3,7 +3,7 @@ slug: mbti-kakure-aura
 title: "【MBTI別】16タイプが友達から言われがちな「隠れオーラ」まとめ"
 description: "MBTIの自己イメージと、友達目線のオーラが一致しない理由を16タイプ別に解説。AuraMakerの他人目線診断と重ねて読めます。"
 date: "2026-09-04"
-cover: "/blog/mbti-kakure-aura-cover.png"
+cover: "/blog/mbti-kakure-aura-cover.webp"
 ---
 
 「自分ではINTJ気質だと思ってるのに、友達からは盛り上げ番長扱い」

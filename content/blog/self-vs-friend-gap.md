@@ -3,7 +3,7 @@ slug: self-vs-friend-gap
 title: "自己診断と友達診断がズレる理由｜「自分では知らない自分」の正体"
 description: "MBTIや自己診断と、友達目線のオーラ診断が一致しないのはバグじゃない。ズレが生まれる理由と、AuraMakerの使い方を解説します。"
 date: "2026-09-05"
-cover: "/blog/self-vs-friend-cover.png"
+cover: "/blog/self-vs-friend-cover.webp"
 ---
 
 「自分ではINTJ気質なのに、友達からは盛り上げ番長」

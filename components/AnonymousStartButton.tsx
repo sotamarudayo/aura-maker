@@ -96,6 +96,7 @@ export default function AnonymousStartButton({
         <button
           type="button"
           onClick={() => {
+            trackEvent("start_anonymous_click", { source: startSource });
             setError(null);
             setAskingName(true);
           }}

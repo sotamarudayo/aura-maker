@@ -47,9 +47,16 @@ https://auramaker.net
 
 ## 5. プロダクト側ですでに実装済み
 
-- 投票完了 → 自分のURL作成 CTA
+- 投票完了 → 自分のURL作成 CTA（相互誘導）
 - 結果ワンタップ投稿（X / LINE / コピー）
 - 画像シェア（ストーリー向け）
 - LPヒーロー「自分では知らない、自分を知る。」＋票数社会的証明
+- LP / 図鑑の人気オーラ TOP
 - 自己診断スキップで先にURL
 - ダッシュボード「今月の顔」ログ
+- ダッシュボード「あとN票」進捗 CTA（メール通知なし・アプリ内のみ）
+- Analytics: `votes_progress_cta` / `popular_aura_click` / `mutual_invite_*` / `share_result_flex`
+
+## 6. やらないこと
+
+- メール・プッシュなど外向き通知（うるさいので禁止）

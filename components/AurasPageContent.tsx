@@ -4,10 +4,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import AuraBackground from "@/components/AuraBackground";
 import AuraEncyclopediaSection from "@/components/AuraEncyclopediaSection";
+import PopularAurasStrip from "@/components/PopularAurasStrip";
 import { useLocale } from "@/components/LocaleProvider";
+import type { PopularAuraStat } from "@/lib/stats/public";
 import { createClient } from "@/utils/supabase/client";
 
-export default function AurasPageContent() {
+type AurasPageContentProps = {
+  popularAuras?: PopularAuraStat[];
+};
+
+export default function AurasPageContent({ popularAuras = [] }: AurasPageContentProps) {
   const { t } = useLocale();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -32,6 +38,10 @@ export default function AurasPageContent() {
               {t.encyclopedia.backDashboard}
             </Link>
           </div>
+        ) : null}
+
+        {popularAuras.length > 0 ? (
+          <PopularAurasStrip popularAuras={popularAuras} source="encyclopedia" />
         ) : null}
 
         <AuraEncyclopediaSection showCta isLoggedIn={isLoggedIn} />

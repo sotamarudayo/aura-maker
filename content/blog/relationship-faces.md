@@ -3,7 +3,7 @@ slug: relationship-faces
 title: "友達・恋人・職場で顔が変わる？関係性ごとのオーラの見方"
 description: "同じ人でも、友達・恋人・職場で見えるオーラは変わる。AuraMakerの関係性タグ投票と「複数の顔」の楽しみ方を解説します。"
 date: "2026-09-05"
-cover: "/blog/relationship-faces-cover.png"
+cover: "/blog/relationship-faces-cover.webp"
 ---
 
 「友達からは盛り上げ番長なのに、職場メンバーからは空気清浄機枠」

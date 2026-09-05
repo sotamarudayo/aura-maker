@@ -3,7 +3,7 @@ slug: chaos-ecology
 title: "【カオス系】盛り上げ番長・むっつりど変態の生態を徹底分析してみた"
 description: "盛り上げ番長・むっつりど変態などカオス系オーラの生息地・弱点・危険ワードを公式設定に沿って解剖。"
 date: "2026-09-04"
-cover: "/blog/chaos-ecology-cover.png"
+cover: "/blog/chaos-ecology-cover.webp"
 ---
 
 「友達から投票された結果見たら、治安終わってて草」  

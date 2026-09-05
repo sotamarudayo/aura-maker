@@ -3,7 +3,7 @@ slug: lineage-mystic
 title: "【神秘系】じわ惹き魔・夜更かし詩人など、静かに残るオーラまとめ"
 description: "AuraMaker神秘系（MY）の解説。じわ惹き魔、頭回り最速マン、夜更かし詩人、雰囲気芸人の特徴とあるある。"
 date: "2026-09-05"
-cover: "/blog/lineage-mystic-cover.png"
+cover: "/blog/lineage-mystic-cover.webp"
 ---
 
 **神秘系（MY）** は、じわ惹き・クール・感性。静かに残る空気感の系統です。

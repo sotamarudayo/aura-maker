@@ -3,7 +3,7 @@ slug: instagram-vote-templates
 title: "【コピペOK】インスタストーリーで自然に投票を集める投稿テンプレート5選"
 description: "AuraMakerの投票URLを送りづらい人向け。インスタストーリー・LINE・Xで使えるコピペテンプレ5選。"
 date: "2026-09-04"
-cover: "/blog/instagram-vote-templates-cover.png"
+cover: "/blog/instagram-vote-templates-cover.webp"
 ---
 
 AuraMakerでいちばん多い止まり方、これです。
@@ -16,7 +16,7 @@ AuraMakerでいちばん多い止まり方、これです。
 
 この記事では、インスタストーリーにそのまま貼れる文面を5つ用意しました。
 
-![ストーリー参考ビジュアル](/blog/instagram-story-visual.png)  
+![ストーリー参考ビジュアル](/blog/instagram-story-visual.webp)  
 全部コピペOK。自分の投票URLに差し替えて使ってください。
 
 👉 投票URLの発行: https://auramaker.net

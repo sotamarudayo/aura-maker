@@ -9,6 +9,7 @@ import { useLocale } from "@/components/LocaleProvider";
 import { AURA_TYPES, getAuraById, getAuraLineage } from "@/lib/constants/auras";
 import { getLocalizedWordLabel, getRarityLabel, localizeAuraType } from "@/lib/i18n/localize";
 import type { PublicStats } from "@/lib/stats/public";
+import PopularAurasStrip from "@/components/PopularAurasStrip";
 
 const LANDING_EXAMPLE_WORDS_JA = [
   "カリスマ",
@@ -157,6 +158,12 @@ export default function HomeContent({ stats }: HomeContentProps) {
           <div className="mt-8">
             <AnonymousStartButton className="w-full rounded-full bg-violet-300 px-6 py-3.5 text-center text-base font-bold text-black disabled:opacity-60 sm:w-auto sm:min-w-56 sm:py-4 sm:text-lg" />
           </div>
+
+          {stats?.popularAuras?.length ? (
+            <div className="mt-8">
+              <PopularAurasStrip popularAuras={stats.popularAuras} source="landing" />
+            </div>
+          ) : null}
 
           <div className="mt-8">
             <p className="text-sm font-semibold text-white/75">{t.landing.keywordHint}</p>

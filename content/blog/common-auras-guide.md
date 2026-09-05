@@ -3,7 +3,7 @@ slug: common-auras-guide
 title: "よく出るオーラの見分け方｜主人公番長・空気清浄機枠・距離感近すぎ系"
 description: "AuraMakerで報告が多い定番オーラの特徴、来やすい投票ワード、あるあるギャップをまとめました。結果が出た人の読み方ガイド。"
 date: "2026-09-05"
-cover: "/blog/common-auras-cover.png"
+cover: "/blog/common-auras-cover.webp"
 ---
 
 AuraMaker（オーラメーカー）の結果でいちばん多い反応は、だいたいこれです。

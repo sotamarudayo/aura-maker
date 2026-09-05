@@ -3,7 +3,7 @@ slug: auramaker-vs-mbti
 title: "AuraMakerとMBTIの違い｜自己診断と友達診断、どっちを使う？"
 description: "MBTIは内側のOS、AuraMakerは外側の取扱説明書。違い・向き・併用の仕方を比較して解説します。"
 date: "2026-09-05"
-cover: "/blog/vs-mbti-cover.png"
+cover: "/blog/vs-mbti-cover.webp"
 ---
 
 「MBTIはもうやった。次は何が面白い？」

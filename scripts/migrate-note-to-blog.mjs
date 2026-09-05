@@ -9,7 +9,7 @@ const posts = [
     description:
       "MBTIの自己イメージと、友達目線のオーラが一致しない理由を16タイプ別に解説。AuraMakerの他人目線診断と重ねて読めます。",
     date: "2026-09-04",
-    cover: "/blog/mbti-kakure-aura-cover.png",
+    cover: "/blog/mbti-kakure-aura-cover.webp",
   },
   {
     src: "content/note/02-chaos-ecology.md",
@@ -19,7 +19,7 @@ const posts = [
     description:
       "盛り上げ番長・むっつりど変態などカオス系オーラの生息地・弱点・危険ワードを公式設定に沿って解剖。",
     date: "2026-09-04",
-    cover: "/blog/chaos-ecology-cover.png",
+    cover: "/blog/chaos-ecology-cover.webp",
   },
   {
     src: "content/note/03-instagram-vote-templates.md",
@@ -29,7 +29,7 @@ const posts = [
     description:
       "AuraMakerの投票URLを送りづらい人向け。インスタストーリー・LINE・Xで使えるコピペテンプレ5選。",
     date: "2026-09-04",
-    cover: "/blog/instagram-vote-templates-cover.png",
+    cover: "/blog/instagram-vote-templates-cover.webp",
   },
 ];
 
@@ -42,7 +42,7 @@ for (const post of posts) {
   if (post.slug === "instagram-vote-templates") {
     body = body.replace(
       "この記事では、インスタストーリーにそのまま貼れる文面を5つ用意しました。",
-      "この記事では、インスタストーリーにそのまま貼れる文面を5つ用意しました。\n\n![ストーリー参考ビジュアル](/blog/instagram-story-visual.png)",
+      "この記事では、インスタストーリーにそのまま貼れる文面を5つ用意しました。\n\n![ストーリー参考ビジュアル](/blog/instagram-story-visual.webp)",
     );
   }
 

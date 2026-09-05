@@ -13,6 +13,7 @@ import { useLocale } from "@/components/LocaleProvider";
 import SelfFriendGapCard from "@/components/SelfFriendGapCard";
 import RelationshipFacesCard from "@/components/RelationshipFacesCard";
 import AuraMonthLogCard from "@/components/AuraMonthLogCard";
+import VotesProgressCard from "@/components/VotesProgressCard";
 import { groupFriendVotesByRelationship } from "@/lib/votes/relationship-faces";
 import { isVoteRelationship } from "@/lib/votes/relationship";
 import { calculateAuraType, type AuraCalculationResult, type AuraType } from "@/lib/constants/auras";
@@ -579,6 +580,11 @@ export default function DashboardClient({
         ) : null}
 
         <AuraMonthLogCard votes={votes} />
+
+        <VotesProgressCard
+          friendVoteCount={friendWords.length}
+          onCopyVoteUrl={copyVoteUrlOnly}
+        />
 
         <section className="min-w-0 rounded-2xl border border-violet-300/35 bg-black/40 p-4 backdrop-blur sm:p-6">
           <h2 className="text-xl font-bold">{t.dashboard.shareTitle}</h2>
