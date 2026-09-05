@@ -606,6 +606,7 @@ export default function DashboardClient({
                 visibleAura.aura.archetypeName,
                 siteUrl,
                 locale,
+                visibleAura.dynamicProfile.observationCount,
               );
               return (
                 <>

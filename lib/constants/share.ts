@@ -136,16 +136,27 @@ export function buildResultFlexShareText(
   archetypeName: string,
   siteUrl: string,
   locale: Locale = "ja",
+  observationCount = 0,
 ) {
   if (locale === "en") {
+    const proof =
+      observationCount > 0
+        ? `${observationCount} friend-word observations / not a self-test`
+        : "Decided by friend votes, not self-report";
     return [
       `My friend-view aura is “${archetypeName}” 🔮`,
+      proof,
       "See yourself through your friends' eyes.",
       `${siteUrl} #AuraMaker`,
     ].join("\n");
   }
+  const proof =
+    observationCount > 0
+      ? `${observationCount}票の友達観測 / 自己診断じゃない`
+      : "友達の票で決まる他人目線診断";
   return [
     `私の友達目線オーラは「${archetypeName}」だった🔮`,
+    proof,
     "自分では知らない、自分を知る。",
     `${siteUrl} #AuraMaker #オーラ診断 #${archetypeName.replace(/\s+/g, "")}`,
   ].join("\n");
@@ -155,8 +166,9 @@ export function buildResultFlexShareUrls(
   archetypeName: string,
   siteUrl: string,
   locale: Locale = "ja",
+  observationCount = 0,
 ) {
-  const text = buildResultFlexShareText(archetypeName, siteUrl, locale);
+  const text = buildResultFlexShareText(archetypeName, siteUrl, locale, observationCount);
   const encodedText = encodeURIComponent(text);
   const encodedUrl = encodeURIComponent(siteUrl);
   return {

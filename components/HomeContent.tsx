@@ -55,7 +55,10 @@ export default function HomeContent({ stats }: HomeContentProps) {
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
             {t.landing.hero}
           </h1>
-          <p className="mt-5 max-w-2xl rounded-2xl border border-violet-300/40 bg-violet-500/15 px-4 py-3.5 text-base font-semibold leading-relaxed text-violet-50 shadow-[0_0_24px_rgba(167,139,250,0.18)] sm:px-5 sm:py-4 sm:text-lg">
+          <p className="mt-4 text-lg font-black leading-snug text-cyan-100 sm:text-xl">
+            {t.landing.reasonHook}
+          </p>
+          <p className="mt-4 max-w-2xl rounded-2xl border border-violet-300/40 bg-violet-500/15 px-4 py-3.5 text-base font-semibold leading-relaxed text-violet-50 shadow-[0_0_24px_rgba(167,139,250,0.18)] sm:px-5 sm:py-4 sm:text-lg">
             {t.landing.sub}
           </p>
 

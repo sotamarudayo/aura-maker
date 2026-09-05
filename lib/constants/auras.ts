@@ -100,6 +100,8 @@ export type DynamicAuraProfile = {
   /** 票数に応じた結果の確からしさ */
   confidence: AuraResultConfidence;
   confidenceLabel: string;
+  /** 観測に使った印象ワード票数（信頼度表示用） */
+  observationCount: number;
 };
 
 export type AuraCalculationOptions = {
@@ -1872,7 +1874,12 @@ function buildSpecialMove(aura: AuraType, topWords: string[]): string {
   );
 }
 
-function buildShareLine(aura: AuraType, topWords: string[], displayName?: string): string {
+function buildShareLine(
+  aura: AuraType,
+  topWords: string[],
+  displayName?: string,
+  observationCount = 0,
+): string {
   const who = displayName?.trim() || "私";
   const tags =
     topWords.length > 0
@@ -1881,8 +1888,13 @@ function buildShareLine(aura: AuraType, topWords: string[], displayName?: string
           .map((word) => `#${word.replace(/\s+/g, "")}`)
           .join(" ")
       : "";
+  const proof =
+    observationCount > 0
+      ? `${observationCount}票の友達観測 / 自己診断じゃない`
+      : "友達の票で決まる他人目線診断";
   return [
     `${who}の友達目線オーラは「${aura.archetypeName}」だった🔮`,
+    proof,
     "自分では知らない、自分を知る。",
     `${tags} #AuraMaker #オーラ診断`.replace(/^\s+/, "").trim(),
   ].join("\n");
@@ -1921,23 +1933,30 @@ function buildAwakening(votes: string[]): AuraAwakening {
 function buildResultConfidence(votes: string[]): {
   confidence: AuraResultConfidence;
   confidenceLabel: string;
+  observationCount: number;
 } {
   const total = votes.length;
   if (total < 3) {
     return {
       confidence: "provisional",
-      confidenceLabel: `暫定結果（まだ${total}票。あと${3 - total}票で暫定を卒業しやすい）`,
+      observationCount: total,
+      confidenceLabel:
+        total === 0
+          ? "観測信頼度：暫定（投票待ち）"
+          : `観測信頼度：暫定（${total}票・あと${3 - total}票で卒業しやすい）`,
     };
   }
   if (total < 10) {
     return {
       confidence: "growing",
-      confidenceLabel: `結果が育ち中（${total}票。あと${10 - total}票でより納得感アップ）`,
+      observationCount: total,
+      confidenceLabel: `観測信頼度：育ち中（${total}票・あと${10 - total}票でより安定）`,
     };
   }
   return {
     confidence: "stable",
-    confidenceLabel: `結果が安定（${total}票）`,
+    observationCount: total,
+    confidenceLabel: `観測信頼度：安定（${total}票・複数の友達観測が揃っている）`,
   };
 }
 
@@ -1962,11 +1981,12 @@ function buildDynamicProfile(
       specialMove: "（覚醒待ち）",
       contradiction: null,
       compatibility: DORMANT_COMPATIBILITY,
-      shareLine: buildShareLine(aura, topWords, options?.displayName),
+      shareLine: buildShareLine(aura, topWords, options?.displayName, confidence.observationCount),
       dailyFortune: "投票が集まると今日のオーラ占いが解放されます",
       awakening: buildAwakening(votes),
-      confidence: "provisional",
-      confidenceLabel: "暫定結果（投票待ち）",
+      confidence: confidence.confidence,
+      confidenceLabel: confidence.confidenceLabel,
+      observationCount: confidence.observationCount,
     };
   }
 
@@ -1990,7 +2010,7 @@ function buildDynamicProfile(
     specialMove: buildSpecialMove(aura, topWords),
     contradiction,
     compatibility: buildCompatibility(aura),
-    shareLine: buildShareLine(aura, topWords, options?.displayName),
+    shareLine: buildShareLine(aura, topWords, options?.displayName, confidence.observationCount),
     dailyFortune: buildDailyFortune(options?.userId, aura),
     awakening: buildAwakening(votes),
     ...confidence,

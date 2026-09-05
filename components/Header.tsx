@@ -95,31 +95,10 @@ export default function Header() {
     router.refresh();
   }
 
-  const navLinks = (
-    <>
-      <Link
-        href="/auras"
-        onClick={() => setMenuOpen(false)}
-        className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
-      >
-        📖 {t.header.encyclopediaFull}
-      </Link>
-      <Link
-        href="/blog"
-        onClick={() => setMenuOpen(false)}
-        className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
-      >
-        {t.header.blogFull}
-      </Link>
-      <Link
-        href="/faq"
-        onClick={() => setMenuOpen(false)}
-        className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10"
-      >
-        {t.header.faqFull}
-      </Link>
-    </>
-  );
+  const linkClass =
+    "whitespace-nowrap rounded-full px-2 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 sm:px-3 sm:text-sm";
+  const menuItemClass =
+    "whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-semibold text-white/90 transition hover:bg-white/10";
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/85 backdrop-blur-md">
@@ -135,8 +114,19 @@ export default function Header() {
         <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
           <LanguageToggle />
 
-          {/* Desktop mid-nav: hide on narrow so auth never gets clipped */}
-          <nav className="hidden items-center gap-1 md:flex">{navLinks}</nav>
+          <Link href="/auras" className={linkClass}>
+            <span className="sm:hidden">📖 {t.header.encyclopedia}</span>
+            <span className="hidden sm:inline">📖 {t.header.encyclopediaFull}</span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex">
+            <Link href="/blog" className={linkClass}>
+              {t.header.blogFull}
+            </Link>
+            <Link href="/faq" className={linkClass}>
+              {t.header.faqFull}
+            </Link>
+          </nav>
 
           {auth.status === "loading" ? (
             <span className="h-7 w-16 shrink-0 rounded-full bg-white/10" aria-hidden />
@@ -152,7 +142,7 @@ export default function Header() {
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="shrink-0 whitespace-nowrap rounded-full border border-white/25 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-white/85 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
+                className="hidden shrink-0 whitespace-nowrap rounded-full border border-white/25 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-white/85 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs md:inline-flex"
               >
                 {loggingOut ? "..." : t.header.logout}
               </button>
@@ -169,7 +159,7 @@ export default function Header() {
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="shrink-0 whitespace-nowrap rounded-full border border-white/25 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-white/85 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs"
+                className="hidden shrink-0 whitespace-nowrap rounded-full border border-white/25 bg-white/5 px-2.5 py-1 text-[10px] font-semibold text-white/85 transition hover:bg-white/10 disabled:opacity-60 sm:text-xs md:inline-flex"
               >
                 {loggingOut ? "..." : t.header.logout}
               </button>
@@ -203,7 +193,28 @@ export default function Header() {
                 id="header-mobile-menu"
                 className="absolute right-0 top-full z-50 mt-2 w-52 rounded-2xl border border-white/15 bg-zinc-950/95 p-2 shadow-xl backdrop-blur"
               >
-                <nav className="flex flex-col">{navLinks}</nav>
+                <nav className="flex flex-col">
+                  <Link
+                    href="/blog"
+                    onClick={() => setMenuOpen(false)}
+                    className={menuItemClass}
+                  >
+                    {t.header.blogFull}
+                  </Link>
+                  <Link href="/faq" onClick={() => setMenuOpen(false)} className={menuItemClass}>
+                    {t.header.faqFull}
+                  </Link>
+                  {isLoggedIn ? (
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      disabled={loggingOut}
+                      className={`${menuItemClass} mt-1 border-t border-white/10 text-left text-white/70 disabled:opacity-60`}
+                    >
+                      {loggingOut ? "..." : t.header.logout}
+                    </button>
+                  ) : null}
+                </nav>
               </div>
             ) : null}
           </div>

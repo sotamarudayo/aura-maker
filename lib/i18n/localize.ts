@@ -151,10 +151,31 @@ function personalizeCatchCopyEn(catchCopy: string, topWords: string[]): string {
   return `Led by "${topWords[0]}" with "${topWords[1]}" & "${topWords[2]}" — ${catchCopy}`;
 }
 
-function confidenceLabelEn(confidence: DynamicAuraProfile["confidence"]): string {
-  if (confidence === "provisional") return "Draft result";
-  if (confidence === "growing") return "Still evolving";
-  return "Locked in";
+function confidenceLabelEn(
+  confidence: DynamicAuraProfile["confidence"],
+  observationCount: number,
+): string {
+  if (confidence === "provisional") {
+    return observationCount === 0
+      ? "Observation trust: draft (awaiting votes)"
+      : `Observation trust: draft (${observationCount} votes — ${3 - observationCount} more to leave draft)`;
+  }
+  if (confidence === "growing") {
+    return `Observation trust: growing (${observationCount} votes — ${10 - observationCount} more to stabilize)`;
+  }
+  return `Observation trust: stable (${observationCount} votes from friend observations)`;
+}
+
+function shareLineEn(archetype: string, observationCount: number): string {
+  const proof =
+    observationCount > 0
+      ? `${observationCount} friend-word observations / not a self-test`
+      : "Decided by friend votes, not self-report";
+  return [
+    `My friend-view aura is ${archetype} on AuraMaker 🔮`,
+    proof,
+    "See the you you don't know yet. #AuraMaker",
+  ].join("\n");
 }
 
 export function localizeDynamicProfile(
@@ -184,9 +205,9 @@ export function localizeDynamicProfile(
     shadowText: enAura?.shadow ?? profile.shadowText,
     ecology: enAura?.ecology ?? profile.ecology,
     specialMove: enAura?.specialMove(topWords) ?? profile.specialMove,
-    shareLine: `My friend-view aura is ${archetype} on AuraMaker 🔮\nSee the you you don't know yet. #AuraMaker`,
+    shareLine: shareLineEn(archetype, profile.observationCount),
     dailyFortune: enAura?.fortune ?? profile.dailyFortune,
-    confidenceLabel: confidenceLabelEn(profile.confidence),
+    confidenceLabel: confidenceLabelEn(profile.confidence, profile.observationCount),
     evidence: profile.evidence.map((item) => ({
       ...item,
       word: getLocalizedWordLabel(item.word, locale),

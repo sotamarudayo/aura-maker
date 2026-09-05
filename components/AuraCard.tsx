@@ -302,6 +302,25 @@ export default function AuraCard({
       ? profile.evidence.slice(0, 3).map((item) => item.word)
       : topWords.slice(0, 3);
 
+  const deciderWords = (
+    profile.evidence.length > 0
+      ? (() => {
+          const tagged = profile.evidence
+            .filter(
+              (item) =>
+                item.badge === "決め手" ||
+                item.badge === "Decider" ||
+                item.badge === "最多" ||
+                item.badge === "Top pick",
+            )
+            .map((item) => item.word);
+          return tagged.length > 0
+            ? tagged
+            : profile.evidence.map((item) => item.word);
+        })()
+      : topWords
+  ).slice(0, 2);
+
   const oneLineCatch = aura.catchCopy || catchCopy;
   const lineage = getAuraLineage(aura.id);
 
@@ -441,6 +460,28 @@ export default function AuraCard({
             )}
           </p>
 
+          <div className="mt-4 w-full max-w-md rounded-2xl border border-white/20 bg-black/55 px-3.5 py-3 text-left backdrop-blur-sm">
+            <p className="text-[11px] font-bold tracking-wide text-white/55">
+              {t.aura.observationTrust}
+            </p>
+            <p className="mt-1 text-sm font-semibold leading-snug text-white/90">
+              {profile.confidenceLabel}
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-white/70">
+              {profile.observationCount > 0
+                ? t.aura.whyResult.replace("{count}", String(profile.observationCount))
+                : t.aura.whyResultEmpty}
+            </p>
+            {deciderWords.length > 0 ? (
+              <p className="mt-1.5 text-xs font-semibold leading-relaxed text-cyan-100/90">
+                {t.aura.whyResultDeciders.replace(
+                  "{words}",
+                  deciderWords.map((word) => quoteWrap(word, locale)).join(locale === "en" ? ", " : "・"),
+                )}
+              </p>
+            ) : null}
+          </div>
+
           <div className="mt-4 flex max-w-full flex-wrap justify-center gap-2">
             {(heroTags.length > 0 ? heroTags : [t.aura.awaitingVotes]).map((word) => (
               <span
@@ -512,7 +553,7 @@ export default function AuraCard({
           } as CSSProperties
         }
       >
-        {profile.confidence !== "stable" ? (
+        {profile.confidenceLabel ? (
           <p className="text-xs text-white/55">{profile.confidenceLabel}</p>
         ) : null}
 
