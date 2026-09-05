@@ -7,6 +7,10 @@ export type SeoCopy = {
   homeDescription: string;
   aurasTitle: string;
   aurasDescription: string;
+  blogTitle: string;
+  blogDescription: string;
+  faqTitle: string;
+  faqDescription: string;
   ogImageAlt: string;
   keywords: string[];
   jsonLdDescription: string;
@@ -22,6 +26,12 @@ const SEO_JA: SeoCopy = {
   aurasTitle: "オーラ図鑑",
   aurasDescription:
     "AuraMakerの全22種類のオーラタイプ一覧。友達の印象ワードから決まる、他人から見たタイプ診断の図鑑。",
+  blogTitle: "ブログ",
+  blogDescription:
+    "MBTIと友達目線のズレ、カオス系オーラの生態、投票リンクの送り方など、AuraMakerの攻略記事まとめ。",
+  faqTitle: "よくある質問",
+  faqDescription:
+    "AuraMakerとは？MBTIとの違い、匿名投票、所要時間、無料かどうかなど、初めての方向けFAQ。",
   ogImageAlt: "AuraMaker | 友達から見た自分のオーラがわかる",
   keywords: [
     "オーラ診断",
@@ -46,6 +56,12 @@ const SEO_EN: SeoCopy = {
   aurasTitle: "Aura Dex — All 22 Personality Auras",
   aurasDescription:
     "Browse every aura type in AuraMaker. A personality read built from how friends describe you — Common to Secret rarity.",
+  blogTitle: "Blog",
+  blogDescription:
+    "Guides on friend-view aura diagnosis, MBTI gaps, chaos auras, and how to share your vote link.",
+  faqTitle: "FAQ",
+  faqDescription:
+    "What is AuraMaker? How it differs from MBTI, anonymity, time required, pricing, and more.",
   ogImageAlt: "AuraMaker — personality aura quiz from friends' impressions",
   keywords: [
     "aura personality test",

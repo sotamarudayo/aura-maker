@@ -91,6 +91,20 @@ export default function Header() {
             <span className="sm:hidden">📖 {t.header.encyclopedia}</span>
             <span className="hidden sm:inline">📖 {t.header.encyclopediaFull}</span>
           </Link>
+          <Link
+            href="/blog"
+            className="whitespace-nowrap rounded-full px-2 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 sm:px-3 sm:text-sm"
+          >
+            <span className="sm:hidden">{t.header.blog}</span>
+            <span className="hidden sm:inline">{t.header.blogFull}</span>
+          </Link>
+          <Link
+            href="/faq"
+            className="whitespace-nowrap rounded-full px-2 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/10 sm:px-3 sm:text-sm"
+          >
+            <span className="sm:hidden">{t.header.faq}</span>
+            <span className="hidden sm:inline">{t.header.faqFull}</span>
+          </Link>
 
           {auth.status === "loading" ? (
             <span className="h-7 w-16 shrink-0 rounded-full bg-white/10" aria-hidden />

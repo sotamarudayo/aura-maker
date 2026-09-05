@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+import { AURA_TYPES } from "@/lib/constants/auras";
+import { getAllBlogPosts } from "@/lib/blog/posts";
 
 function getBaseUrl() {
   return (
@@ -10,6 +12,7 @@ function getBaseUrl() {
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getBaseUrl();
   const now = new Date();
+  const posts = getAllBlogPosts();
 
   return [
     {
@@ -24,11 +27,35 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    ...AURA_TYPES.map((aura) => ({
+      url: `${baseUrl}/auras/${aura.id}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    ...posts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    })),
+    {
+      url: `${baseUrl}/faq`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
     {
       url: `${baseUrl}/login`,
       lastModified: now,
       changeFrequency: "monthly",
-      priority: 0.5,
+      priority: 0.4,
     },
   ];
 }

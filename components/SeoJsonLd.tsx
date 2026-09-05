@@ -20,11 +20,6 @@ export default function SeoJsonLd({ locale }: SeoJsonLdProps) {
         name: "AuraMaker",
         description: seo.jsonLdDescription,
         inLanguage: ["ja", "en"],
-        potentialAction: {
-          "@type": "SearchAction",
-          target: `${siteUrl}/auras`,
-          "query-input": "required name=search_term_string",
-        },
       },
       {
         "@type": "WebApplication",
