@@ -50,27 +50,6 @@ export default function HomeContent({ stats }: HomeContentProps) {
       <AuraBackground />
 
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl space-y-12 sm:space-y-16">
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/dashboard"
-            className="rounded-full border border-violet-300/50 bg-violet-500/20 px-5 py-2.5 text-sm font-semibold text-violet-100 transition hover:bg-violet-500/30"
-          >
-            {t.landing.myAura}
-          </Link>
-          <Link
-            href="/auras"
-            className="rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
-          >
-            {t.landing.viewEncyclopedia}
-          </Link>
-          <Link
-            href="/blog"
-            className="rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
-          >
-            {t.header.blog}
-          </Link>
-        </div>
-
         <section className="rounded-3xl border border-white/20 bg-black/35 p-5 backdrop-blur sm:p-8 md:p-10">
           <p className="font-display text-2xl text-violet-200 sm:text-3xl">AuraMaker</p>
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
@@ -96,6 +75,10 @@ export default function HomeContent({ stats }: HomeContentProps) {
               {t.landing.proofNote}
             </span>
           </div>
+
+          <p className="mt-5 text-sm font-semibold leading-relaxed text-white/80 sm:text-base">
+            {t.landing.flow}
+          </p>
 
           {exampleAura ? (
             <div
@@ -181,7 +164,6 @@ export default function HomeContent({ stats }: HomeContentProps) {
                 </span>
               ))}
             </div>
-            <p className="mt-4 text-sm text-white/55">{t.landing.flow}</p>
           </div>
         </section>
 

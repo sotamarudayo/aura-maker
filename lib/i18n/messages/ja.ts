@@ -19,6 +19,7 @@ export const jaMessages = {
     guest: "ゲスト",
     login: "ログイン",
     logout: "ログアウト",
+    menu: "メニュー",
   },
   landing: {
     myAura: "マイオーラ / ダッシュボード",

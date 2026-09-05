@@ -21,6 +21,7 @@ export const enMessages: Messages = {
     guest: "Guest",
     login: "Log in",
     logout: "Log out",
+    menu: "Menu",
   },
   landing: {
     myAura: "My Aura / Dashboard",

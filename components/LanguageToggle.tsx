@@ -12,19 +12,21 @@ export default function LanguageToggle() {
   }
 
   const targetLabel = locale === "ja" ? t.lang.switchToEn : t.lang.switchToJa;
+  const shortLabel = locale === "ja" ? "EN" : "JA";
 
   return (
     <button
       type="button"
       onClick={toggle}
-      className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[10px] font-bold text-white/90 transition hover:border-violet-200/40 hover:bg-white/15 sm:gap-1.5 sm:px-3 sm:text-xs"
+      className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-white/25 bg-white/10 px-2 py-1 text-[10px] font-bold text-white/90 transition hover:border-violet-200/40 hover:bg-white/15 sm:gap-1.5 sm:px-3 sm:text-xs"
       aria-label={locale === "ja" ? "Switch to English" : "日本語に切り替え"}
       title={targetLabel}
     >
       <span aria-hidden className="text-[11px] sm:text-xs">
         🌐
       </span>
-      <span>{targetLabel}</span>
+      <span className="sm:hidden">{shortLabel}</span>
+      <span className="hidden sm:inline">{targetLabel}</span>
     </button>
   );
 }
