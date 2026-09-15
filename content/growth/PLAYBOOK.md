@@ -33,6 +33,10 @@ https://auramaker.net
 2. リンクスタンプに投票 URL or auramaker.net
 3. 「匿名・10秒で投票して」＋テンプレ（`/blog/instagram-vote-templates`）
 
+### TikTok（初期認知）
+
+詳細は [`TIKTOK.md`](./TIKTOK.md)。型A/B・CapCut手順・投稿設定・AI共有プロンプト・1週間テストまで。
+
 ## 3. Search Console
 
 1. 本番デプロイ後に `https://auramaker.net/sitemap.xml` を再送信
