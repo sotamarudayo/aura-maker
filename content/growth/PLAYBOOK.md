@@ -60,3 +60,11 @@ https://auramaker.net
 ## 6. やらないこと
 
 - メール・プッシュなど外向き通知（うるさいので禁止）
+- 結果判定への生成AI導入（費用・遅延のため。必要なら説明のみ・後出し）
+
+## 7. インフラ（レイテンシ）
+
+- Vercel Functions は `vercel.json` で **Tokyo (`hnd1`)** に固定
+- Supabase も Project Settings → Infrastructure で **Northeast Asia (Tokyo)** か確認。米国のままだと DB 往復がまだ遠いまま
+- デプロイ後、レスポンスヘッダ `X-Vercel-Id` が `…::hnd1::…` になっていれば OK（以前は `iad1` = 米国東部）
+
