@@ -1,9 +1,14 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { GA_MEASUREMENT_ID, isGaEnabled, trackPageView } from "@/lib/analytics";
+import {
+  GA_MEASUREMENT_ID,
+  isGaEnabled,
+  syncGaOptOutFromUrl,
+  trackPageView,
+} from "@/lib/analytics";
 
 function GoogleAnalyticsPageViews() {
   const pathname = usePathname();
@@ -26,7 +31,16 @@ function GoogleAnalyticsPageViews() {
 }
 
 export default function GoogleAnalytics() {
-  if (!isGaEnabled()) return null;
+  const [ready, setReady] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    syncGaOptOutFromUrl();
+    setEnabled(isGaEnabled());
+    setReady(true);
+  }, []);
+
+  if (!ready || !enabled) return null;
 
   return (
     <>
